@@ -8,7 +8,10 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AppHeader: typeof import('./src/components/AppHeader.vue')['default']
-    ModalWrap: typeof import('./src/components/ui/ModalWrap.vue')['default']
+    ForgotPwForm: typeof import('./src/components/form/ForgotPwForm.vue')['default']
+    LoginForm: typeof import('./src/components/form/LoginForm.vue')['default']
+    ModalWrap: typeof import('./src/components/ModalWrap.vue')['default']
+    OrgotPwForm: typeof import('./src/components/form/orgotPwForm.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }
