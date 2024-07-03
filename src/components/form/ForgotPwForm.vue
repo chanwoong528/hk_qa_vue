@@ -16,6 +16,13 @@ const rules = {
 };
 
 const v$ = useVuelidate(rules, state);
+
+const emit = defineEmits(["userEmail"]);
+
+const handleSubmitEmail = () => {
+  // $emit("userEmail", state.email);
+  emit("userEmail", state.email);
+};
 </script>
 
 <template>
@@ -28,6 +35,15 @@ const v$ = useVuelidate(rules, state);
       @blur="v$.email.$touch"
       @input="v$.email.$touch"
     ></v-text-field>
-    <v-btn class="me-4" @click="v$.$validate">Send Verification Email</v-btn>
+    <v-btn
+      class="me-4"
+      @click="
+        () => {
+          v$.$validate();
+          handleSubmitEmail();
+        }
+      "
+      >Send Verification Email</v-btn
+    >
   </form>
 </template>

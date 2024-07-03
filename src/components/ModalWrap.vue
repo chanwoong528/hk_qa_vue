@@ -6,7 +6,6 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits(["toggle-dialog"]);
-
 const isOpen = computed(() => props.dialog);
 </script>
 

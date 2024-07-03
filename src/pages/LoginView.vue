@@ -1,20 +1,28 @@
 <script setup lang="ts">
-import ModalWrap from "@/components/ModalWrap.vue";
-import ForgotPwForm from "@/components/form/ForgotPwForm.vue";
 import { ref } from "vue";
+
+import ForgotPwForm from "@/components/form/ForgotPwForm.vue";
+import ModalWrap from "@/components/ModalWrap.vue";
 
 const pwVisible = ref(false);
 const isDialogOpen = ref<boolean>(false);
 
 const toggleDialog = () => {
   isDialogOpen.value = !isDialogOpen.value;
-  console.log(isDialogOpen.value);
+};
+
+const handleForgotPw = (email: string) => {
+  console.log("Forgot password", email);
+
+  if (!email) return;
+
+  return toggleDialog();
 };
 </script>
 
 <template>
   <ModalWrap :dialog="isDialogOpen" @toggle-dialog="toggleDialog">
-    <ForgotPwForm />
+    <ForgotPwForm @userEmail="handleForgotPw" />
   </ModalWrap>
   <div>
     <v-card
