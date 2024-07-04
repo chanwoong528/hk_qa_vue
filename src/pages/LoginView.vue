@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { reactive, ref } from "vue";
-import ForgotPwForm from "@/components/form/ForgotPwForm.vue";
-import ModalWrap from "@/components/ModalWrap.vue";
 import { authApi } from "@/services/domain/authService";
 import { useUserStore } from "@/store/userStore";
+
+import ForgotPwForm from "@/components/form/ForgotPwForm.vue";
+import ModalWrap from "@/components/ModalWrap.vue";
 
 import { IUserInfo } from "@/types/types";
 

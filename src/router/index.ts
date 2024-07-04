@@ -5,13 +5,28 @@ import AboutView from "@/pages/AboutView.vue";
 import LoginView from "@/pages/LoginView.vue";
 
 // Composables
-export const routes = [
-  { path: "/", component: HomeView, label: "Home" },
-  { path: "/about", component: AboutView, label: "About" },
-  { path: "/login", component: LoginView, label: "Login" },
+export const NAV_LIST = [
+  {
+    path: "/",
+    component: HomeView,
+    label: "Home",
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/about",
+    component: AboutView,
+    label: "About",
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/login",
+    component: LoginView,
+    label: "Login",
+    meta: { requiresAuth: false },
+  },
 ];
 
 export const router = createRouter({
   history: createMemoryHistory(),
-  routes,
+  routes: NAV_LIST,
 });
