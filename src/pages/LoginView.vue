@@ -1,27 +1,50 @@
 <script setup lang="ts">
-import { ref } from "vue";
-
+import { reactive, ref } from "vue";
 import ForgotPwForm from "@/components/form/ForgotPwForm.vue";
 import ModalWrap from "@/components/ModalWrap.vue";
+import { authApi } from "@/services/domain/authService";
+import { useUserStore } from "@/store/userStore";
 
-const pwVisible = ref(false);
+import { IUserInfo } from "@/types/types";
+
+const store = useUserStore();
+const { setUser } = store;
+
+const pwVisible = ref<boolean>(false);
 const isDialogOpen = ref<boolean>(false);
+
+const loginInfo = reactive({
+  email: "",
+  pw: "",
+});
 
 const toggleDialog = () => {
   isDialogOpen.value = !isDialogOpen.value;
 };
 
-const handleForgotPw = (email: string) => {
-  console.log("Forgot password", email);
+const handleForgotPw = (errors: Object, email: String, closeFlag?: boolean) => {
+  if (!!closeFlag) {
+    return toggleDialog();
+  }
 
-  if (!email) return;
+  if (!errors) {
+    console.log("Forgot pw no error", email);
+    //TODO: api call forget pw -> send verfication email
+  }
+};
 
-  return toggleDialog();
+const handleLogin = () => {
+  authApi
+    .POST_login(loginInfo)
+    .then((res) => setUser(res as IUserInfo))
+    .catch((err) => {
+      console.log("err[handleLogin]:  ", err);
+    });
 };
 </script>
 
 <template>
-  <ModalWrap :dialog="isDialogOpen" @toggle-dialog="toggleDialog">
+  <ModalWrap v-model="isDialogOpen" title="Reset Password">
     <ForgotPwForm @userEmail="handleForgotPw" />
   </ModalWrap>
   <div>
@@ -38,6 +61,7 @@ const handleForgotPw = (email: string) => {
         placeholder="Email address"
         prepend-inner-icon="mdi-email-outline"
         variant="outlined"
+        @input="loginInfo.email = $event.target.value"
       />
       <div
         class="text-subtitle-1 text-medium-emphasis d-flex align-center justify-space-between"
@@ -60,9 +84,17 @@ const handleForgotPw = (email: string) => {
         prepend-inner-icon="mdi-lock-outline"
         variant="outlined"
         @click:append-inner="pwVisible = !pwVisible"
+        @input="loginInfo.pw = $event.target.value"
       ></v-text-field>
 
-      <v-btn class="mb-8" color="blue" size="large" variant="tonal" block>
+      <v-btn
+        class="mb-8"
+        color="blue"
+        size="large"
+        variant="tonal"
+        block
+        @click="handleLogin"
+      >
         Log In
       </v-btn>
     </v-card>

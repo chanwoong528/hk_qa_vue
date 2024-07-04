@@ -19,14 +19,18 @@ const v$ = useVuelidate(rules, state);
 
 const emit = defineEmits(["userEmail"]);
 
-const handleSubmitEmail = () => {
-  // $emit("userEmail", state.email);
-  emit("userEmail", state.email);
+const handleSubmitEmail = (closeFlag?: boolean) => {
+  emit(
+    "userEmail",
+    v$.value.$errors.map((e) => e.$message).join(", "),
+    state.email,
+    closeFlag
+  );
 };
 </script>
 
 <template>
-  <form>
+  <form @submit.prevent="">
     <v-text-field
       v-model="state.email"
       :error-messages="v$.email.$errors.map((e) => e.$message).join(', ')"
@@ -37,13 +41,25 @@ const handleSubmitEmail = () => {
     ></v-text-field>
     <v-btn
       class="me-4"
+      type="submit"
+      variant="outlined"
+      color="primary"
       @click="
-        () => {
+        {
           v$.$validate();
           handleSubmitEmail();
         }
       "
-      >Send Verification Email</v-btn
     >
+      Send Verification Email
+    </v-btn>
+    <v-btn
+      type="close"
+      @click="handleSubmitEmail(true)"
+      variant="outlined"
+      color="error"
+    >
+      close
+    </v-btn>
   </form>
 </template>
