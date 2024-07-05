@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import SideHeader from "@/components/SideHeader.vue";
+// import AppHeader from "@/components/AppHeader.vue";
 </script>
 <template>
   <main>
-    <SideHeader />
+    <!-- <AppHeader /> -->
     <slot></slot>
   </main>
 </template>

@@ -60,6 +60,7 @@ export const ExceptionWrapper = async <T>(callback: Function): Promise<T | INetw
     return await callback();
   } catch (error) {
     if (axios.isAxiosError(error)) throw error.response?.data;
+    
 
     throw new Error('different error than axios' + error);
   }
