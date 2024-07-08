@@ -1,11 +1,24 @@
 import { createWebHistory, createRouter } from "vue-router";
 
 import HomeView from "@/pages/HomeView.vue";
-import AboutView from "@/pages/AboutView.vue";
 import LoginView from "@/pages/LoginView.vue";
+import UsersView from "@/pages/UsersView.vue";
+import type { Component } from "vue";
+
+interface NavItem {
+  path: string;
+  component: Component,
+  label: string;
+  meta: {
+    requiresAuth?: boolean
+    requiresAdmin?: boolean,
+    requiresMaster?: boolean,
+  },
+}
+
 
 // Composables
-export const NAV_LIST = [
+export const NAV_LIST: NavItem[] = [
   {
     path: "/",
     component: HomeView,
@@ -13,10 +26,13 @@ export const NAV_LIST = [
     meta: { requiresAuth: true },
   },
   {
-    path: "/about",
-    component: AboutView,
-    label: "About",
-    meta: { requiresAuth: true },
+    path: "/user",
+    component: UsersView,
+    label: "Users",
+    meta: {
+      requiresAuth: true,
+      requiresMaster: true
+    },
   },
   {
     path: "/login",
