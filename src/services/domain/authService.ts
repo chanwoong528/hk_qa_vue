@@ -14,16 +14,16 @@ export const authApi = {
         pw: loginInfo.pw
       })
       const data = await apiResult.data
-
       localStorage.setItem("accessToken", data.access_token)
+
       return data;
     })
   },
   GET_loginCheck: (): Promise<IUserInfo | INetworkException> => {
     return ExceptionWrapper(async () => {
-      const accToken = localStorage.getItem("accessToken")
-      const apiResult = await http.get("/auth", { headers: { Authorization: `Bearer ${accToken}` } })
+      const apiResult = await http.get("/auth")
       const data = await apiResult.data
+
       return data;
     })
   }

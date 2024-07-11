@@ -5,24 +5,25 @@ import { ref } from "vue";
 import { onMounted } from "vue";
 import { userApi } from "@/services/domain/userService";
 import { IUserInfo } from "@/types/types";
+import { E_Role } from "@/types/enum";
 
 const userList = ref<IUserInfo[]>([]);
 
 onMounted(() => {
   userApi.GET_users().then((usersData) => {
-    console.log("usersData: ", usersData);
     userList.value = usersData as IUserInfo[];
   });
 });
+
+const onChangeSelectRole = (id: string, role: E_Role) => {
+  console.log("onChangeSelectRole", id, role);
+  userApi.PATCH_user({ id: id, role: role });
+};
 </script>
 
 <template>
   <DefaultLayout>
-    <div class="main">
-      <h1>userPage</h1>
-      <p>aaa</p>
-    </div>
-    <UserList :userList="userList" />
+    <UserList :userList="userList" @onChangeSelectRole="onChangeSelectRole" />
   </DefaultLayout>
 </template>
 
