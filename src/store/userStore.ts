@@ -1,5 +1,5 @@
-import { IUserInfo } from "@/types/types";
 import { defineStore } from "pinia";
+import { IUserInfo } from "@/types/types";
 
 interface UserStoreState {
   user: IUserInfo | undefined;

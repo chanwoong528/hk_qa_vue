@@ -16,7 +16,6 @@ onMounted(() => {
 });
 
 const onChangeSelectRole = (id: string, role: E_Role) => {
-  console.log("onChangeSelectRole", id, role);
   userApi.PATCH_user({ id: id, role: role });
 };
 </script>

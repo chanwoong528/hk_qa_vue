@@ -27,6 +27,26 @@ export interface ISwType {
   user: IUserInfo
 }
 
+export interface ISwVersion {
+  swVersionId: string;
+  versionTitle: string;
+  versionDesc: string;
+  fileSrc: string;
+  tag: string;
+  createdAt: string;
+
+  user: IUserInfo;
+  swType: ISwType;
+  testSessions: ITestSession[];
+}
+
+export interface ITestSession {
+  sessionId: string
+  status: string
+  createdAt: string
+  updatedAt: string
+  finishedAt?: string
+}
 
 
 export interface INetworkException {

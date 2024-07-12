@@ -17,6 +17,7 @@ declare module 'vue' {
     RouterView: typeof import('vue-router')['RouterView']
     SideHeader: typeof import('./src/components/SideHeader.vue')['default']
     SwList: typeof import('./src/components/list/SwList.vue')['default']
+    SwVersionList: typeof import('./src/components/list/SwVersionList.vue')['default']
     UserList: typeof import('./src/components/list/UserList.vue')['default']
   }
 }

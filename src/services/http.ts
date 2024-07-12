@@ -4,25 +4,24 @@ import type { INetworkException } from "@/types/types";
 
 const DEV_BASE_RESTAPI = "http://localhost:3000";
 
-const accessToken = localStorage.getItem("accessToken");
+
 
 export const http = axios.create({
   baseURL: DEV_BASE_RESTAPI,
   headers: {
     "Content-Type": "application/json",
-    Authorization: `Bearer ${accessToken}`
   },
   withCredentials: true,
 });
 
-// http.interceptors.request.use((config) => {
-//   if (localStorage.getItem("accessToken")) {
-//     let accessToken = localStorage.getItem("accessToken");
+http.interceptors.request.use((config) => {
+  if (localStorage.getItem("accessToken")) {
+    let accessToken = localStorage.getItem("accessToken");
 
-//     config.headers["authorization"] = `Bearer ${accessToken}`;
-//   }
-//   return config;
-// });
+    config.headers["authorization"] = `Bearer ${accessToken}`;
+  }
+  return config;
+});
 
 // http.interceptors.response.use(
 //   async (response) => {
