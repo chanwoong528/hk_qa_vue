@@ -11,7 +11,7 @@ import { useSwStore } from "@/store/swStore";
 import { ISwType } from "@/types/types";
 
 const store = useUserStore();
-const { user } = storeToRefs(store);
+const { loggedInUser } = storeToRefs(store);
 const swStore = useSwStore();
 const { swTypes } = storeToRefs(swStore);
 
@@ -25,14 +25,14 @@ onMounted(() => {
 });
 
 const computedNavList = computed(() => {
-  if (!user) return NAV_LIST;
+  if (!loggedInUser) return NAV_LIST;
 
-  if (user.value?.role === E_Role.master) return NAV_LIST;
+  if (loggedInUser.value?.role === E_Role.master) return NAV_LIST;
 
-  if (user.value?.role === E_Role.admin)
+  if (loggedInUser.value?.role === E_Role.admin)
     return NAV_LIST.filter((navItem) => !navItem.meta.requiresMaster);
 
-  if (user.value?.role === E_Role.tester)
+  if (loggedInUser.value?.role === E_Role.tester)
     return NAV_LIST.filter(
       (navItem) => !navItem.meta.requiresAdmin || !navItem.meta.requiresMaster
     );
@@ -42,8 +42,8 @@ const computedNavList = computed(() => {
 <template>
   <v-navigation-drawer permanent>
     <v-list v-model:opened="openGroups">
-      <v-list-item title="HK QA TEST" :subtitle="user?.username">
-        <p>{{ user?.role }}</p>
+      <v-list-item title="HK QA TEST" :subtitle="loggedInUser?.username">
+        <p>{{ loggedInUser?.role }}</p>
       </v-list-item>
       <v-divider></v-divider>
       <template v-for="navItem in computedNavList" x>

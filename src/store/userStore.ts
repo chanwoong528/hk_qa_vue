@@ -2,24 +2,24 @@ import { defineStore } from "pinia";
 import { IUserInfo } from "@/types/types";
 
 interface UserStoreState {
-  user: IUserInfo | undefined;
+  loggedInUser: IUserInfo | undefined;
   isLoggedIn: boolean;
 }
 
 export const useUserStore = defineStore("user", {
   state: (): UserStoreState => {
     return {
-      user: undefined || ({} as IUserInfo) || undefined,
+      loggedInUser: undefined || ({} as IUserInfo) || undefined,
       isLoggedIn: true,
     };
   },
   actions: {
     setUser(user: IUserInfo) {
-      this.user = user;
+      this.loggedInUser = user;
       this.isLoggedIn = true;
     },
     setResetUser() {
-      this.user = undefined;
+      this.loggedInUser = undefined;
       this.isLoggedIn = false;
     },
   },

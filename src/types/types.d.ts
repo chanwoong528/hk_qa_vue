@@ -46,6 +46,7 @@ export interface ITestSession {
   createdAt: string
   updatedAt: string
   finishedAt?: string
+  user: IUserInfo
 }
 
 

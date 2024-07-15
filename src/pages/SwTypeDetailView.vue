@@ -4,6 +4,8 @@ import { ISwVersion } from "@/types/types";
 import { ref, watch, onMounted } from "vue";
 import { useRoute } from "vue-router";
 
+import SwVersionList from "@/components/list/SwVersionList.vue";
+
 const route = useRoute();
 const swVersionList = ref<ISwVersion[]>([]);
 
@@ -27,9 +29,8 @@ watch(
 </script>
 
 <template>
-  <div>User {{ $route.params.id }}</div>
-
-  <div>User {{ swVersionList[0] }}</div>
+  <div>{{ swVersionList[0] }}</div>
+  <SwVersionList :swVersionList="swVersionList" />
 </template>
 
 <style scoped></style>
