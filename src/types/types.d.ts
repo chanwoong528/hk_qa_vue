@@ -1,3 +1,5 @@
+import { E_TestStatus } from "./enum";
+
 export interface ILoginInfo {
   email: string;
   pw: string;
@@ -42,7 +44,7 @@ export interface ISwVersion {
 
 export interface ITestSession {
   sessionId: string
-  status: string
+  status: E_TestStatus
   createdAt: string
   updatedAt: string
   finishedAt?: string

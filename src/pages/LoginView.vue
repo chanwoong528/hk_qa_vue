@@ -26,7 +26,7 @@ const handleForgotPw = (errors: Object, email: String, closeFlag?: boolean) => {
     return toggleDialog();
   }
   if (!errors) {
-    console.log("Forgot pw no error", email);
+    // console.log("Forgot pw no error", email);
     //TODO: api call forget pw -> send verfication email
   }
 };

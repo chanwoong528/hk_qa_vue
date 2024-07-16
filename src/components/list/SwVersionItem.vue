@@ -1,8 +1,9 @@
 <script setup lang="ts">
+import { computed } from "vue";
 import { useUserStore } from "@/store/userStore";
 import { storeToRefs } from "pinia";
 
-import { E_TestStatus } from "@/types/enum.d";
+import { E_Role, E_SwVersionModalType, E_TestStatus } from "@/types/enum.d";
 import type { ISwVersion, ITestSession } from "@/types/types.d";
 
 const store = useUserStore();
@@ -15,16 +16,19 @@ const props = defineProps({
   toggleModal: Function,
 });
 
-const emit = defineEmits(["onClickTester"]);
+const emit = defineEmits(["onClickTester", "onClickAddTester"]);
 
-const testSessionsPassStatus =
-  props.swVersion?.testSessions &&
-  props.swVersion?.testSessions.length > 0 &&
-  !props.swVersion?.testSessions.some(
-    (tester) =>
-      tester.status === E_TestStatus.failed ||
-      tester.status === E_TestStatus.pending
+const testSessionsPassStatus = computed(() => {
+  return (
+    props.swVersion?.testSessions &&
+    props.swVersion?.testSessions.length > 0 &&
+    !props.swVersion?.testSessions.some(
+      (tester) =>
+        tester.status === E_TestStatus.failed ||
+        tester.status === E_TestStatus.pending
+    )
   );
+});
 
 const renderTestStatus = (type: E_TestStatus) => {
   switch (type) {
@@ -39,14 +43,17 @@ const renderTestStatus = (type: E_TestStatus) => {
 
 const onClickLoggedInUserStatus = (tester: ITestSession) => {
   if (tester.user.id === loggedInUser.value?.id) {
-    console.log("open modal");
-    // emit("toggleDialog", testerId, loggedInUser.value?.id);
-    console.log(props.toggleModal);
-
-    if (props.toggleModal) {
+    if (!!props.toggleModal) {
       props.toggleModal();
       emit("onClickTester", tester, loggedInUser.value?.id);
     }
+  }
+};
+
+const onClickAddTester = () => {
+  if (!!props.toggleModal) {
+    props.toggleModal(E_SwVersionModalType.addTester);
+    emit("onClickAddTester");
   }
 };
 </script>
@@ -67,29 +74,35 @@ const onClickLoggedInUserStatus = (tester: ITestSession) => {
       <p>
         {{ props.swVersion?.versionDesc }}
       </p>
-      <div
-        v-if="
-          !!props.swVersion?.testSessions &&
-          props.swVersion?.testSessions.length > 0
-        "
-      >
-        <v-chip
-          v-for="tester in props.swVersion?.testSessions"
-          :class="tester.user.id === loggedInUser?.id ? ' on' : ''"
-          class="mr-2 mb-2"
-          label
-          :color="renderTestStatus(tester.status as E_TestStatus)"
-          @click="onClickLoggedInUserStatus(tester)"
+      <v-container>
+        <div
+          v-if="
+            !!props.swVersion?.testSessions &&
+            props.swVersion?.testSessions.length > 0
+          "
         >
-          <v-icon icon="mdi-account-circle-outline" start></v-icon>
-          {{
-            tester.user.id === loggedInUser?.id ? "me" : tester.user.username
-          }}
-        </v-chip>
-      </div>
-      <div v-else>
-        <p>no tester registered</p>
-      </div>
+          <v-chip
+            v-for="tester in props.swVersion?.testSessions"
+            :class="tester.user.id === loggedInUser?.id ? ' on' : ''"
+            class="mr-2 mb-2"
+            :variant="tester.user.id === loggedInUser?.id ? 'flat' : 'outlined'"
+            label
+            :color="renderTestStatus(tester.status as E_TestStatus)"
+            @click="onClickLoggedInUserStatus(tester)"
+          >
+            <v-icon icon="mdi-account-circle-outline" start></v-icon>
+            {{
+              tester.user.id === loggedInUser?.id ? "me" : tester.user.username
+            }}
+          </v-chip>
+        </div>
+        <div v-else>
+          <p>no tester registered</p>
+        </div>
+        <div v-if="loggedInUser?.role !== E_Role.tester">
+          <v-btn @click="onClickAddTester">add tester</v-btn>
+        </div>
+      </v-container>
     </v-expansion-panel-text>
   </v-expansion-panel>
 </template>

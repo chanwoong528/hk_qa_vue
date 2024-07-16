@@ -18,10 +18,9 @@ const { swTypes } = storeToRefs(swStore);
 const openGroups = ref<string[]>([]);
 
 onMounted(() => {
-  swApi.GET_sw().then((swListRes) => {
-    console.log(swListRes);
-    swStore.setSwTypes(swListRes as ISwType[]);
-  });
+  swApi
+    .GET_sw()
+    .then((swListRes) => swStore.setSwTypes(swListRes as ISwType[]));
 });
 
 const computedNavList = computed(() => {

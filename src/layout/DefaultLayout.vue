@@ -2,10 +2,10 @@
 // import AppHeader from "@/components/AppHeader.vue";
 </script>
 <template>
-  <main class="main-layout">
+  <v-container>
     <!-- <AppHeader /> -->
     <slot></slot>
-  </main>
+  </v-container>
 </template>
 <style lang="scss" scoped>
 @import "./defaultLayout.scss";

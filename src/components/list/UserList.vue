@@ -1,12 +1,18 @@
 <script setup lang="ts">
-import { E_Role } from "@/types/enum.d";
+import { E_Role, E_UserListType } from "@/types/enum.d";
 import type { IUserInfo } from "@/types/types";
+import { PropType } from "vue";
+
 import { ref } from "vue";
 
 const props = defineProps({
   userList: {
     type: Array as () => IUserInfo[],
     required: true,
+  },
+  tableType: {
+    type: String as PropType<E_UserListType>,
+    required: false,
   },
 });
 

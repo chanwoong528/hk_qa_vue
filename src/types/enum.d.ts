@@ -9,3 +9,12 @@ export enum E_TestStatus {
   passed = 'passed',
   failed = 'failed',
 }
+export enum E_SwVersionModalType {
+  updateStatus = "updateStatus",
+  addTester = "addTester",
+}
+
+export enum E_UserListType  {
+  checkbox = "checkbox",
+  
+}

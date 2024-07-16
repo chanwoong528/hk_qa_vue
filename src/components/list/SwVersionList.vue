@@ -4,42 +4,62 @@ import type { ISwVersion, ITestSession } from "@/types/types";
 import SwVersionItem from "@/components/list/SwVersionItem.vue";
 import ModalWrap from "@/components/ModalWrap.vue";
 import TestStatusForm from "@/components/form/TestStatusForm.vue";
-
-const openModal = ref<boolean>(false);
-
-const selectedTestSession = reactive({
-  testStatus: "",
-});
+import { E_TestStatus, E_SwVersionModalType } from "@/types/enum.d";
 
 const props = defineProps({
   swVersionList: {
     type: Array as () => ISwVersion[],
   },
 });
-const toggleModal = () => {
-  openModal.value = !openModal.value;
+
+const emit = defineEmits(["onSubmitStatus"]);
+const openModalUpdateStatus = ref<boolean>(false);
+const openModalAddTester = ref<boolean>(false);
+
+const selectedTestSession = reactive<Partial<ITestSession>>({
+  sessionId: "",
+  status: E_TestStatus.pending,
+});
+
+const toggleModal = (type?: E_SwVersionModalType) => {
+  switch (type) {
+    case E_SwVersionModalType.addTester:
+      return (openModalAddTester.value = !openModalAddTester.value);
+    default:
+      return (openModalUpdateStatus.value = !openModalUpdateStatus.value);
+  }
 };
 
 const onSubmitStatus = () => {
-  console.log(selectedTestSession);
-  console.log("submitted");
-  //TODO:API call
+  emit("onSubmitStatus", selectedTestSession);
 };
 
 const onClickTester = (testerInfo: ITestSession, loggedInUserId: string) => {
-  console.log(testerInfo, loggedInUserId);
-  selectedTestSession.testStatus = testerInfo.status;
+  selectedTestSession.sessionId = testerInfo.sessionId;
+  selectedTestSession.status = testerInfo.status;
+};
+
+const onClickAddTester = () => {
+  console.log("clcickeD! ");
 };
 </script>
 
 <template>
   <ModalWrap
-    v-model="openModal"
+    v-model="openModalUpdateStatus"
     title="Change Status"
     haveBtnCtl
     @onSubmit="onSubmitStatus"
   >
     <TestStatusForm v-model="selectedTestSession" />
+  </ModalWrap>
+  <ModalWrap
+    v-model="openModalAddTester"
+    title="Add Tester"
+    haveBtnCtl
+    @onSubmit="onSubmitStatus"
+  >
+    tester
   </ModalWrap>
   <v-expansion-panels>
     <SwVersionItem
@@ -48,6 +68,7 @@ const onClickTester = (testerInfo: ITestSession, loggedInUserId: string) => {
       :swVersion="swVersion"
       :toggleModal="toggleModal"
       @onClickTester="onClickTester"
+      @onClickAddTester="onClickAddTester"
     />
   </v-expansion-panels>
 </template>
