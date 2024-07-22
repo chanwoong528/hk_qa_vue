@@ -7,6 +7,7 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
+    AddTesterForm: typeof import('./src/components/form/AddTesterForm.vue')['default']
     AppHeader: typeof import('./src/components/AppHeader.vue')['default']
     DefaultHeader: typeof import('./src/components/DefaultHeader.vue')['default']
     ForgotPwForm: typeof import('./src/components/form/ForgotPwForm.vue')['default']

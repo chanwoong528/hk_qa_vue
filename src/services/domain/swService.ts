@@ -1,9 +1,9 @@
 
-import type { INetworkException, ISwType, ISwVersion } from "@/types/types"
+import type { ISwType, ISwVersion } from "@/types/types"
 import { http, ExceptionWrapper } from "../http"
 
 export const swApi = {
-  GET_sw: (): Promise<ISwType[] | INetworkException> => {
+  GET_sw: (): Promise<ISwType[]> => {
     return ExceptionWrapper(async () => {
       const apiResult = await http.get("/sw-type")
 
@@ -15,7 +15,7 @@ export const swApi = {
 
 
 export const swVersionApi = {
-  GET_swVersionsBySwTypeId: (swTypeId: string): Promise<ISwVersion[] | INetworkException> => {
+  GET_swVersionsBySwTypeId: (swTypeId: string): Promise<ISwVersion[]> => {
     return ExceptionWrapper(async () => {
       const apiResult = await http.get(`/sw-version/${swTypeId}`)
       const data = await apiResult.data;

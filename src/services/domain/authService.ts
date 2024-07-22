@@ -1,13 +1,13 @@
 
 import { http, ExceptionWrapper } from "../http"
 
-import type { ILoginInfo, IUserInfo, INetworkException } from "@/types/types";
+import type { ILoginInfo, IUserInfo } from "@/types/types";
 
 
 
 
 export const authApi = {
-  POST_login: (loginInfo: ILoginInfo): Promise<IUserInfo | INetworkException> => {
+  POST_login: (loginInfo: ILoginInfo): Promise<IUserInfo> => {
     return ExceptionWrapper(async () => {
       const apiResult = await http.post("/auth", {
         email: loginInfo.email,
@@ -19,7 +19,7 @@ export const authApi = {
       return data;
     })
   },
-  GET_loginCheck: (): Promise<IUserInfo | INetworkException> => {
+  GET_loginCheck: (): Promise<IUserInfo> => {
     return ExceptionWrapper(async () => {
       const apiResult = await http.get("/auth")
       const data = await apiResult.data

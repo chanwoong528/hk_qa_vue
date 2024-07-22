@@ -57,6 +57,7 @@ const onSubmitStatus = (selectedTestSession: Partial<ITestSession>) => {
     <h3>Versions for {{ swTitle }}</h3>
     <SwVersionList
       :swVersionList="swVersionList"
+      :onFetchSwVersionList="onFetchSwVersionList"
       @onSubmitStatus="onSubmitStatus"
     />
   </DefaultLayout>

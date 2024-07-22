@@ -53,7 +53,7 @@ const onClickLoggedInUserStatus = (tester: ITestSession) => {
 const onClickAddTester = () => {
   if (!!props.toggleModal) {
     props.toggleModal(E_SwVersionModalType.addTester);
-    emit("onClickAddTester");
+    emit("onClickAddTester", props.swVersion?.swVersionId);
   }
 };
 </script>
@@ -100,7 +100,9 @@ const onClickAddTester = () => {
           <p>no tester registered</p>
         </div>
         <div v-if="loggedInUser?.role !== E_Role.tester">
-          <v-btn @click="onClickAddTester">add tester</v-btn>
+          <v-btn @click="onClickAddTester" class="text-none text-subtitle-1">
+            Modify TesterLists
+          </v-btn>
         </div>
       </v-container>
     </v-expansion-panel-text>

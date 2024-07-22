@@ -56,12 +56,11 @@ http.interceptors.request.use((config) => {
 
 
 
-export const ExceptionWrapper = async <T>(callback: Function): Promise<T | INetworkException> => {
+export const ExceptionWrapper = async <T>(callback: Function): Promise<T> => {
   try {
     return await callback();
   } catch (error) {
     if (axios.isAxiosError(error)) throw error.response?.data;
-
 
     throw new Error('different error than axios' + error);
   }

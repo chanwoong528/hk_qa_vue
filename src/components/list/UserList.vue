@@ -27,11 +27,37 @@ const headers = ref([
   { title: "Created Date ", key: "createdAt" },
   { title: "Role", key: "actions", sortable: false },
 ] as const);
+
+const checkboxHeader = ref([
+  {
+    title: "Email",
+    align: "start",
+    sortable: false,
+    key: "email",
+  },
+  { title: "Username", key: "username" },
+  { title: "Created Date", key: "createdAt" },
+  { title: "Role", key: "role" },
+] as const);
+
+const model = defineModel<IUserInfo[]>();
 const emit = defineEmits(["onChangeSelectRole"]);
 </script>
 
 <template>
-  <section>
+  <section v-if="tableType === E_UserListType.checkbox">
+    <v-data-table
+      v-model="model"
+      :headers="checkboxHeader"
+      :items="props.userList"
+      :sort-by="[{ key: 'createdAt', order: 'asc' }]"
+      show-select
+      return-object
+    >
+    </v-data-table>
+  </section>
+
+  <section v-else>
     <v-data-table
       :headers="headers"
       :items="props.userList"
