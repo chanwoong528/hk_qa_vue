@@ -8,5 +8,7 @@
   </v-container>
 </template>
 <style lang="scss" scoped>
-@import "./defaultLayout.scss";
+.main-layout {
+  padding: 20px;
+}
 </style>

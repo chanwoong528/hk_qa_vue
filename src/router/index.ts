@@ -4,20 +4,20 @@ import type { Component } from "vue";
 import HomeView from "@/pages/HomeView.vue";
 import LoginView from "@/pages/LoginView.vue";
 import UsersView from "@/pages/UsersView.vue";
+import SwTypeView from "@/pages/SwTypeView.vue";
 import SwTypeDetailView from "@/pages/SwTypeDetailView.vue";
 
 interface NavItem {
   path: string;
-  component: Component,
+  component: Component;
   label: string;
   directTo?: string; // for dynamic route
   meta: {
-    requiresAuth?: boolean
-    requiresAdmin?: boolean,
-    requiresMaster?: boolean,
-  },
+    requiresAuth?: boolean;
+    requiresAdmin?: boolean;
+    requiresMaster?: boolean;
+  };
 }
-
 
 // Composables
 export const NAV_LIST: NavItem[] = [
@@ -33,7 +33,16 @@ export const NAV_LIST: NavItem[] = [
     label: "Users",
     meta: {
       requiresAuth: true,
-      requiresMaster: true
+      requiresMaster: true,
+    },
+  },
+  {
+    path: "/sw-type",
+    component: SwTypeView,
+    label: "Services",
+    meta: {
+      requiresAuth: true,
+      requiresMaster: true,
     },
   },
   {
@@ -54,7 +63,6 @@ export const NAV_LIST: NavItem[] = [
 ];
 
 export const router = createRouter({
-
-  history: createWebHistory('/'),
+  history: createWebHistory("/"),
   routes: NAV_LIST,
 });

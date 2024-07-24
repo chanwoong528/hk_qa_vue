@@ -1,19 +1,18 @@
 export enum E_Role {
-  tester = 'tester',
-  admin = 'admin',
-  master = 'master',
+  tester = "tester",
+  admin = "admin",
+  master = "master",
 }
 export enum E_UserStatus {
-  ok = 'ok',
-  pending = 'pending',
-  blocked = 'blocked',
+  ok = "ok",
+  pending = "pending",
+  blocked = "blocked",
 }
 
-
 export enum E_TestStatus {
-  pending = 'pending',
-  passed = 'passed',
-  failed = 'failed',
+  pending = "pending",
+  passed = "passed",
+  failed = "failed",
 }
 export enum E_SwVersionModalType {
   updateStatus = "updateStatus",
@@ -22,5 +21,8 @@ export enum E_SwVersionModalType {
 
 export enum E_UserListType {
   checkbox = "checkbox",
-
+}
+export enum E_SwTypeListType {
+  section = "section",
+  // page = "page",
 }

@@ -2,8 +2,8 @@
 import { onMounted, computed, ref } from "vue";
 import { storeToRefs } from "pinia";
 
-import { NAV_LIST } from "@/router/index.ts";
 import { useUserStore } from "@/store/userStore";
+import { NAV_LIST } from "@/router/index.ts";
 
 import { E_Role } from "@/types/enum.d";
 import { swApi } from "@/services/domain/swService";
@@ -45,8 +45,7 @@ const computedNavList = computed(() => {
 });
 
 const onSubmitNewService = (title: string, desc: string) => {
-  console.log(title, desc);
-  swApi.POST_sw({ typeTitle: title, typeDesc: desc }).then((res) => {
+  return swApi.POST_sw({ typeTitle: title, typeDesc: desc }).then((res) => {
     fetchSw();
   });
 };
@@ -78,7 +77,7 @@ const onSubmitNewService = (title: string, desc: string) => {
         <p>{{ loggedInUser?.role }}</p>
       </v-list-item>
 
-      <v-divider></v-divider>
+      <v-divider />
 
       <template v-for="navItem in computedNavList">
         <v-list-item
@@ -103,7 +102,7 @@ const onSubmitNewService = (title: string, desc: string) => {
 
           <v-list-item
             v-for="(swType, i) in swTypes"
-            :key="i"
+            :key="swType.swTypeId + i"
             link
             :to="navItem.directTo + swType.swTypeId"
             :title="swType.typeTitle"
@@ -114,6 +113,7 @@ const onSubmitNewService = (title: string, desc: string) => {
     </v-list>
   </v-navigation-drawer>
 </template>
+
 <style lang="scss" scoped>
 .title-wrap {
   display: flex;

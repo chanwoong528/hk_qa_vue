@@ -3,12 +3,13 @@ import { onBeforeMount } from "vue";
 import { useRoute, useRouter, RouterLink } from "vue-router";
 import { storeToRefs } from "pinia";
 
-import { NAV_LIST } from "@/router/index.ts";
 import { useUserStore } from "@/store/userStore";
-
-import SideHeader from "./SideHeader.vue";
 import { authApi } from "@/services/domain/authService";
+import { NAV_LIST } from "@/router/index.ts";
+
 import type { IUserInfo } from "@/types/types";
+
+import SideHeader from "@/components/SideHeader.vue";
 
 const route = useRoute();
 const router = useRouter();
