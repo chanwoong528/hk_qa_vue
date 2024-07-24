@@ -35,7 +35,7 @@ const renderTestStatus = (type: E_TestStatus) => {
     case E_TestStatus.failed:
       return "error";
     case E_TestStatus.passed:
-      return "primary";
+      return "green";
     default:
       return "warning";
   }
@@ -85,7 +85,9 @@ const onClickAddTester = () => {
             v-for="tester in props.swVersion?.testSessions"
             :class="tester.user.id === loggedInUser?.id ? ' on' : ''"
             class="mr-2 mb-2"
-            :variant="tester.user.id === loggedInUser?.id ? 'flat' : 'outlined'"
+            :variant="
+              tester.user.id === loggedInUser?.id ? 'tonal' : 'outlined'
+            "
             label
             :color="renderTestStatus(tester.status as E_TestStatus)"
             @click="onClickLoggedInUserStatus(tester)"
@@ -99,8 +101,15 @@ const onClickAddTester = () => {
         <div v-else>
           <p>no tester registered</p>
         </div>
-        <div v-if="loggedInUser?.role !== E_Role.tester">
-          <v-btn @click="onClickAddTester" class="text-none text-subtitle-1">
+        <div
+          class="modify-tester-btn-con"
+          v-if="loggedInUser?.role !== E_Role.tester"
+        >
+          <v-btn
+            @click="onClickAddTester"
+            class="text-none text-subtitle-1"
+            variant="outlined"
+          >
             Modify TesterLists
           </v-btn>
         </div>
@@ -110,6 +119,9 @@ const onClickAddTester = () => {
 </template>
 
 <style scoped>
+.modify-tester-btn-con {
+  margin-top: 20px;
+}
 .v-chip:hover {
   cursor: not-allowed;
 }

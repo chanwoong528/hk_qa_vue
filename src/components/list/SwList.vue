@@ -10,7 +10,7 @@ const props = defineProps({
 
 <template>
   <section>
-    <h3>HK Software List</h3>
+    <h4>HK Software List</h4>
 
     <v-row cols="12" md="4">
       <v-col v-for="swItem in props.swList" :key="swItem.swTypeId">

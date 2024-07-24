@@ -3,6 +3,12 @@ export enum E_Role {
   admin = 'admin',
   master = 'master',
 }
+export enum E_UserStatus {
+  ok = 'ok',
+  pending = 'pending',
+  blocked = 'blocked',
+}
+
 
 export enum E_TestStatus {
   pending = 'pending',
@@ -14,7 +20,7 @@ export enum E_SwVersionModalType {
   addTester = "addTester",
 }
 
-export enum E_UserListType  {
+export enum E_UserListType {
   checkbox = "checkbox",
-  
+
 }

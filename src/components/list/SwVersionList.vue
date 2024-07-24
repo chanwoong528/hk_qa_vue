@@ -71,7 +71,6 @@ const onSubmitAddTesters = (testers: IUserInfo[]) => {
       (tester) => !testers.some((newTester) => newTester.id === tester.id)
     )
     .map((tester) => tester.id);
-  // .map((tester) => ({ userId: tester.id, username: tester.username }));
 
   const tobeAdded = testers
     .filter(
@@ -81,17 +80,15 @@ const onSubmitAddTesters = (testers: IUserInfo[]) => {
         )
     )
     .map((tester) => tester.id);
-  // .map((tester) => ({ userId: tester.id, username: tester.username }));
 
   testSessionApi
     .PUT_deleteOrAddTestSession(curSwVersionId.value, tobeDeleted, tobeAdded)
     .then((res) => {
       props.onFetchSwVersionList &&
         props.onFetchSwVersionList(props.swVersionList?.[0]?.swType?.swTypeId);
+      toggleModal(E_SwVersionModalType.addTester);
     })
     .catch((error) => alert(error));
-
-  // testSessionApi.POST_AllTestSession(apiParams).then((res) => {});
 };
 </script>
 
@@ -112,8 +109,8 @@ const onSubmitAddTesters = (testers: IUserInfo[]) => {
       @onSubmitAddTesters="onSubmitAddTesters"
     />
   </ModalWrap>
+
   <v-expansion-panels>
-    {{ curSwVersionId }}
     <SwVersionItem
       v-for="swVersion in props.swVersionList"
       :key="swVersion.swVersionId"

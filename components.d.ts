@@ -8,14 +8,18 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AddTesterForm: typeof import('./src/components/form/AddTesterForm.vue')['default']
+    AddUserForm: typeof import('./src/components/form/AddUserForm.vue')['default']
     AppHeader: typeof import('./src/components/AppHeader.vue')['default']
     DefaultHeader: typeof import('./src/components/DefaultHeader.vue')['default']
     ForgotPwForm: typeof import('./src/components/form/ForgotPwForm.vue')['default']
     LoginForm: typeof import('./src/components/form/LoginForm.vue')['default']
     ModalWrap: typeof import('./src/components/ModalWrap.vue')['default']
+    NewServiceForm: typeof import('./src/components/form/NewServiceForm.vue')['default']
+    NewVersionForm: typeof import('./src/components/form/NewVersionForm.vue')['default']
     OrgotPwForm: typeof import('./src/components/form/orgotPwForm.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    SearchBar: typeof import('./src/components/SearchBar.vue')['default']
     SideHeader: typeof import('./src/components/SideHeader.vue')['default']
     SwList: typeof import('./src/components/list/SwList.vue')['default']
     SwVersionItem: typeof import('./src/components/list/SwVersionItem.vue')['default']

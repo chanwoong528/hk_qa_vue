@@ -10,42 +10,77 @@ import { swApi } from "@/services/domain/swService";
 import { useSwStore } from "@/store/swStore";
 import { ISwType } from "@/types/types";
 
+import ModalWrap from "@/components/ModalWrap.vue";
+import NewServiceForm from "@/components/form/NewServiceForm.vue";
+
 const store = useUserStore();
 const { loggedInUser } = storeToRefs(store);
 const swStore = useSwStore();
 const { swTypes } = storeToRefs(swStore);
 
 const openGroups = ref<string[]>([]);
+const openNewServiceModal = ref<boolean>(false);
 
-onMounted(() => {
-  swApi
+onMounted(() => fetchSw());
+
+const fetchSw = () => {
+  return swApi
     .GET_sw()
     .then((swListRes) => swStore.setSwTypes(swListRes as ISwType[]));
-});
-
+};
 const computedNavList = computed(() => {
-  if (!loggedInUser) return NAV_LIST;
+  if (!loggedInUser.value) return NAV_LIST;
 
   if (loggedInUser.value?.role === E_Role.master) return NAV_LIST;
 
-  if (loggedInUser.value?.role === E_Role.admin)
+  if (loggedInUser.value?.role === E_Role.admin) {
     return NAV_LIST.filter((navItem) => !navItem.meta.requiresMaster);
+  }
 
-  if (loggedInUser.value?.role === E_Role.tester)
+  if (loggedInUser.value?.role === E_Role.tester) {
     return NAV_LIST.filter(
-      (navItem) => !navItem.meta.requiresAdmin || !navItem.meta.requiresMaster
+      (navItem) => !navItem.meta.requiresAdmin && !navItem.meta.requiresMaster
     );
+  }
 });
+
+const onSubmitNewService = (title: string, desc: string) => {
+  console.log(title, desc);
+  swApi.POST_sw({ typeTitle: title, typeDesc: desc }).then((res) => {
+    fetchSw();
+  });
+};
 </script>
 
 <template>
+  <ModalWrap v-model="openNewServiceModal" title="New Service">
+    <NewServiceForm @onSubmitNewService="onSubmitNewService" />
+  </ModalWrap>
   <v-navigation-drawer permanent>
     <v-list v-model:opened="openGroups">
-      <v-list-item title="HK QA TEST" :subtitle="loggedInUser?.username">
+      <v-list-item>
+        <div class="title-wrap">
+          <v-list-item-title>HK QA TEST </v-list-item-title>
+          <v-btn
+            v-if="loggedInUser?.role === E_Role.master"
+            size="x-small"
+            variant="outlined"
+            color="primary"
+            @click="openNewServiceModal = true"
+          >
+            New Service
+            <v-icon icon="mdi-plus"></v-icon>
+          </v-btn>
+        </div>
+        <v-list-item-subtitle>
+          {{ loggedInUser?.username }}
+        </v-list-item-subtitle>
         <p>{{ loggedInUser?.role }}</p>
       </v-list-item>
+
       <v-divider></v-divider>
-      <template v-for="navItem in computedNavList" x>
+
+      <template v-for="navItem in computedNavList">
         <v-list-item
           :key="navItem.label"
           link
@@ -79,3 +114,10 @@ const computedNavList = computed(() => {
     </v-list>
   </v-navigation-drawer>
 </template>
+<style lang="scss" scoped>
+.title-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+</style>

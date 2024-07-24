@@ -10,6 +10,7 @@ export interface IUserInfo {
   username: string;
   role: E_Role
   email: string;
+  userStatus: E_UserStatus
   access_token?: string;
   refresh_token?: string;
 }

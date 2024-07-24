@@ -16,6 +16,7 @@ const toggleDialog = () => {
 
 <template>
   <div class="text-center">
+    <!-- <h1>ModalWrap:{{ model }}</h1> -->
     <v-dialog v-model="model" width="auto">
       <v-card class="mx-auto pa-8" min-width="400">
         <h4 v-if="title" class="pb-8">{{ title }}</h4>

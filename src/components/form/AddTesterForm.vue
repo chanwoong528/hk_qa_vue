@@ -26,10 +26,6 @@ watch(
   }
 );
 
-// const selectedUsers = computed(() => {
-//   return props.curTesterList;
-// });
-
 const onSubmit = () => {
   emit("onSubmitAddTesters", selectedUsers.value);
 };
@@ -51,7 +47,7 @@ const onSubmit = () => {
       type="submit"
       @click="onSubmit"
     >
-      Add testers
+      Confirm Testers
     </v-btn>
   </form>
 

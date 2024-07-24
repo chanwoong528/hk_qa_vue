@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { E_Role, E_UserListType } from "@/types/enum.d";
+import { E_Role, E_UserListType, E_UserStatus } from "@/types/enum.d";
 import type { IUserInfo } from "@/types/types";
 import { PropType } from "vue";
 
@@ -25,7 +25,7 @@ const headers = ref([
   },
   { title: "Username", key: "username" },
   { title: "Created Date ", key: "createdAt" },
-  { title: "Role", key: "actions", sortable: false },
+  { title: "Role/Status", key: "actions", sortable: false },
 ] as const);
 
 const checkboxHeader = ref([
@@ -41,7 +41,7 @@ const checkboxHeader = ref([
 ] as const);
 
 const model = defineModel<IUserInfo[]>();
-const emit = defineEmits(["onChangeSelectRole"]);
+const emit = defineEmits(["onChangeSelectRole", "onChangeUserStatus"]);
 </script>
 
 <template>
@@ -68,6 +68,14 @@ const emit = defineEmits(["onChangeSelectRole"]);
           v-model="item.role"
           :items="Object.values(E_Role)"
           @update:modelValue="emit('onChangeSelectRole', item.id, item.role)"
+          hide-details
+        ></v-select>
+        <v-select
+          v-model="item.userStatus"
+          :items="Object.values(E_UserStatus)"
+          @update:modelValue="
+            emit('onChangeUserStatus', item.id, item.userStatus)
+          "
           hide-details
         ></v-select>
       </template>
