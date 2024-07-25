@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { ref, watch, onMounted, computed } from "vue";
+import { ref, watch, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { storeToRefs } from "pinia";
 
 import { useUserStore } from "@/store/userStore";
-import { useSwStore } from "@/store/swStore";
+
 import { swVersionApi } from "@/services/domain/swService";
 import { testSessionApi } from "@/services/domain/testSessionService";
 
-import type { ISwType, ISwVersion, ITestSession } from "@/types/types";
+import type { ISwVersion, ITestSession } from "@/types/types";
 import { E_Role } from "@/types/enum.d";
 
 import SwVersionList from "@/components/list/SwVersionList.vue";
@@ -21,9 +21,6 @@ const route = useRoute();
 const userStore = useUserStore();
 const { loggedInUser } = storeToRefs(userStore);
 
-const swStore = useSwStore();
-const { swTypes } = storeToRefs(swStore);
-
 const swVersionList = ref<ISwVersion[]>([]);
 const openModalNewVersion = ref<boolean>(false);
 const submitErrorFlag = ref<boolean>(true);
@@ -32,7 +29,9 @@ onMounted(() => onFetchSwVersionList(route.params.id as string));
 
 watch(
   () => route.params.id,
-  (newId, _) => onFetchSwVersionList(newId as string)
+  (newId, _) => {
+    onFetchSwVersionList(newId as string);
+  }
 );
 watch(
   () => [openModalNewVersion.value, submitErrorFlag.value],
@@ -48,14 +47,10 @@ watch(
   }
 );
 
-const curSwTypeInfo = computed(() =>
-  swTypes.value.find((swType: ISwType) => swType.swTypeId === route.params.id)
-);
-
 const onFetchSwVersionList = (swTypeId: string) => {
-  return swVersionApi.GET_swVersionsBySwTypeId(swTypeId).then((res) => {
-    swVersionList.value = res as ISwVersion[];
-  });
+  return swVersionApi
+    .GET_swVersionsBySwTypeId(swTypeId)
+    .then((res) => (swVersionList.value = res as ISwVersion[]));
 };
 
 const onSubmitStatus = (selectedTestSession: Partial<ITestSession>) => {
@@ -80,10 +75,12 @@ const onSubmitNewVersion = (
   tag: string,
   files?: File
 ) => {
-  if (!!curSwTypeInfo.value?.swTypeId) {
+  if (!!route.params.id) {
     return swVersionApi
       .POST_swVersion({
-        swTypeId: curSwTypeInfo.value.swTypeId,
+        swTypeId: Array.isArray(route.params.id)
+          ? route.params.id[0]
+          : route.params.id,
         versionTitle,
         versionDesc,
         tag,
@@ -106,7 +103,14 @@ const onSubmitNewVersion = (
   </ModalWrap>
   <DefaultLayout>
     <header class="sw-detail-header">
-      <h3>Versions for {{ curSwTypeInfo?.typeTitle }}</h3>
+      <h3>
+        Versions for
+        <!-- {{
+          swTypes?.find(
+            (swType: ISwType) => swType.swTypeId === route.params.id
+          )?.typeTitle
+        }} -->
+      </h3>
       <v-btn
         v-if="loggedInUser?.role !== E_Role.tester"
         variant="elevated"

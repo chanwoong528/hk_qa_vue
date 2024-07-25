@@ -6,6 +6,7 @@ import LoginView from "@/pages/LoginView.vue";
 import UsersView from "@/pages/UsersView.vue";
 import SwTypeView from "@/pages/SwTypeView.vue";
 import SwTypeDetailView from "@/pages/SwTypeDetailView.vue";
+import VerifyView from "@/pages/VerifyView.vue";
 
 interface NavItem {
   path: string;
@@ -58,6 +59,12 @@ export const NAV_LIST: NavItem[] = [
     path: "/login",
     component: LoginView,
     label: "Login",
+    meta: { requiresAuth: false },
+  },
+  {
+    path: "/verify",
+    component: VerifyView,
+    label: "Verify Email",
     meta: { requiresAuth: false },
   },
 ];

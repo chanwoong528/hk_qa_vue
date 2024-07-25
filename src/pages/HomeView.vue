@@ -14,7 +14,6 @@ const { swTypes } = storeToRefs(swStore);
     <header class="home-header">
       <h3>Home</h3>
     </header>
-
     <SwList :type="E_SwTypeListType.section" :swList="swTypes" />
   </DefaultLayout>
 </template>

@@ -36,6 +36,10 @@ const handleLogin = (error: Object, email: string, pw: string) => {
     authApi
       .POST_login({ email, pw })
       .then((res) => {
+        console.log(res);
+        if (!!res.isPwDefault) {
+          alert("Please reset your password");
+        }
         setUser(res as IUserInfo);
         return router.push("/");
       })
@@ -50,7 +54,10 @@ const handleLogin = (error: Object, email: string, pw: string) => {
 </script>
 
 <template>
-  <ModalWrap v-model="isDialogOpen" title="Reset Password">
+  <ModalWrap
+    v-model="isDialogOpen"
+    title="Send Verification Email for Reset Password"
+  >
     <ForgotPwForm @userEmail="handleForgotPw" />
   </ModalWrap>
   <div>

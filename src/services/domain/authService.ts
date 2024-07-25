@@ -1,7 +1,7 @@
 
 import { http, ExceptionWrapper } from "../http"
 
-import type { ILoginInfo, IUserInfo } from "@/types/types";
+import type { ILoginInfo, INetworkSuccess, IUserInfo } from "@/types/types";
 
 
 
@@ -22,6 +22,20 @@ export const authApi = {
   GET_loginCheck: (): Promise<IUserInfo> => {
     return ExceptionWrapper(async () => {
       const apiResult = await http.get("/auth")
+      const data = await apiResult.data
+
+      return data;
+    })
+  },
+  POST_verifyEmailByToken: (token: string): Promise<INetworkSuccess> => {
+    return ExceptionWrapper(async () => {
+      const apiResult = await http.post(
+        `/auth/verify-email`,
+        { token },
+        {
+          headers: { "Authorization": `Bearer ${token}` }
+        }
+      )
       const data = await apiResult.data
 
       return data;

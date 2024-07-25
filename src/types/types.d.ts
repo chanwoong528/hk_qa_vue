@@ -11,6 +11,7 @@ export interface IUserInfo {
   role: E_Role
   email: string;
   userStatus: E_UserStatus
+  isPwDefault?: boolean;
   access_token?: string;
   refresh_token?: string;
 }
@@ -61,4 +62,8 @@ export interface INetworkException {
 }
 
 
+export interface INetworkSuccess {
+  code: number;
+  message: string
+}
 

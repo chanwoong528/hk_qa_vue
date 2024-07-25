@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onBeforeMount } from "vue";
+import { watch } from "vue";
 import { useRoute, useRouter, RouterLink } from "vue-router";
 import { storeToRefs } from "pinia";
 
@@ -14,29 +14,34 @@ import SideHeader from "@/components/SideHeader.vue";
 const route = useRoute();
 const router = useRouter();
 const store = useUserStore();
-const { isLoggedIn } = storeToRefs(store);
+const { loggedInUser } = storeToRefs(store);
 
-onBeforeMount(() => {
-  if (!!localStorage.getItem("accessToken")) {
-    authApi
-      .GET_loginCheck()
-      .then((loginResult) => {
-        store.setUser(loginResult as IUserInfo);
-        return router.push("/");
-      })
-      .catch((err) => {
-        alert("Session expired. Please login again.");
-      });
+watch(
+  () => [route.path, route.query.token],
+  ([newPath, newToken]) => {
+    if (!!localStorage.getItem("accessToken")) {
+      return authApi
+        .GET_loginCheck()
+        .then((loginResult) => {
+          store.setUser(loginResult as IUserInfo);
+          // return router.push("/");
+        })
+        .catch((err) => {
+          alert("Session expired. Please login again.");
+        });
+    } else {
+      store.setResetUser();
+      if (!newToken) {
+        return router.push("/login");
+      }
+    }
   }
-  store.setResetUser();
-  return router.push("/login");
-});
+);
 </script>
 <template>
-  <template v-if="!isLoggedIn">
+  <template v-if="!loggedInUser?.id">
     <template>
       <h1>Hello App!</h1>
-      <p>isLoggedIn {{ isLoggedIn }}</p>
     </template>
     <p><strong>Current route path:</strong> {{ route.fullPath }}</p>
     <nav>
@@ -44,7 +49,7 @@ onBeforeMount(() => {
         <template v-for="navItem in NAV_LIST">
           <li
             v-if="
-              !!isLoggedIn
+              !!loggedInUser?.id
                 ? navItem.meta.requiresAuth
                 : !navItem.meta.requiresAuth
             "

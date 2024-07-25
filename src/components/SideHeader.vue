@@ -12,21 +12,35 @@ import { ISwType } from "@/types/types";
 
 import ModalWrap from "@/components/ModalWrap.vue";
 import NewServiceForm from "@/components/form/NewServiceForm.vue";
+import { watch } from "vue";
+import { useRoute } from "vue-router";
+import ResetPwForm from "./form/ResetPwForm.vue";
+const route = useRoute();
 
 const store = useUserStore();
 const { loggedInUser } = storeToRefs(store);
+
 const swStore = useSwStore();
 const { swTypes } = storeToRefs(swStore);
 
 const openGroups = ref<string[]>([]);
 const openNewServiceModal = ref<boolean>(false);
 
-onMounted(() => fetchSw());
+onMounted(() => {
+  if (!!loggedInUser.value?.id) return fetchSw();
+});
+
+watch(
+  () => [route.path, loggedInUser.value?.id],
+  ([newPath, newUserId]) => {
+    if (!!newUserId) return fetchSw();
+  }
+);
 
 const fetchSw = () => {
-  return swApi
-    .GET_sw()
-    .then((swListRes) => swStore.setSwTypes(swListRes as ISwType[]));
+  return swApi.GET_sw().then((swListRes) => {
+    return swStore.setSwTypes(swListRes as ISwType[]);
+  });
 };
 const computedNavList = computed(() => {
   if (!loggedInUser.value) return NAV_LIST;
@@ -44,6 +58,12 @@ const computedNavList = computed(() => {
   }
 });
 
+const openResetPwModal = computed(() => {
+  if (!!loggedInUser.value?.isPwDefault) return true;
+
+  return false;
+});
+
 const onSubmitNewService = (title: string, desc: string) => {
   return swApi.POST_sw({ typeTitle: title, typeDesc: desc }).then((res) => {
     fetchSw();
@@ -52,6 +72,9 @@ const onSubmitNewService = (title: string, desc: string) => {
 </script>
 
 <template>
+  <ModalWrap v-model="openResetPwModal" title="Reset Password">
+    <ResetPwForm />
+  </ModalWrap>
   <ModalWrap v-model="openNewServiceModal" title="New Service">
     <NewServiceForm @onSubmitNewService="onSubmitNewService" />
   </ModalWrap>
@@ -107,7 +130,11 @@ const onSubmitNewService = (title: string, desc: string) => {
             :to="navItem.directTo + swType.swTypeId"
             :title="swType.typeTitle"
             :value="swType.typeTitle"
-          ></v-list-item>
+          >
+            <!-- <RouterLink :to="navItem.directTo + swType.swTypeId" c>
+              {{ swType.typeTitle }}
+            </RouterLink> -->
+          </v-list-item>
         </v-list-group>
       </template>
     </v-list>
