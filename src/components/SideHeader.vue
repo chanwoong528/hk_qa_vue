@@ -14,7 +14,7 @@ import ModalWrap from "@/components/ModalWrap.vue";
 import NewServiceForm from "@/components/form/NewServiceForm.vue";
 import { watch } from "vue";
 import { useRoute } from "vue-router";
-import ResetPwForm from "./form/ResetPwForm.vue";
+
 const route = useRoute();
 
 const store = useUserStore();
@@ -58,12 +58,6 @@ const computedNavList = computed(() => {
   }
 });
 
-const openResetPwModal = computed(() => {
-  if (!!loggedInUser.value?.isPwDefault) return true;
-
-  return false;
-});
-
 const onSubmitNewService = (title: string, desc: string) => {
   return swApi.POST_sw({ typeTitle: title, typeDesc: desc }).then((res) => {
     fetchSw();
@@ -72,9 +66,6 @@ const onSubmitNewService = (title: string, desc: string) => {
 </script>
 
 <template>
-  <ModalWrap v-model="openResetPwModal" title="Reset Password">
-    <ResetPwForm />
-  </ModalWrap>
   <ModalWrap v-model="openNewServiceModal" title="New Service">
     <NewServiceForm @onSubmitNewService="onSubmitNewService" />
   </ModalWrap>

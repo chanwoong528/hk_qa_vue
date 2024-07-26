@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { watch } from "vue";
+import { computed, watch } from "vue";
 import { useRoute, useRouter, RouterLink } from "vue-router";
 import { storeToRefs } from "pinia";
 
@@ -10,25 +10,35 @@ import { NAV_LIST } from "@/router/index.ts";
 import type { IUserInfo } from "@/types/types";
 
 import SideHeader from "@/components/SideHeader.vue";
+import ResetPwForm from "@/components/form/ResetPwForm.vue";
 
 const route = useRoute();
 const router = useRouter();
 const store = useUserStore();
 const { loggedInUser } = storeToRefs(store);
 
+const openResetPwModal = computed(() => {
+  if (!!loggedInUser.value?.isPwDefault) return true;
+
+  return false;
+});
+const fetchAuthByAccToken = () => {
+  return authApi
+    .GET_loginCheck()
+    .then((loginResult) => {
+      store.setUser(loginResult as IUserInfo);
+      // return router.push("/");
+    })
+    .catch((err) => {
+      alert("Session expired. Please login again.");
+    });
+};
+
 watch(
   () => [route.path, route.query.token],
   ([newPath, newToken]) => {
     if (!!localStorage.getItem("accessToken")) {
-      return authApi
-        .GET_loginCheck()
-        .then((loginResult) => {
-          store.setUser(loginResult as IUserInfo);
-          // return router.push("/");
-        })
-        .catch((err) => {
-          alert("Session expired. Please login again.");
-        });
+      return fetchAuthByAccToken();
     } else {
       store.setResetUser();
       if (!newToken) {
@@ -39,6 +49,9 @@ watch(
 );
 </script>
 <template>
+  <ModalWrap v-model="openResetPwModal" title="Reset Password">
+    <ResetPwForm :fetchAuthByAccToken="fetchAuthByAccToken" />
+  </ModalWrap>
   <template v-if="!loggedInUser?.id">
     <template>
       <h1>Hello App!</h1>

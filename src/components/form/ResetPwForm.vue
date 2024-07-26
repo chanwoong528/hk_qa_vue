@@ -1,7 +1,18 @@
 <script setup lang="ts">
 import { reactive, ref } from "vue";
+import { storeToRefs } from "pinia";
 import { useVuelidate } from "@vuelidate/core";
 import { required, helpers } from "@vuelidate/validators";
+
+import { useUserStore } from "@/store/userStore";
+import { userApi } from "@/services/domain/userService";
+
+const props = defineProps<{
+  fetchAuthByAccToken: () => void;
+}>();
+
+const store = useUserStore();
+const { loggedInUser } = storeToRefs(store);
 
 const pwVisible = ref<boolean>(false);
 const initialState = {
@@ -14,7 +25,7 @@ const state = reactive({
 const rules = {
   pw: { required: helpers.withMessage("Password is required", required) },
   pwConfirm: {
-    required: helpers.withMessage("Email is required", required),
+    required: helpers.withMessage("Confirming Password is required", required),
     sameAsPw: helpers.withMessage("Passwords do not match", (value) => {
       return value === state.pw;
     }),
@@ -23,7 +34,16 @@ const rules = {
 const onSubmitResetPassword = () => {
   if (!!v$.value.$errors.map((e) => e.$message).join(", ")) return;
 
-  console.log("!!!!!!");
+  if (!!loggedInUser.value?.id) {
+    userApi
+      .PATCH_user({ id: loggedInUser.value?.id, pw: state.pw })
+      .then((res) => {
+        console.log(res);
+        state.pw = "";
+        state.pwConfirm = "";
+        props.fetchAuthByAccToken();
+      });
+  }
 };
 
 const v$ = useVuelidate(rules, state);
@@ -70,7 +90,7 @@ const v$ = useVuelidate(rules, state);
         }
       "
     >
-      Login
+      Change Password
     </v-btn>
   </form>
 </template>
