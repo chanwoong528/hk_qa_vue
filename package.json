@@ -14,8 +14,10 @@
     "axios": "^1.7.2",
     "core-js": "^3.34.0",
     "pinia": "^2.1.7",
+    "quill": "^2.0.2",
     "roboto-fontface": "*",
     "vue": "^3.4.21",
+    "vue-quilly": "^1.0.5",
     "vue-router": "^4.4.0",
     "vuetify": "^3.5.8"
   },

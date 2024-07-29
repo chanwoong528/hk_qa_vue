@@ -29,9 +29,29 @@ export const swVersionApi = {
       return data;
     })
   },
-  POST_swVersion: (swVersion: Partial<Omit<ISwVersion, 'fileSrc'>> & { swTypeId: string, files?: File }): Promise<ISwVersion> => {
+  POST_swVersion: (swVersion: Partial<Omit<ISwVersion, 'fileSrc'>> & {
+
+    swTypeId: string,
+    versionTitle: string,
+    versionDesc: string,
+    tag: string,
+    file?: File
+  }): Promise<ISwVersion> => {
     return ExceptionWrapper(async () => {
-      const apiResult = await http.post("/sw-version", swVersion)
+      const formData = new FormData()
+      formData.append('swTypeId', swVersion.swTypeId)
+      formData.append('versionTitle', swVersion.versionTitle)
+      formData.append('versionDesc', swVersion.versionDesc)
+      formData.append('tag', swVersion.tag)
+      if (!!swVersion.file) {
+        console.log("upload!!")
+        formData.append('file', swVersion.file)
+
+      }
+      console.log(formData)
+      const apiResult = await http.post("/sw-version", formData,
+        { headers: { 'Content-Type': 'multipart/form-data' } }
+      )
       const data = await apiResult.data
       return data
     })

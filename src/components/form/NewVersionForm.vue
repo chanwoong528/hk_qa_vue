@@ -3,11 +3,13 @@ import { reactive } from "vue";
 import { useVuelidate } from "@vuelidate/core";
 import { required, helpers } from "@vuelidate/validators";
 
+import RichEditor from "../RichEditor.vue";
+
 const initialState = {
   versionTitle: "",
   versionDesc: "",
   tag: "",
-  // files: "",
+  file: "",
 };
 const state = reactive({
   ...initialState,
@@ -30,8 +32,8 @@ const onSubmitNewVersion = () => {
     "onSubmitNewVersion",
     state.versionTitle,
     state.versionDesc,
-    state.tag
-    // state.files
+    state.tag,
+    state.file
   );
 };
 </script>
@@ -59,6 +61,8 @@ const onSubmitNewVersion = () => {
       @input="v$.versionDesc.$touch"
       v-model="state.versionDesc"
     />
+    <RichEditor v-model="state.versionDesc" />
+
     <v-text-field
       :error-messages="v$.tag.$errors.map((e) => e.$message).join(', ')"
       density="compact"
@@ -69,13 +73,13 @@ const onSubmitNewVersion = () => {
       @input="v$.tag.$touch"
       v-model="state.tag"
     />
-    <!-- <v-file-input
+    <v-file-input
       label="Upload File"
       chips
-      multiple
       density="compact"
       variant="outlined"
-    ></v-file-input> -->
+      @change="state.file = $event.target.files[0]"
+    ></v-file-input>
     <v-btn
       class="mb-8"
       color="blue"

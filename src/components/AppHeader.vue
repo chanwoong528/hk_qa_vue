@@ -30,7 +30,8 @@ const fetchAuthByAccToken = () => {
       // return router.push("/");
     })
     .catch((err) => {
-      alert("Session expired. Please login again.");
+      store.setResetUser();
+      return alert("Session expired. Please login again.");
     });
 };
 

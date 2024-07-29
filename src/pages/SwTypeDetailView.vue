@@ -8,28 +8,40 @@ import { useUserStore } from "@/store/userStore";
 import { swVersionApi } from "@/services/domain/swService";
 import { testSessionApi } from "@/services/domain/testSessionService";
 
-import type { ISwVersion, ITestSession } from "@/types/types";
+import type { ISwType, ISwVersion, ITestSession } from "@/types/types";
 import { E_Role } from "@/types/enum.d";
 
 import SwVersionList from "@/components/list/SwVersionList.vue";
 import DefaultLayout from "@/layout/DefaultLayout.vue";
 import ModalWrap from "@/components/ModalWrap.vue";
 import NewVersionForm from "@/components/form/NewVersionForm.vue";
+import { useSwStore } from "@/store/swStore";
 
 const route = useRoute();
 
 const userStore = useUserStore();
 const { loggedInUser } = storeToRefs(userStore);
 
+const swStore = useSwStore();
+const { swTypes } = storeToRefs(swStore);
+
 const swVersionList = ref<ISwVersion[]>([]);
+
 const openModalNewVersion = ref<boolean>(false);
 const submitErrorFlag = ref<boolean>(true);
+
+const swTypeInfo = ref<ISwType>();
 
 onMounted(() => onFetchSwVersionList(route.params.id as string));
 
 watch(
-  () => route.params.id,
-  (newId, _) => {
+  () => [route.params.id, swTypes.value],
+  ([newId, newSwTypes]) => {
+    if (!!newSwTypes) {
+      swTypeInfo.value = swTypes.value.find(
+        (swType) => swType.swTypeId === newId
+      ) as ISwType;
+    }
     onFetchSwVersionList(newId as string);
   }
 );
@@ -73,8 +85,10 @@ const onSubmitNewVersion = (
   versionTitle: string,
   versionDesc: string,
   tag: string,
-  files?: File
+  file?: File
 ) => {
+  console.log("onSubmitNewVersion", versionTitle, versionDesc, tag, file);
+
   if (!!route.params.id) {
     return swVersionApi
       .POST_swVersion({
@@ -84,7 +98,7 @@ const onSubmitNewVersion = (
         versionTitle,
         versionDesc,
         tag,
-        files,
+        ...(file && { file }),
       })
       .then((res) => {
         submitErrorFlag.value = false;
@@ -105,11 +119,7 @@ const onSubmitNewVersion = (
     <header class="sw-detail-header">
       <h3>
         Versions for
-        <!-- {{
-          swTypes?.find(
-            (swType: ISwType) => swType.swTypeId === route.params.id
-          )?.typeTitle
-        }} -->
+        {{ swTypeInfo?.typeTitle }}
       </h3>
       <v-btn
         v-if="loggedInUser?.role !== E_Role.tester"

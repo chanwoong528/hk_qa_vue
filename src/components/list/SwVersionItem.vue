@@ -74,6 +74,9 @@ const onClickAddTester = () => {
       <p>
         {{ props.swVersion?.versionDesc }}
       </p>
+      <a v-if="props.swVersion?.fileSrc" :href="props.swVersion?.fileSrc"
+        >Download File</a
+      >
       <v-container>
         <div
           v-if="
@@ -112,6 +115,13 @@ const onClickAddTester = () => {
           >
             Modify TesterLists
           </v-btn>
+          <v-btn
+            @click="onClickAddTester"
+            class="text-none text-subtitle-1"
+            variant="outlined"
+          >
+            Go to Detail Version
+          </v-btn>
         </div>
       </v-container>
     </v-expansion-panel-text>
@@ -120,6 +130,9 @@ const onClickAddTester = () => {
 
 <style scoped>
 .modify-tester-btn-con {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-top: 20px;
 }
 .v-chip:hover {

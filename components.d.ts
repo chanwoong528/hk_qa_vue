@@ -18,6 +18,7 @@ declare module 'vue' {
     NewVersionForm: typeof import('./src/components/form/NewVersionForm.vue')['default']
     OrgotPwForm: typeof import('./src/components/form/orgotPwForm.vue')['default']
     ResetPwForm: typeof import('./src/components/form/ResetPwForm.vue')['default']
+    RichEditor: typeof import('./src/components/RichEditor.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SearchBar: typeof import('./src/components/SearchBar.vue')['default']
