@@ -39,7 +39,6 @@ const onSubmit = () => {
       :user-list="props.userList"
     />
     <v-btn
-      class="mb-8"
       color="blue"
       size="large"
       variant="tonal"

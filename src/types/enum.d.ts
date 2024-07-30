@@ -14,9 +14,12 @@ export enum E_TestStatus {
   passed = "passed",
   failed = "failed",
 }
+
+
 export enum E_SwVersionModalType {
   updateStatus = "updateStatus",
   addTester = "addTester",
+  detailView = "detailView",
 }
 
 export enum E_UserListType {
@@ -25,4 +28,9 @@ export enum E_UserListType {
 export enum E_SwTypeListType {
   section = "section",
   // page = "page",
+}
+
+
+export enum E_ModalType {
+  full = "full",
 }

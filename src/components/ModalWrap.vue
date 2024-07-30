@@ -1,7 +1,10 @@
 <script setup lang="ts">
+import { E_ModalType } from "@/types/enum.d";
+
 defineProps({
   haveBtnCtl: Boolean,
   title: String,
+  type: String as () => E_ModalType,
 });
 
 const model = defineModel<boolean>();
@@ -16,10 +19,21 @@ const toggleDialog = () => {
 
 <template>
   <div class="text-center">
-    <!-- <h1>ModalWrap:{{ model }}</h1> -->
-    <v-dialog v-model="model" width="auto">
-      <v-card class="mx-auto pa-8" min-width="400">
-        <h4 v-if="title" class="pb-8">{{ title }}</h4>
+    <v-dialog
+      v-model="model"
+      width="100%"
+      :fullscreen="type === E_ModalType.full"
+      transition="dialog-bottom-transition"
+    >
+      <v-card
+        class="mx-auto pa-8"
+        min-width="500px"
+        :width="type === E_ModalType.full ? '100%' : 'auto'"
+      >
+        <v-toolbar>
+          <v-toolbar-title>{{ title }}</v-toolbar-title>
+          <v-btn icon="mdi-close" @click="model = false"></v-btn>
+        </v-toolbar>
         <slot></slot>
         <template v-slot:actions v-if="!!haveBtnCtl">
           <v-btn class="ms-auto" text="Ok" @click="toggleDialog"></v-btn>
@@ -28,3 +42,11 @@ const toggleDialog = () => {
     </v-dialog>
   </div>
 </template>
+
+<style lang="scss">
+button[type="submit"] {
+  margin-left: auto;
+  margin-top: auto;
+  min-width: auto;
+}
+</style>

@@ -28,6 +28,7 @@ const v$ = useVuelidate(rules, state);
 const emit = defineEmits(["onSubmitNewVersion"]);
 
 const onSubmitNewVersion = () => {
+  if (!!v$.value.$errors.map((e) => e.$message).join(", ")) return;
   emit(
     "onSubmitNewVersion",
     state.versionTitle,
@@ -61,6 +62,7 @@ const onSubmitNewVersion = () => {
       @input="v$.versionDesc.$touch"
       v-model="state.versionDesc"
     />
+
     <RichEditor v-model="state.versionDesc" />
 
     <v-text-field
@@ -81,7 +83,6 @@ const onSubmitNewVersion = () => {
       @change="state.file = $event.target.files[0]"
     ></v-file-input>
     <v-btn
-      class="mb-8"
       color="blue"
       size="large"
       variant="tonal"

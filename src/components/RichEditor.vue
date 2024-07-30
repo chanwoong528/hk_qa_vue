@@ -1,54 +1,52 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
-import Quill from "quill"; // Full build
-// import Quill from "quill/core"; // Core build
-import { QuillyEditor } from "vue-quilly";
-import "quill/dist/quill.core.css"; // Required
-import "quill/dist/quill.snow.css"; // For snow theme (optional)
-import "quill/dist/quill.bubble.css"; // For bubble theme (optional)
+import { QuillEditor } from "@vueup/vue-quill";
+import ImageCompress from "quill-image-compress";
+import QuillResizeImage from "quill-resize-image";
 
-const editor = ref<InstanceType<typeof QuillyEditor>>();
-// const model = ref<string>("<p>Hello Quilly!</p>");
+import "@vueup/vue-quill/dist/vue-quill.snow.css";
 
-const modelValue = defineModel<string>("<p>Hello Quilly!</p>");
-// Quill instance
-
-// const quill = ref<Quill | null>(null);
-// Remove the declaration of the 'quill' variable
-onMounted(() => {
-  editor.value?.initialize(Quill)!;
-});
+const modelValue = defineModel<string>();
 
 const options = {
-  theme: "snow", // If you need Quill theme
+  theme: "snow",
   modules: {
     toolbar: true,
   },
-  placeholder: "Compose an epic...",
+  placeholder: "Write something...",
   readOnly: false,
 };
+const modules = [
+  {
+    name: "ImageCompress",
+    module: ImageCompress,
+    options: {
+      quality: 0.9,
+      imageType: "image/jpeg",
+    },
+  },
+  {
+    name: "QuillResizeImage",
+    module: QuillResizeImage,
+    options: {
+      handleStyles: {
+        backgroundColor: "black",
+        border: "black",
+        color: "black",
+        // other camelCase styles for size display
+      },
+    },
+  },
+];
 </script>
 
 <template>
-  <QuillyEditor
-    ref="editor"
-    v-model="modelValue"
+  <QuillEditor
+    theme="snow"
+    contentType="html"
+    v-model:content="modelValue"
+    :modules="modules"
     :options="options"
-    @update:modelValue="(value) => console.log('HTML model updated:', value)"
-    @text-change="
-      ({ delta, oldContent, source }) =>
-        console.log('text-change', delta, oldContent, source)
-    "
-    @selection-change="
-      ({ range, oldRange, source }) =>
-        console.log('selection-change', range, oldRange, source)
-    "
-    @editor-change="
-      (eventName) => console.log('editor-change', `eventName: ${eventName}`)
-    "
-    @focus="(quill) => console.log('focus', quill)"
-    @blur="(quill) => console.log('blur', quill)"
-    @ready="(quill) => console.log('ready', quill)"
+    @ready="(edit) => console.log('editor is ready', edit.editor)"
   />
 </template>
 

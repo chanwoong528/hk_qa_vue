@@ -9,7 +9,7 @@ import { swVersionApi } from "@/services/domain/swService";
 import { testSessionApi } from "@/services/domain/testSessionService";
 
 import type { ISwType, ISwVersion, ITestSession } from "@/types/types";
-import { E_Role } from "@/types/enum.d";
+import { E_ModalType, E_Role } from "@/types/enum.d";
 
 import SwVersionList from "@/components/list/SwVersionList.vue";
 import DefaultLayout from "@/layout/DefaultLayout.vue";
@@ -87,7 +87,7 @@ const onSubmitNewVersion = (
   tag: string,
   file?: File
 ) => {
-  console.log("onSubmitNewVersion", versionTitle, versionDesc, tag, file);
+  // console.log("onSubmitNewVersion", versionTitle, versionDesc, tag, file);
 
   if (!!route.params.id) {
     return swVersionApi
@@ -112,7 +112,11 @@ const onSubmitNewVersion = (
 </script>
 
 <template>
-  <ModalWrap v-model="openModalNewVersion" title="Create New Version">
+  <ModalWrap
+    v-model="openModalNewVersion"
+    title="Create New Version"
+    :type="E_ModalType.full"
+  >
     <NewVersionForm @onSubmitNewVersion="onSubmitNewVersion" />
   </ModalWrap>
   <DefaultLayout>

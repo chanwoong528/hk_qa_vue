@@ -20,11 +20,12 @@ const rules = {
     required: helpers.withMessage("Username is required", required),
   },
 };
+const v$ = useVuelidate(rules, state);
+
 const onClickSubmit = () => {
+  if (!!v$.value.$errors.map((e) => e.$message).join(", ")) return;
   emit("submitUser", state);
 };
-
-const v$ = useVuelidate(rules, state);
 </script>
 <template>
   <form @submit.prevent="">

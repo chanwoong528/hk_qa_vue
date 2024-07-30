@@ -4,7 +4,11 @@ import type { ISwVersion, ITestSession, IUserInfo } from "@/types/types";
 import SwVersionItem from "@/components/list/SwVersionItem.vue";
 import ModalWrap from "@/components/ModalWrap.vue";
 import TestStatusForm from "@/components/form/TestStatusForm.vue";
-import { E_TestStatus, E_SwVersionModalType } from "@/types/enum.d";
+import {
+  E_TestStatus,
+  E_SwVersionModalType,
+  E_ModalType,
+} from "@/types/enum.d";
 import AddTesterForm from "../form/AddTesterForm.vue";
 import { userApi } from "@/services/domain/userService";
 import { testSessionApi } from "@/services/domain/testSessionService";
@@ -22,9 +26,12 @@ const emit = defineEmits(["onSubmitStatus"]);
 
 const userList = ref<IUserInfo[]>([]);
 const testSessionUserList = ref<IUserInfo[]>([]);
+const curSwVersionId = ref<string>("");
+const curSwVersionInfo = reactive({} as ISwVersion);
+
+const openModalDetailView = ref<boolean>(false);
 const openModalUpdateStatus = ref<boolean>(false);
 const openModalAddTester = ref<boolean>(false);
-const curSwVersionId = ref<string>("");
 
 const selectedTestSession = reactive<Partial<ITestSession>>({
   sessionId: "",
@@ -35,6 +42,8 @@ const toggleModal = (type?: E_SwVersionModalType) => {
   switch (type) {
     case E_SwVersionModalType.addTester:
       return (openModalAddTester.value = !openModalAddTester.value);
+    case E_SwVersionModalType.detailView:
+      return (openModalDetailView.value = !openModalDetailView.value);
     default:
       return (openModalUpdateStatus.value = !openModalUpdateStatus.value);
   }
@@ -63,6 +72,14 @@ const onClickAddTester = (swVerId: string) => {
     testSessionUserList.value = curTesters as IUserInfo[];
     userList.value = usersData as IUserInfo[];
   });
+};
+
+const onClickDetailView = (swVerId: string) => {
+  curSwVersionId.value = swVerId;
+  Object.assign(
+    curSwVersionInfo,
+    props.swVersionList?.find((sw) => sw.swVersionId === swVerId)
+  );
 };
 
 const onSubmitAddTesters = (testers: IUserInfo[]) => {
@@ -109,6 +126,19 @@ const onSubmitAddTesters = (testers: IUserInfo[]) => {
       @onSubmitAddTesters="onSubmitAddTesters"
     />
   </ModalWrap>
+  <ModalWrap
+    v-model="openModalDetailView"
+    :type="E_ModalType.full"
+    :title="'Detail for ' + curSwVersionInfo.versionTitle"
+  >
+    <SwVersionItem
+      :swVersion="curSwVersionInfo"
+      @onClickTester="onClickTester"
+      @onClickAddTester="onClickAddTester"
+      @onClickDetailView="onClickDetailView"
+    />
+    <!-- TODO: comment area -->
+  </ModalWrap>
 
   <v-expansion-panels>
     <SwVersionItem
@@ -116,8 +146,10 @@ const onSubmitAddTesters = (testers: IUserInfo[]) => {
       :key="swVersion.swVersionId"
       :swVersion="swVersion"
       :toggleModal="toggleModal"
+      itemType="panel"
       @onClickTester="onClickTester"
       @onClickAddTester="onClickAddTester"
+      @onClickDetailView="onClickDetailView"
     />
   </v-expansion-panels>
 </template>

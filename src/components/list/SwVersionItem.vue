@@ -13,10 +13,15 @@ const props = defineProps({
   swVersion: {
     type: Object as () => ISwVersion,
   },
+  itemType: String,
   toggleModal: Function,
 });
 
-const emit = defineEmits(["onClickTester", "onClickAddTester"]);
+const emit = defineEmits([
+  "onClickTester",
+  "onClickAddTester",
+  "onClickDetailView",
+]);
 
 const testSessionsPassStatus = computed(() => {
   return (
@@ -56,10 +61,17 @@ const onClickAddTester = () => {
     emit("onClickAddTester", props.swVersion?.swVersionId);
   }
 };
+
+const onClickDetailView = () => {
+  if (!!props.toggleModal) {
+    props.toggleModal(E_SwVersionModalType.detailView);
+    emit("onClickDetailView", props.swVersion?.swVersionId);
+  }
+};
 </script>
 
 <template>
-  <v-expansion-panel>
+  <v-expansion-panel v-if="itemType === 'panel'">
     <v-expansion-panel-title>
       {{ props.swVersion?.versionTitle }}
       <template v-slot:actions="{ expanded }">
@@ -71,12 +83,11 @@ const onClickAddTester = () => {
       </template>
     </v-expansion-panel-title>
     <v-expansion-panel-text>
-      <p>
-        {{ props.swVersion?.versionDesc }}
-      </p>
       <a v-if="props.swVersion?.fileSrc" :href="props.swVersion?.fileSrc"
         >Download File</a
       >
+      <div class="desc-inner-html" v-html="props.swVersion?.versionDesc"></div>
+
       <v-container>
         <div
           v-if="
@@ -104,28 +115,62 @@ const onClickAddTester = () => {
         <div v-else>
           <p>no tester registered</p>
         </div>
-        <div
-          class="modify-tester-btn-con"
-          v-if="loggedInUser?.role !== E_Role.tester"
-        >
+        <div class="modify-tester-btn-con">
           <v-btn
+            v-if="loggedInUser?.role !== E_Role.tester"
             @click="onClickAddTester"
             class="text-none text-subtitle-1"
             variant="outlined"
           >
+            <v-icon icon="mdi-account-multiple-plus" start></v-icon>
             Modify TesterLists
           </v-btn>
           <v-btn
-            @click="onClickAddTester"
+            @click="onClickDetailView"
             class="text-none text-subtitle-1"
             variant="outlined"
           >
             Go to Detail Version
+            <v-icon icon="mdi-information" end></v-icon>
           </v-btn>
         </div>
       </v-container>
     </v-expansion-panel-text>
   </v-expansion-panel>
+
+  <div class="default-type-item" v-else>
+    <a v-if="props.swVersion?.fileSrc" :href="props.swVersion?.fileSrc"
+      >Download File</a
+    >
+    <div v-html="props.swVersion?.versionDesc"></div>
+
+    <div>
+      <div
+        v-if="
+          !!props.swVersion?.testSessions &&
+          props.swVersion?.testSessions.length > 0
+        "
+      >
+        <v-chip
+          v-for="tester in props.swVersion?.testSessions"
+          class="mr-2 mb-2"
+          :class="tester.user.id === loggedInUser?.id ? ' on' : 'no'"
+          :variant="tester.user.id === loggedInUser?.id ? 'tonal' : 'outlined'"
+          label
+          :color="renderTestStatus(tester.status as E_TestStatus)"
+          @click="onClickLoggedInUserStatus(tester)"
+        >
+          <v-icon icon="mdi-account-circle-outline" start></v-icon>
+          {{
+            tester.user.id === loggedInUser?.id ? "me" : tester.user.username
+          }}
+        </v-chip>
+      </div>
+      <div v-else>
+        <p>no tester registered</p>
+      </div>
+    </div>
+  </div>
 </template>
 
 <style scoped>
@@ -140,5 +185,17 @@ const onClickAddTester = () => {
 }
 .v-chip.on:hover {
   cursor: pointer;
+}
+.desc-inner-html {
+  overflow: hidden;
+  max-height: 300px;
+}
+.default-type-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 20px;
+
+  margin-top: 20px;
 }
 </style>

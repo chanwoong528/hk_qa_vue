@@ -20,6 +20,7 @@ const v$ = useVuelidate(rules, state);
 const emit = defineEmits(["userEmail"]);
 
 const handleSubmitEmail = (closeFlag?: boolean) => {
+  if (!!v$.value.$errors.map((e) => e.$message).join(", ")) return;
   emit(
     "userEmail",
     v$.value.$errors.map((e) => e.$message).join(", "),

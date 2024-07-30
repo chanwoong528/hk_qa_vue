@@ -26,12 +26,12 @@ const fetchAuthByAccToken = () => {
   return authApi
     .GET_loginCheck()
     .then((loginResult) => {
-      store.setUser(loginResult as IUserInfo);
-      // return router.push("/");
+      return store.setUser(loginResult as IUserInfo);
     })
     .catch((err) => {
       store.setResetUser();
-      return alert("Session expired. Please login again.");
+      alert("Session expired. Please login again.");
+      return router.push("/login");
     });
 };
 

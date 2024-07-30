@@ -24,6 +24,7 @@ const rules = {
 };
 const v$ = useVuelidate(rules, state);
 const onSubmitNewService = () => {
+  if (!!v$.value.$errors.map((e) => e.$message).join(", ")) return;
   emit("onSubmitNewService", state.typeTitle, state.typeDesc);
 };
 </script>
@@ -50,7 +51,6 @@ const onSubmitNewService = () => {
       v-model="state.typeDesc"
     />
     <v-btn
-      class="mb-8"
       color="blue"
       size="large"
       variant="tonal"
