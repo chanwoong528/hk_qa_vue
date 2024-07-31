@@ -1,4 +1,4 @@
-import type { INetworkException, IUserInfo, IUserUpdateInfo } from "@/types/types";
+import type { IUserInfo, IUserUpdateInfo } from "@/types/types";
 import { http, ExceptionWrapper } from "../http";
 
 

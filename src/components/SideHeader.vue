@@ -113,18 +113,15 @@ const onSubmitNewService = (title: string, desc: string) => {
           <template v-slot:activator="{ props }">
             <v-list-item v-bind="props" :title="navItem.label"></v-list-item>
           </template>
-
           <v-list-item
-            v-for="(swType, i) in swTypes"
-            :key="swType.swTypeId + i"
+            v-for="swType in swTypes"
+            :key="navItem.directTo + swType.swTypeId"
             link
             :to="navItem.directTo + swType.swTypeId"
             :title="swType.typeTitle"
             :value="swType.typeTitle"
           >
-            <!-- <RouterLink :to="navItem.directTo + swType.swTypeId" c>
-              {{ swType.typeTitle }}
-            </RouterLink> -->
+            <!-- :active="route.path === navItem.directTo + swType.swTypeId" -->
           </v-list-item>
         </v-list-group>
       </template>

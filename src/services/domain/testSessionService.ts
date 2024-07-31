@@ -1,7 +1,5 @@
-import type { INetworkException } from "@/types/types";
 
 import { http, ExceptionWrapper } from "../http";
-
 
 export const testSessionApi = {
   PATCH_testSession: (sessionId: string, status: string): Promise<void> => {

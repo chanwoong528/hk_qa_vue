@@ -1,11 +1,6 @@
 import axios from "axios";
 
-import type { INetworkException } from "@/types/types";
-
 const DEV_BASE_RESTAPI = "http://localhost:3000";
-
-
-
 export const http = axios.create({
   baseURL: DEV_BASE_RESTAPI,
   headers: {

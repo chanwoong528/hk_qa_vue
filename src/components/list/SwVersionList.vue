@@ -1,17 +1,27 @@
 <script setup lang="ts">
-import { reactive, ref } from "vue";
-import type { ISwVersion, ITestSession, IUserInfo } from "@/types/types";
-import SwVersionItem from "@/components/list/SwVersionItem.vue";
-import ModalWrap from "@/components/ModalWrap.vue";
-import TestStatusForm from "@/components/form/TestStatusForm.vue";
+import { reactive, ref, computed } from "vue";
+import type {
+  ISwVersion,
+  ITestSession,
+  IUserInfo,
+  IComment,
+} from "@/types/types";
+
 import {
   E_TestStatus,
   E_SwVersionModalType,
   E_ModalType,
 } from "@/types/enum.d";
-import AddTesterForm from "../form/AddTesterForm.vue";
+
 import { userApi } from "@/services/domain/userService";
 import { testSessionApi } from "@/services/domain/testSessionService";
+
+import AddTesterForm from "@/components/form/AddTesterForm.vue";
+import CommentList from "@/components/list/CommentList.vue";
+import SwVersionItem from "@/components/list/SwVersionItem.vue";
+import ModalWrap from "@/components/ModalWrap.vue";
+import TestStatusForm from "@/components/form/TestStatusForm.vue";
+import { commentApi } from "@/services/domain/commentService";
 
 const props = defineProps({
   swVersionList: {
@@ -27,7 +37,8 @@ const emit = defineEmits(["onSubmitStatus"]);
 const userList = ref<IUserInfo[]>([]);
 const testSessionUserList = ref<IUserInfo[]>([]);
 const curSwVersionId = ref<string>("");
-const curSwVersionInfo = reactive({} as ISwVersion);
+
+const commentListForVersion = ref<IComment[]>([]);
 
 const openModalDetailView = ref<boolean>(false);
 const openModalUpdateStatus = ref<boolean>(false);
@@ -36,6 +47,12 @@ const openModalAddTester = ref<boolean>(false);
 const selectedTestSession = reactive<Partial<ITestSession>>({
   sessionId: "",
   status: E_TestStatus.pending,
+});
+
+const curSwVersionInfo = computed(() => {
+  return props.swVersionList?.find(
+    (sw) => sw.swVersionId === curSwVersionId.value
+  );
 });
 
 const toggleModal = (type?: E_SwVersionModalType) => {
@@ -76,10 +93,9 @@ const onClickAddTester = (swVerId: string) => {
 
 const onClickDetailView = (swVerId: string) => {
   curSwVersionId.value = swVerId;
-  Object.assign(
-    curSwVersionInfo,
-    props.swVersionList?.find((sw) => sw.swVersionId === swVerId)
-  );
+  return commentApi
+    .GET_commentsBySwVersionId(swVerId)
+    .then((res) => (commentListForVersion.value = res));
 };
 
 const onSubmitAddTesters = (testers: IUserInfo[]) => {
@@ -126,19 +142,25 @@ const onSubmitAddTesters = (testers: IUserInfo[]) => {
       @onSubmitAddTesters="onSubmitAddTesters"
     />
   </ModalWrap>
+  <!-- Detail Modal for Specific Version -->
   <ModalWrap
     v-model="openModalDetailView"
     :type="E_ModalType.full"
-    :title="'Detail for ' + curSwVersionInfo.versionTitle"
+    :title="'Detail for ' + curSwVersionInfo?.versionTitle"
   >
     <SwVersionItem
       :swVersion="curSwVersionInfo"
+      :toggleModal="toggleModal"
       @onClickTester="onClickTester"
       @onClickAddTester="onClickAddTester"
       @onClickDetailView="onClickDetailView"
     />
-    <!-- TODO: comment area -->
+    <CommentList
+      v-model="commentListForVersion"
+      :swVersion="curSwVersionInfo"
+    />
   </ModalWrap>
+  <!-- Detail Modal for Specific Version -->
 
   <v-expansion-panels>
     <SwVersionItem

@@ -34,3 +34,7 @@ export enum E_SwTypeListType {
 export enum E_ModalType {
   full = "full",
 }
+
+export enum E_EditorType {
+  comment = "comment",
+}

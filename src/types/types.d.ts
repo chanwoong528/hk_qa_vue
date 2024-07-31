@@ -68,3 +68,14 @@ export interface INetworkSuccess {
   message: string
 }
 
+
+export interface IComment {
+  commentId: string;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
+
+  user: IUserInfo;
+  swVersion: ISwVersion;
+  childComments: IComment[]
+}

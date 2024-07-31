@@ -154,7 +154,7 @@ const onClickDetailView = () => {
         <v-chip
           v-for="tester in props.swVersion?.testSessions"
           class="mr-2 mb-2"
-          :class="tester.user.id === loggedInUser?.id ? ' on' : 'no'"
+          :class="tester.user.id === loggedInUser?.id ? ' on' : ''"
           :variant="tester.user.id === loggedInUser?.id ? 'tonal' : 'outlined'"
           label
           :color="renderTestStatus(tester.status as E_TestStatus)"
