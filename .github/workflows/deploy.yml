@@ -37,7 +37,7 @@ jobs:
           npm run build
 
       - name: zip file
-        run: zip -r qaVue.zip ./dist
+        run: zip -r qaVue.zip ./dist ./scripts ./appspec.yml
 
       - name: AWS configure credentials
         uses: aws-actions/configure-aws-credentials@v1
