@@ -1,5 +1,5 @@
 #!/bin/bash
-REPOSITORY=/home/ubuntu/vue
+REPOSITORY=/var/www
 
 cd $REPOSITORY
 # export NVM_DIR="$HOME/.nvm"
