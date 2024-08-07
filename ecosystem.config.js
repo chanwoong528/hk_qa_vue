@@ -8,7 +8,6 @@ module.exports = {
       watch: true, // 파일 변경 모니터링, 파일 변동시 재시작
       exec_mode: "cluster",
       env: {
-        "PORT": 3001,
         "NODE_ENV": "prod"
       }
     }
