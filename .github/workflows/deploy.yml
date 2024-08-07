@@ -51,9 +51,8 @@ jobs:
 
       - name: deploy with AWS codeDeploy
         run: aws deploy create-deployment
-          --file-exists-behavior OVERWRITE
-          --application-name hkqacd
+          --application-name hkqavue
           --deployment-config-name CodeDeployDefault.OneAtATime
-          --deployment-group-name HQGROUP
+          --deployment-group-name HKQAGROUP
           --ignore-application-stop-failures
           --s3-location bucket=hkqa-build-bucket,bundleType=zip,key=deploy/qaVue.zip
