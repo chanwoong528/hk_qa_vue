@@ -18,7 +18,7 @@ const { swTypes } = storeToRefs(swStore);
   </DefaultLayout>
 </template>
 
-<style lang="scss" scoped>
+<style scoped>
 .home-header {
   padding: 20px 0;
   display: flex;
