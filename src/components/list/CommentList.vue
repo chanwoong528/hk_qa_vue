@@ -77,7 +77,7 @@ const onSubmitComment = (parentId?: string, reCommentVal?: string) => {
   </div>
 </template>
 
-<style scoped lang="scss">
+<style scoped>
 .editor-con {
   padding: 10px 0;
   display: flex;

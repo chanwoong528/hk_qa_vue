@@ -9,3 +9,4 @@ cd $REPOSITORY
 # npm install
 # pm2 start dist
 # pm2 start npm --name "hkqa-server" -- run "start:prod"
+pm2 start ./ecosystem.config.js 

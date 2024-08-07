@@ -5,7 +5,8 @@
     "dev": "cross-env NODE_ENV=dev vite",
     "build": "cross-env NODE_ENV=prod vue-tsc --noEmit && vite build",
     "preview": "cross-env NODE_ENV=prod vite preview",
-    "lint": "eslint . --fix --ignore-path .gitignore"
+    "lint": "eslint . --fix --ignore-path .gitignore", 
+    "pm2:start":"cross-env NODE_ENV=prod pm2 serve dist/ 3001 --name hkqa-client  --spa"
   },
   "dependencies": {
     "@mdi/font": "6.2.95",
