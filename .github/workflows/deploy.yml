@@ -30,7 +30,7 @@ jobs:
       - name: Check Npm -v
         run: npm -v
 
-      - name: build server files
+      - name: build vue files
         working-directory: ./
         run: |
           npm install
