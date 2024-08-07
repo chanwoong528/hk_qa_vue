@@ -1,5 +1,5 @@
 #!/bin/bash
-REPOSITORY=/var/www
+REPOSITORY=/var/www/hkqaVue
 
 cd $REPOSITORY
 export NVM_DIR="$HOME/.nvm"
