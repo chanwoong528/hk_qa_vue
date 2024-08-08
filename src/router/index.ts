@@ -12,6 +12,7 @@ interface NavItem {
   path: string;
   component: Component;
   label: string;
+  code: string;
   directTo?: string; // for dynamic route
   meta: {
     requiresAuth?: boolean;
@@ -25,32 +26,36 @@ export const NAV_LIST: NavItem[] = [
   {
     path: "/",
     component: HomeView,
-    label: "Home",
+    label: "홈",
+    code: "Home",
     meta: { requiresAuth: true },
   },
   {
     path: "/user",
     component: UsersView,
-    label: "Users",
+    label: "유저 목록",
+    code: "Users",
     meta: {
       requiresAuth: true,
       requiresMaster: true,
     },
   },
-  {
-    path: "/sw-type",
-    component: SwTypeView,
-    label: "Services",
-    meta: {
-      requiresAuth: true,
-      requiresMaster: true,
-    },
-  },
+  // {
+  //   path: "/sw-type",
+  //   component: SwTypeView,
+  //   label: "Services",
+  //   code:
+  //   meta: {
+  //     requiresAuth: true,
+  //     requiresMaster: true,
+  //   },
+  // },
   {
     path: "/sw-type/:id",
     directTo: "/sw-type/",
     component: SwTypeDetailView,
-    label: "SW Type Detail",
+    label: "한국일보 서비스",
+    code: "SW Type Detail",
     meta: {
       requiresAuth: true,
     },
@@ -59,12 +64,14 @@ export const NAV_LIST: NavItem[] = [
     path: "/login",
     component: LoginView,
     label: "Login",
+    code: "Login",
     meta: { requiresAuth: false },
   },
   {
     path: "/verify",
     component: VerifyView,
     label: "Verify Email",
+    code: "Verify Email",
     meta: { requiresAuth: false },
   },
 ];

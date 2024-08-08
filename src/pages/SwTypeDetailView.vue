@@ -114,24 +114,21 @@ const onSubmitNewVersion = (
 <template>
   <ModalWrap
     v-model="openModalNewVersion"
-    title="Create New Version"
+    title="신규 버전"
     :type="E_ModalType.full"
   >
     <NewVersionForm @onSubmitNewVersion="onSubmitNewVersion" />
   </ModalWrap>
   <DefaultLayout>
     <header class="sw-detail-header">
-      <h3>
-        Versions for
-        {{ swTypeInfo?.typeTitle }}
-      </h3>
+      <h3>{{ swTypeInfo?.typeTitle }} 개발 버전 리스트</h3>
       <v-btn
         v-if="loggedInUser?.role !== E_Role.tester"
-        variant="elevated"
+        variant="outlined"
         color="primary"
         @click="openModalNewVersion = true"
       >
-        New Version
+        새로운 버전 등록
         <v-icon icon="mdi-plus"></v-icon>
       </v-btn>
     </header>

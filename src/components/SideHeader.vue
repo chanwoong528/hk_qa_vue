@@ -61,6 +61,7 @@ const computedNavList = computed(() => {
 const onSubmitNewService = (title: string, desc: string) => {
   return swApi.POST_sw({ typeTitle: title, typeDesc: desc }).then((res) => {
     fetchSw();
+    openNewServiceModal.value = false;
   });
 };
 </script>
@@ -73,7 +74,7 @@ const onSubmitNewService = (title: string, desc: string) => {
     <v-list v-model:opened="openGroups">
       <v-list-item>
         <div class="title-wrap">
-          <v-list-item-title>HK QA TEST </v-list-item-title>
+          <v-list-item-title>HIQ</v-list-item-title>
           <v-btn
             v-if="loggedInUser?.role === E_Role.master"
             size="x-small"
@@ -81,7 +82,7 @@ const onSubmitNewService = (title: string, desc: string) => {
             color="primary"
             @click="openNewServiceModal = true"
           >
-            New Service
+            서비스 등록
             <v-icon icon="mdi-plus"></v-icon>
           </v-btn>
         </div>
@@ -99,14 +100,14 @@ const onSubmitNewService = (title: string, desc: string) => {
           link
           :to="navItem.path"
           v-if="
-            !!navItem.meta.requiresAuth && !(navItem.label === 'SW Type Detail')
+            !!navItem.meta.requiresAuth && !(navItem.code === 'SW Type Detail')
           "
         >
           {{ navItem.label }}
         </v-list-item>
 
         <v-list-group
-          v-else-if="!!(navItem.label === 'SW Type Detail')"
+          v-else-if="!!(navItem.code === 'SW Type Detail')"
           v-model="openGroups"
           :value="navItem.label"
         >

@@ -4,6 +4,7 @@ import { QuillEditor } from "@vueup/vue-quill";
 
 import ImageCompress from "quill-image-compress";
 import QuillResizeImage from "quill-resize-image";
+import MagicUrl from "quill-magic-url";
 
 import { E_EditorType } from "@/types/enum.d";
 
@@ -18,6 +19,10 @@ const props = defineProps({
     type: String as PropType<E_EditorType>,
     required: false,
   },
+  isEditorFocused: {
+    type: Boolean,
+    required: false,
+  },
 });
 watch(
   () => modelValue.value,
@@ -29,6 +34,19 @@ watch(
     }
   }
 );
+watch(
+  () => props.isEditorFocused,
+  (newVal) => {
+    if (!!newVal && editorRef.value) {
+      (editorRef.value as any).focus();
+    }
+  }
+);
+const emit = defineEmits(["onBlurEditorCon"]);
+
+const onBlur = () => {
+  emit("onBlurEditorCon", true);
+};
 
 const options = {
   theme: "",
@@ -57,6 +75,10 @@ const modules = [
       },
     },
   },
+  {
+    name: "MagicUrl",
+    module: MagicUrl,
+  },
 ];
 </script>
 
@@ -69,6 +91,7 @@ const modules = [
     :toolbar="props.editorType === E_EditorType.comment ? 'essential' : 'full'"
     :modules="modules"
     :options="options"
+    @blur="onBlur"
   >
   </QuillEditor>
 
@@ -79,5 +102,14 @@ const modules = [
 .hide--toolbar {
   display: flex;
   flex-direction: column;
+}
+.ql-toolbar.ql-snow {
+  border: none;
+}
+.ql-container.ql-snow {
+  border: none;
+  .ql-editor {
+    height: 100%;
+  }
 }
 </style>

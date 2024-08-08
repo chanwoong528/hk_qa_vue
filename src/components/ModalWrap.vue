@@ -22,13 +22,12 @@ const toggleDialog = () => {
     <v-dialog
       v-model="model"
       width="100%"
-      :fullscreen="type === E_ModalType.full"
       transition="dialog-bottom-transition"
     >
       <v-card
         class="mx-auto pa-8"
         min-width="500px"
-        :width="type === E_ModalType.full ? '100%' : 'auto'"
+        :width="type === E_ModalType.full ? 'auto' : 'auto'"
       >
         <v-toolbar>
           <v-toolbar-title>{{ title }}</v-toolbar-title>

@@ -17,6 +17,7 @@
     "core-js": "^3.34.0",
     "pinia": "^2.1.7",
     "quill-image-compress": "^2.0.2",
+    "quill-magic-url": "^4.2.0",
     "quill-resize-image": "^1.0.4",
     "roboto-fontface": "*",
     "vue": "^3.4.21",
