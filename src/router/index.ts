@@ -4,7 +4,7 @@ import type { Component } from "vue";
 import HomeView from "@/pages/HomeView.vue";
 import LoginView from "@/pages/LoginView.vue";
 import UsersView from "@/pages/UsersView.vue";
-import SwTypeView from "@/pages/SwTypeView.vue";
+// import SwTypeView from "@/pages/SwTypeView.vue";
 import SwTypeDetailView from "@/pages/SwTypeDetailView.vue";
 import VerifyView from "@/pages/VerifyView.vue";
 
