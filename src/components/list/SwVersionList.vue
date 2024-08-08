@@ -176,4 +176,10 @@ const onSubmitAddTesters = (testers: IUserInfo[]) => {
   </v-expansion-panels>
 </template>
 
-<style scoped></style>
+<style scoped lang="scss">
+.test-status-modal {
+  :deep(".v-card") {
+    border: 10px solid red;
+  }
+}
+</style>

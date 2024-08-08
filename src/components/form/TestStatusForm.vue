@@ -13,30 +13,41 @@ const btnList = ref<{ code: E_TestStatus; label: string }[]>([
   { code: E_TestStatus.failed, label: "실패" },
 ]);
 
-const renderClassForETestStatus = (status: E_TestStatus) => {
+// const renderClassForETestStatus = (status: E_TestStatus) => {
+//   switch (status) {
+//     case E_TestStatus.failed:
+//       return "text-error";
+//     case E_TestStatus.passed:
+//       return "text-success";
+//     default:
+//       return "text-warning";
+//   }
+// };
+const renderRadioBtnTestStatus = (status: E_TestStatus) => {
   switch (status) {
     case E_TestStatus.failed:
-      return "text-error";
+      return "error";
     case E_TestStatus.passed:
-      return "text-success";
+      return "success";
     default:
-      return "text-warning";
+      return "warning";
   }
 };
 </script>
 
 <template>
   <div>
-    <v-radio-group v-model="state.status">
+    <v-radio-group v-model="state.status" hide-details>
       <v-radio
         v-for="btn in btnList"
         :key="btn"
+        :color="renderRadioBtnTestStatus(btn.code)"
         :label="btn.label"
         :value="btn.code"
       >
         <template v-slot:label>
           <p>
-            <strong :class="renderClassForETestStatus(btn.code)">
+            <strong>
               {{ btn.label }}
             </strong>
           </p>
@@ -46,4 +57,8 @@ const renderClassForETestStatus = (status: E_TestStatus) => {
   </div>
 </template>
 
-<style scoped></style>
+<style scoped lang="scss">
+.v-input__details {
+  display: none;
+}
+</style>

@@ -36,6 +36,7 @@ const renderModalSizeByModalType = (type?: E_ModalType) => {
 <template>
   <div class="text-center">
     <v-dialog
+      :class="title === 'QA 항목 상태 변경' ? ' dialog-tester-status' : ''"
       v-model="model"
       width="100%"
       transition="dialog-bottom-transition"
@@ -45,7 +46,7 @@ const renderModalSizeByModalType = (type?: E_ModalType) => {
           <v-toolbar-title>{{ title }}</v-toolbar-title>
           <v-btn icon="mdi-close" @click="model = false"></v-btn>
         </v-toolbar>
-        <div class="px-8 pb-4">
+        <div class="px-8 pb-4 slot-con">
           <div><slot></slot></div>
         </div>
         <template v-slot:actions v-if="!!haveBtnCtl">
@@ -61,5 +62,19 @@ button[type="submit"] {
   margin-left: auto;
   margin-top: auto;
   min-width: auto;
+}
+.dialog-tester-status {
+  .v-card {
+    border-radius: 10px !important;
+    .slot-con {
+      padding-bottom: 0 !important;
+    }
+    .v-toolbar {
+      background-color: #fff;
+      .v-toolbar-title {
+        font-weight: 600;
+      }
+    }
+  }
 }
 </style>

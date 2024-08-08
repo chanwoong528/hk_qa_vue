@@ -10,6 +10,7 @@ import LoginForm from "@/components/form/LoginForm.vue";
 import ModalWrap from "@/components/ModalWrap.vue";
 
 import type { IUserInfo } from "@/types/types";
+import HIQ_LOGO from "@/assets/hiq_logo_text.svg";
 
 const router = useRouter();
 const store = useUserStore();
@@ -67,10 +68,21 @@ const handleLogin = (error: Object, email: string, pw: string) => {
       max-width="448"
       rounded="lg"
     >
-      <h1>HK QA Tester</h1>
-      <div class="text-subtitle-1 text-medium-emphasis">Account</div>
+      <h1>
+        <img :src="HIQ_LOGO" alt="HK QA Tester" />
+      </h1>
+      <div class="text-subtitle-1 text-medium-emphasis">Email</div>
 
       <LoginForm @handle-login="handleLogin" :toggleDialog="toggleDialog" />
     </v-card>
   </div>
 </template>
+<style scoped lang="scss">
+h1 {
+  width: 50%;
+  margin: 0 auto;
+  img {
+    width: 100%;
+  }
+}
+</style>
