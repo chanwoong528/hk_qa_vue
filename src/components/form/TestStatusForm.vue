@@ -13,16 +13,16 @@ const btnList = ref<{ code: E_TestStatus; label: string }[]>([
   { code: E_TestStatus.failed, label: "실패" },
 ]);
 
-// const renderClassForETestStatus = (status: E_TestStatus) => {
-//   switch (status) {
-//     case E_TestStatus.failed:
-//       return "text-error";
-//     case E_TestStatus.passed:
-//       return "text-success";
-//     default:
-//       return "text-warning";
-//   }
-// };
+const renderClassForETestStatus = (status: E_TestStatus) => {
+  switch (status) {
+    case E_TestStatus.failed:
+      return "text-error";
+    case E_TestStatus.passed:
+      return "text-success";
+    default:
+      return "text-warning";
+  }
+};
 const renderRadioBtnTestStatus = (status: E_TestStatus) => {
   switch (status) {
     case E_TestStatus.failed:
@@ -44,10 +44,11 @@ const renderRadioBtnTestStatus = (status: E_TestStatus) => {
         :color="renderRadioBtnTestStatus(btn.code)"
         :label="btn.label"
         :value="btn.code"
+        :class="renderClassForETestStatus(btn.code)"
       >
         <template v-slot:label>
           <p>
-            <strong>
+            <strong class="label-text">
               {{ btn.label }}
             </strong>
           </p>
@@ -58,7 +59,9 @@ const renderRadioBtnTestStatus = (status: E_TestStatus) => {
 </template>
 
 <style scoped lang="scss">
-.v-input__details {
-  display: none;
+.label-text {
+  color: #000;
+  opacity: 1;
+  font-weight: 600;
 }
 </style>

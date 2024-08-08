@@ -49,12 +49,7 @@ const emit = defineEmits(["onChangeSelectRole", "onChangeUserStatus"]);
       v-model="model"
       :items-per-page="0"
       :headers="checkboxHeader"
-      :items="
-        props.userList.map((user) => ({
-          ...user,
-          createdAt: user.createdAt && formatDateTime(user.createdAt),
-        }))
-      "
+      :items="props.userList"
       :sort-by="[{ key: 'createdAt', order: 'asc' }]"
       show-select
       return-object
