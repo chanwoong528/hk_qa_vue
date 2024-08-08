@@ -63,9 +63,13 @@ const onClickSubmit = () => {
         }
       "
     >
-      create user</v-btn
+      등록</v-btn
     >
   </form>
 </template>
 
-<style scoped></style>
+<style scoped>
+form {
+  padding-top: 20px;
+}
+</style>

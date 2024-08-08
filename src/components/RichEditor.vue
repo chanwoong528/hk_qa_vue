@@ -50,7 +50,10 @@ const onBlur = () => {
 
 const options = {
   theme: "",
-  placeholder: "Write something...",
+  placeholder:
+    props.editorType === E_EditorType.comment
+      ? "댓글 추가"
+      : "버전 설명을 입력해주세요",
   readOnly: false,
 };
 const modules = [
@@ -83,18 +86,30 @@ const modules = [
 </script>
 
 <template>
-  <QuillEditor
-    ref="editorRef"
-    theme="snow"
-    contentType="html"
-    v-model:content="modelValue"
-    :toolbar="props.editorType === E_EditorType.comment ? 'essential' : 'full'"
-    :modules="modules"
-    :options="options"
-    @blur="onBlur"
+  <div
+    class="editor-wrap"
+    :class="
+      props.editorType === E_EditorType.comment
+        ? !!props.isEditorFocused
+          ? ' focused comment-editor'
+          : ' comment-editor'
+        : ''
+    "
   >
-  </QuillEditor>
-
+    <QuillEditor
+      ref="editorRef"
+      theme="snow"
+      contentType="html"
+      v-model:content="modelValue"
+      :toolbar="
+        props.editorType === E_EditorType.comment ? 'essential' : 'full'
+      "
+      :modules="modules"
+      :options="options"
+      @blur="onBlur"
+    >
+    </QuillEditor>
+  </div>
   <!-- @ready="(edit) => console.log('editor is ready', edit.editor)" -->
 </template>
 
@@ -103,13 +118,26 @@ const modules = [
   display: flex;
   flex-direction: column;
 }
-.ql-toolbar.ql-snow {
-  border: none;
-}
-.ql-container.ql-snow {
-  border: none;
-  .ql-editor {
-    height: 100%;
+.editor-wrap {
+  .ql-toolbar.ql-snow {
+    border: none;
+  }
+  .ql-container.ql-snow {
+    border: none;
+    .ql-editor {
+      height: 100%;
+    }
+  }
+  &.comment-editor {
+    border-bottom: 1px solid #999;
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+    &.focused {
+      .ql-container.ql-snow {
+        border-bottom: 2px solid black;
+      }
+    }
+    // .ql-toolbar.ql-snow {
+    // }
   }
 }
 </style>

@@ -46,7 +46,7 @@ const onSubmit = () => {
       type="submit"
       @click="onSubmit"
     >
-      Confirm Testers
+      테스터 확정
     </v-btn>
   </form>
 

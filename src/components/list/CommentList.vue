@@ -27,15 +27,17 @@ const checkEditorValueEmpty = (content: string) => {
   let regex = /(<([^>]+)>)/gi;
   return content.replace(regex, "").length === 0;
 };
+const isEditorFocused = ref<boolean>(false);
 
+const onFocusEditorCon = (clickedCon: boolean) => {
+  isEditorFocused.value = clickedCon;
+};
+const onBlurEditorCon = (isFocusOut: boolean) => {
+  if (!!isFocusOut && isEditorFocused.value) {
+    isEditorFocused.value = false;
+  }
+};
 const onSubmitComment = (parentId?: string, reCommentVal?: string) => {
-  console.log("Comment: ", isCommentEmpty.value);
-  console.log(
-    commentVal.value,
-    isCommentEmpty.value,
-    loggedInUser.value,
-    props.swVersion?.swVersionId
-  );
   if (
     (isCommentEmpty.value && !reCommentVal) ||
     !loggedInUser.value?.id ||
@@ -60,10 +62,15 @@ const onSubmitComment = (parentId?: string, reCommentVal?: string) => {
 };
 </script>
 <template>
-  <div class="editor-con">
-    <RichEditor :editorType="E_EditorType.comment" v-model="commentVal" />
+  <div class="editor-con" @click="onFocusEditorCon(true)">
+    <RichEditor
+      :editorType="E_EditorType.comment"
+      v-model="commentVal"
+      :isEditorFocused="isEditorFocused"
+      @onBlurEditorCon="onBlurEditorCon"
+    />
     <div class="comment-btn-con">
-      <v-btn @click="onSubmitComment">Comment</v-btn>
+      <v-btn @click="onSubmitComment">댓글</v-btn>
     </div>
   </div>
   <div>

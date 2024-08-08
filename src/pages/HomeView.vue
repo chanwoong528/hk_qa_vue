@@ -12,7 +12,7 @@ const { swTypes } = storeToRefs(swStore);
 <template>
   <DefaultLayout>
     <header class="home-header">
-      <h3>Home</h3>
+      <h3>H(ankookilbo) I(ntelligence) Q(A system)</h3>
     </header>
     <SwList :type="E_SwTypeListType.section" :swList="swTypes" />
   </DefaultLayout>

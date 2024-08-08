@@ -197,7 +197,10 @@ console.log("props.swVersion", props.swVersion);
     <a v-if="props.swVersion?.fileSrc" :href="props.swVersion?.fileSrc"
       >Download File</a
     >
-    <div v-html="props.swVersion?.versionDesc"></div>
+    <div
+      class="desc-inner-html expand"
+      v-html="props.swVersion?.versionDesc"
+    ></div>
 
     <div class="version-ctrl-con">
       <v-divider :thickness="2"></v-divider>
@@ -298,6 +301,12 @@ console.log("props.swVersion", props.swVersion);
   overflow: hidden;
   max-height: 300px;
   margin: 20px 0;
+  &.expand {
+    max-height: none;
+    :deep(img) {
+      border: 1px solid #ececec;
+    }
+  }
 }
 .version-ctrl-con {
   display: flex;

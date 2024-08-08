@@ -52,7 +52,7 @@ const onSubmitAddUser = (
 </script>
 
 <template>
-  <ModalWrap v-model="openModalNewUser" title="Add New User">
+  <ModalWrap v-model="openModalNewUser" title="신규 유저 등록">
     <AddUserForm @submitUser="onSubmitAddUser" />
   </ModalWrap>
   <DefaultLayout>
@@ -64,7 +64,7 @@ const onSubmitAddUser = (
         color="primary"
         @click="onToggleNewUser"
       >
-        New User
+        신규 유저 등록
         <v-icon icon="mdi-plus"></v-icon>
       </v-btn>
     </header>

@@ -28,7 +28,7 @@ const headers = ref([
 <template>
   <section v-if="type === E_SwTypeListType.section">
     <header>
-      <h4>HK Software List</h4>
+      <h4>현재 한국일보 서비스 리스트</h4>
     </header>
     <v-row cols="12" md="4">
       <v-col v-for="swItem in props.swList" :key="swItem.swTypeId">

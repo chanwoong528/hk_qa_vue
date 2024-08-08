@@ -3,6 +3,7 @@ import type { IComment } from "@/types/types";
 import { E_EditorType } from "@/types/enum.d";
 import { ref, defineProps } from "vue";
 
+import { formatDateTime } from "@/utils/common/formatter";
 const props = defineProps({
   comment: {
     type: Object as () => IComment,
@@ -10,12 +11,21 @@ const props = defineProps({
   child: Boolean,
 });
 
+const isEditorFocused = ref<boolean>(false);
 const openChildComments = ref<boolean>(false);
 const openEditorForReply = ref<boolean>(false);
 const curCommentId = ref<string>("");
 const reCommentVal = ref<string>("");
 
 const emit = defineEmits(["onSubmitComment"]);
+const onBlurEditorCon = (isFocusOut: boolean) => {
+  if (!!isFocusOut && isEditorFocused.value) {
+    isEditorFocused.value = false;
+  }
+};
+const onFocusEditorCon = (clickedCon: boolean) => {
+  isEditorFocused.value = clickedCon;
+};
 const onSubmitReComment = () => {
   if (!!curCommentId.value) {
     emit("onSubmitComment", curCommentId.value, reCommentVal.value);
@@ -37,7 +47,9 @@ const onClickReply = () => {
       <template v-slot:title>
         <p class="comment-title">
           {{ props.comment?.user.username }}
-          <span class="date">{{ props.comment?.createdAt }}</span>
+          <span class="date" v-if="props.comment?.createdAt">{{
+            formatDateTime(props.comment?.createdAt)
+          }}</span>
         </p>
       </template>
       <v-card-text v-html="props.comment?.content"></v-card-text>
@@ -51,7 +63,7 @@ const onClickReply = () => {
         @click="openChildComments = !openChildComments"
         variant="plain"
       >
-        {{ comment?.childComments.length }} comments
+        답글 {{ comment?.childComments.length }}개
       </v-btn>
       <v-btn
         class="reply-btn"
@@ -60,13 +72,30 @@ const onClickReply = () => {
         color="primary"
         @click="onClickReply"
       >
-        reply
+        답글
       </v-btn>
     </div>
 
-    <div class="child-comment-con" v-if="openEditorForReply">
-      <RichEditor :editorType="E_EditorType.comment" v-model="reCommentVal" />
-      <v-btn @click="onSubmitReComment">reply</v-btn>
+    <div
+      v-if="openEditorForReply"
+      class="child-comment-con"
+      @click="onFocusEditorCon(true)"
+    >
+      <RichEditor
+        :editorType="E_EditorType.comment"
+        v-model="reCommentVal"
+        :isEditorFocused="isEditorFocused"
+        @onBlurEditorCon="onBlurEditorCon"
+      />
+      <div class="reply-btn-con">
+        <v-btn
+          @click="openEditorForReply = false"
+          variant="outlined"
+          color="warning"
+          >취소</v-btn
+        >
+        <v-btn @click="onSubmitReComment">답글</v-btn>
+      </div>
     </div>
     <v-list line="one" v-if="openChildComments">
       <CommentItem
@@ -94,10 +123,11 @@ const onClickReply = () => {
   flex-direction: column;
   justify-content: end;
   padding: 10px 2px 10px 16px;
-  button {
-    margin-left: auto;
-    margin-top: auto;
-    min-width: auto;
+  .reply-btn-con {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
   }
 }
 .comment-title {

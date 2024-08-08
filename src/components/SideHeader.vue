@@ -15,6 +15,8 @@ import NewServiceForm from "@/components/form/NewServiceForm.vue";
 import { watch } from "vue";
 import { useRoute } from "vue-router";
 
+import HIQ_LOGO from "@/assets/hiq_logo_text.svg";
+
 const route = useRoute();
 
 const store = useUserStore();
@@ -74,10 +76,14 @@ const onSubmitNewService = (title: string, desc: string) => {
     <v-list v-model:opened="openGroups">
       <v-list-item>
         <div class="title-wrap">
-          <v-list-item-title>HIQ</v-list-item-title>
+          <v-list-item-title>
+            <h1>
+              <img :src="HIQ_LOGO" alt="hiq logo" />
+            </h1>
+          </v-list-item-title>
           <v-btn
             v-if="loggedInUser?.role === E_Role.master"
-            size="x-small"
+            size="small"
             variant="outlined"
             color="primary"
             @click="openNewServiceModal = true"
@@ -135,5 +141,11 @@ const onSubmitNewService = (title: string, desc: string) => {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 20px;
+  h1 {
+    img {
+      width: 100%;
+    }
+  }
 }
 </style>

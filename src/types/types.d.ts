@@ -12,6 +12,7 @@ export interface IUserInfo {
   email: string;
   userStatus: E_UserStatus
   isPwDefault?: boolean;
+  createdAt?: string;
   access_token?: string;
   refresh_token?: string;
 }

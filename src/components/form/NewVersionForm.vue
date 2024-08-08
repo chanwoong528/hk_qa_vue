@@ -7,7 +7,7 @@ import RichEditor from "../RichEditor.vue";
 
 const initialState = {
   versionTitle: "",
-  versionDesc: "Write description for new version",
+  versionDesc: "버전 설명",
   tag: "",
   file: "",
 };

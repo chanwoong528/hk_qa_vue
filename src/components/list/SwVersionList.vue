@@ -128,14 +128,14 @@ const onSubmitAddTesters = (testers: IUserInfo[]) => {
 <template>
   <ModalWrap
     v-model="openModalUpdateStatus"
-    title="Change Status"
+    title="QA 항목 상태 변경"
     haveBtnCtl
     @onSubmit="onSubmitStatus"
   >
     <TestStatusForm v-model="selectedTestSession" />
   </ModalWrap>
 
-  <ModalWrap v-model="openModalAddTester" title="Modify TesterLists">
+  <ModalWrap v-model="openModalAddTester" title="테스터 관리">
     <AddTesterForm
       :userList="userList"
       :curTesterList="testSessionUserList"
@@ -146,7 +146,7 @@ const onSubmitAddTesters = (testers: IUserInfo[]) => {
   <ModalWrap
     v-model="openModalDetailView"
     :type="E_ModalType.full"
-    :title="'Detail for ' + curSwVersionInfo?.versionTitle"
+    :title="curSwVersionInfo?.versionTitle + '버전'"
   >
     <SwVersionItem
       :swVersion="curSwVersionInfo"

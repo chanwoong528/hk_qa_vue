@@ -121,7 +121,7 @@ const onSubmitNewVersion = (
   </ModalWrap>
   <DefaultLayout>
     <header class="sw-detail-header">
-      <h3>{{ swTypeInfo?.typeTitle }} 개발 버전 리스트</h3>
+      <h3>{{ swTypeInfo?.typeTitle }} 개발 버전 목록</h3>
       <v-btn
         v-if="loggedInUser?.role !== E_Role.tester"
         variant="outlined"
