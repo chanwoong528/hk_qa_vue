@@ -37,7 +37,6 @@ const handleLogin = (error: Object, email: string, pw: string) => {
     authApi
       .POST_login({ email, pw })
       .then((res) => {
-        console.log(res);
         if (!!res.isPwDefault) {
           alert("Please reset your password");
         }

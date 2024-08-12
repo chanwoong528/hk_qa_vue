@@ -20,6 +20,7 @@ export enum E_SwVersionModalType {
   updateStatus = "updateStatus",
   addTester = "addTester",
   detailView = "detailView",
+  testerLog = "testerLog"
 }
 
 export enum E_UserListType {
@@ -33,6 +34,8 @@ export enum E_SwTypeListType {
 
 export enum E_ModalType {
   full = "full",
+  status = "status",
+
 }
 
 export enum E_EditorType {

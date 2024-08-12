@@ -13,12 +13,12 @@ import { ISwType } from "@/types/types";
 import ModalWrap from "@/components/ModalWrap.vue";
 import NewServiceForm from "@/components/form/NewServiceForm.vue";
 import { watch } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 
 import HIQ_LOGO from "@/assets/hiq_logo_text.svg";
 
 const route = useRoute();
-
+const router = useRouter();
 const store = useUserStore();
 const { loggedInUser } = storeToRefs(store);
 
@@ -60,6 +60,11 @@ const computedNavList = computed(() => {
   }
 });
 
+const onClickLogout = () => {
+  store.setResetUser();
+
+  return router.push("/login");
+};
 const onSubmitNewService = (title: string, desc: string) => {
   return swApi.POST_sw({ typeTitle: title, typeDesc: desc }).then((res) => {
     fetchSw();
@@ -95,7 +100,16 @@ const onSubmitNewService = (title: string, desc: string) => {
         <v-list-item-subtitle>
           {{ loggedInUser?.username }}
         </v-list-item-subtitle>
-        <p>{{ loggedInUser?.role }}</p>
+        <div class="side-ctrl-con">
+          <p>{{ loggedInUser?.role }}</p>
+          <v-btn
+            variant="link"
+            icon="mdi-logout-variant"
+            color="error"
+            @click="onClickLogout"
+          >
+          </v-btn>
+        </div>
       </v-list-item>
 
       <v-divider />
@@ -147,5 +161,10 @@ const onSubmitNewService = (title: string, desc: string) => {
       width: 100%;
     }
   }
+}
+.side-ctrl-con {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 </style>

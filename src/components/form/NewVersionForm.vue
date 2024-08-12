@@ -4,13 +4,30 @@ import { useVuelidate } from "@vuelidate/core";
 import { required, helpers } from "@vuelidate/validators";
 
 import RichEditor from "../RichEditor.vue";
-
-const initialState = {
-  versionTitle: "",
-  versionDesc: "버전 설명",
-  tag: "",
-  file: "",
-};
+import type { ISwVersion } from "@/types/types.d";
+const props = defineProps({
+  editVersionInfo: {
+    type: Object as () => Partial<ISwVersion>,
+    required: false,
+  },
+  editFlag: {
+    type: Boolean,
+    required: false,
+  },
+});
+const initialState = !!props.editFlag
+  ? {
+      versionTitle: props.editVersionInfo?.versionTitle,
+      versionDesc: props.editVersionInfo?.versionDesc,
+      tag: props.editVersionInfo?.tag,
+      fileSrc: props.editVersionInfo?.fileSrc,
+    }
+  : {
+      versionTitle: "",
+      versionDesc: "버전 설명",
+      tag: "",
+      file: "",
+    };
 const state = reactive({
   ...initialState,
 });
@@ -36,10 +53,22 @@ const onBlurEditorCon = (isFocusOut: boolean) => {
 
 const v$ = useVuelidate(rules, state);
 
-const emit = defineEmits(["onSubmitNewVersion"]);
+const emit = defineEmits(["onSubmitNewVersion", "onSubmitEditVersion"]);
 
 const onSubmitNewVersion = () => {
   if (!!v$.value.$errors.map((e) => e.$message).join(", ")) return;
+
+  if (!!props.editFlag) {
+    emit(
+      "onSubmitEditVersion",
+      props.editVersionInfo?.swVersionId,
+      state.versionTitle,
+      state.versionDesc,
+      state.tag,
+      state.file
+    );
+    return;
+  }
   emit(
     "onSubmitNewVersion",
     state.versionTitle,
@@ -62,18 +91,9 @@ const onSubmitNewVersion = () => {
       @blur="v$.versionTitle.$touch"
       @input="v$.versionTitle.$touch"
       v-model="state.versionTitle"
+      :disabled="!!props.editFlag"
     />
-    <!-- <v-text-field
-      class="rich-editor-input"
-      :error-messages="v$.versionDesc.$errors.map((e) => e.$message).join(', ')"
-      density="compact"
-      placeholder="Version Description"
-      prepend-inner-icon="mdi-text-box-multiple-outline"
-      variant="outlined"
-      @blur="v$.versionDesc.$touch"
-      @input="v$.versionDesc.$touch"
-      v-model="state.versionDesc"
-    /> -->
+
     <div
       :class="{ focus: isEditorFocused }"
       class="editor-con"
@@ -102,6 +122,13 @@ const onSubmitNewVersion = () => {
       @input="v$.tag.$touch"
       v-model="state.tag"
     />
+    <a
+      v-if="initialState.fileSrc"
+      class="cur-file-btn"
+      :href="initialState.fileSrc"
+      target="_blank"
+      >현재 파일</a
+    >
     <v-file-input
       label="파일 첨부(필요시)"
       chips
@@ -109,6 +136,7 @@ const onSubmitNewVersion = () => {
       variant="outlined"
       @change="state.file = $event.target.files[0]"
     ></v-file-input>
+
     <v-btn
       color="blue"
       size="large"
@@ -122,7 +150,7 @@ const onSubmitNewVersion = () => {
         }
       "
     >
-      신규 버전 생성
+      {{ props.editFlag ? "버전 수정" : "신규 버전 생성" }}
     </v-btn>
   </form>
 </template>
@@ -133,6 +161,10 @@ form {
   flex-direction: column;
   gap: 10px;
   padding: 20px 0;
+
+  .cur-file-btn {
+  }
+
   .editor-con {
     border: 1px solid #9d9d9d;
     border-radius: 4px;

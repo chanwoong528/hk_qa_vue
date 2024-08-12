@@ -38,7 +38,6 @@ const onSubmitResetPassword = () => {
     userApi
       .PATCH_user({ id: loggedInUser.value?.id, pw: state.pw })
       .then((res) => {
-        console.log(res);
         state.pw = "";
         state.pwConfirm = "";
         props.fetchAuthByAccToken();

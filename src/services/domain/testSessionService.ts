@@ -1,10 +1,11 @@
 
+import { E_TestStatus } from "@/types/enum";
 import { http, ExceptionWrapper } from "../http";
 
 export const testSessionApi = {
-  PATCH_testSession: (sessionId: string, status: string): Promise<void> => {
+  PATCH_testSession: (sessionId: string, status: E_TestStatus, reasonContent: string): Promise<void> => {
     return ExceptionWrapper(async () => {
-      const apiResult = await http.patch(`/test-session/${sessionId}`, { status })
+      const apiResult = await http.patch(`/test-session/${sessionId}`, { status, reasonContent })
       const data = await apiResult.data
       return data
     })

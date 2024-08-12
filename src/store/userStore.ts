@@ -19,6 +19,7 @@ export const useUserStore = defineStore("user", {
       this.isLoggedIn = true;
     },
     setResetUser() {
+      localStorage.removeItem("accessToken");
       this.loggedInUser = undefined;
       this.isLoggedIn = false;
     },

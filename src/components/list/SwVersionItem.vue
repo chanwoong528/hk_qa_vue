@@ -22,6 +22,7 @@ const emit = defineEmits([
   "onClickTester",
   "onClickAddTester",
   "onClickDetailView",
+  "onClickEditVersion",
 ]);
 
 const testSessionsPassStatus = computed(() => {
@@ -47,26 +48,21 @@ const testSessionsPassStatus = computed(() => {
   return E_TestStatus.pending;
 });
 
-const renderTestStatus = (type: E_TestStatus) => {
-  switch (type) {
-    case E_TestStatus.failed:
-      return "error";
-    case E_TestStatus.passed:
-      return "green";
-    default:
-      return "warning";
-  }
-};
-
 const onClickLoggedInUserStatus = (tester: ITestSession) => {
-  if (tester.user.id === loggedInUser.value?.id) {
-    if (!!props.toggleModal) {
+  if (!!props.toggleModal) {
+    if (tester.user.id === loggedInUser.value?.id) {
       props.toggleModal();
-      emit("onClickTester", tester, loggedInUser.value?.id);
+      return emit("onClickTester", tester, loggedInUser.value?.id);
     }
+    if (tester.status === E_TestStatus.pending)
+      return alert("테스트가 진행중입니다.");
+
+    return props.toggleModal(E_SwVersionModalType.testerLog, tester.user.id);
   }
 };
-
+const onClickEditVersion = () => {
+  emit("onClickEditVersion", props.swVersion?.swVersionId);
+};
 const onClickAddTester = () => {
   if (!!props.toggleModal) {
     props.toggleModal(E_SwVersionModalType.addTester);
@@ -82,7 +78,6 @@ const onClickDetailView = () => {
 };
 
 const renderIconForVersionStatus = (status: E_TestStatus) => {
-  console.log("status", status);
   switch (status) {
     case E_TestStatus.failed:
       return "mdi-close-circle";
@@ -102,8 +97,6 @@ const renderColorIcon = (status: E_TestStatus) => {
       return "warning";
   }
 };
-
-console.log("props.swVersion", props.swVersion);
 </script>
 
 <template>
@@ -132,44 +125,23 @@ console.log("props.swVersion", props.swVersion);
     </v-expansion-panel-title>
 
     <v-expansion-panel-text>
+      <div class="desc-wrap">
+        <v-btn class="edit-btn" variant="outlined" @click="onClickEditVersion">
+          <v-icon class="mdi mdi-application-edit" start></v-icon>
+          수정
+        </v-btn>
+        <div class="desc-inner-html" v-html="props.swVersion?.versionDesc" />
+      </div>
       <a v-if="props.swVersion?.fileSrc" :href="props.swVersion?.fileSrc"
-        >Download File</a
+        >첨부 파일</a
       >
-      <div class="desc-inner-html" v-html="props.swVersion?.versionDesc"></div>
-
       <div class="version-ctrl-con">
         <v-divider :thickness="2"></v-divider>
-        <div
-          class="tester-con"
-          v-if="
-            !!props.swVersion?.testSessions &&
-            props.swVersion?.testSessions.length > 0
-          "
-        >
-          <p>현재 테스터</p>
+        <TestListChips
+          :swVersion="props.swVersion"
+          @onClickLoggedInUserStatus="onClickLoggedInUserStatus"
+        />
 
-          <v-chip
-            v-for="tester in props.swVersion?.testSessions.sort((a, b) =>
-              a.createdAt > b.createdAt ? 1 : -1
-            )"
-            :class="tester.user.id === loggedInUser?.id ? ' on' : ''"
-            class="mr-2 mb-2"
-            :variant="
-              tester.user.id === loggedInUser?.id ? 'tonal' : 'outlined'
-            "
-            label
-            :color="renderTestStatus(tester.status as E_TestStatus)"
-            @click="onClickLoggedInUserStatus(tester)"
-          >
-            <v-icon icon="mdi-account-circle-outline" start></v-icon>
-            {{
-              tester.user.id === loggedInUser?.id ? "me" : tester.user.username
-            }}
-          </v-chip>
-        </div>
-        <div v-else>
-          <p>등록된 테스터가 없습니다.</p>
-        </div>
         <div class="modify-tester-btn-con">
           <v-btn
             v-if="loggedInUser?.role !== E_Role.tester"
@@ -204,46 +176,10 @@ console.log("props.swVersion", props.swVersion);
 
     <div class="version-ctrl-con">
       <v-divider :thickness="2"></v-divider>
-      <div
-        class="tester-con"
-        v-if="
-          !!props.swVersion?.testSessions &&
-          props.swVersion?.testSessions.length > 0
-        "
-      >
-        <p>현재 테스터</p>
-
-        <v-chip
-          v-for="tester in props.swVersion?.testSessions.sort((a, b) =>
-            a.createdAt > b.createdAt ? 1 : -1
-          )"
-          :class="tester.user.id === loggedInUser?.id ? ' on' : ''"
-          class="mr-2 mb-2"
-          :variant="tester.user.id === loggedInUser?.id ? 'tonal' : 'outlined'"
-          label
-          :color="renderTestStatus(tester.status as E_TestStatus)"
-          @click="onClickLoggedInUserStatus(tester)"
-        >
-          <v-icon icon="mdi-account-circle-outline" start></v-icon>
-          {{
-            tester.user.id === loggedInUser?.id ? "me" : tester.user.username
-          }}
-        </v-chip>
-        <div class="modify-tester-btn-con">
-          <v-btn
-            v-if="loggedInUser?.role !== E_Role.tester"
-            @click="onClickAddTester"
-            class="text-none text-subtitle-1"
-            variant="outlined"
-          >
-            <v-icon icon="mdi-account-multiple-plus" start></v-icon>
-            테스터 관리
-          </v-btn>
-        </div>
-      </div>
-      <div v-else>
-        <p>등록된 테스터가 없습니다.</p>
-      </div>
+      <TestListChips
+        :swVersion="props.swVersion"
+        @onClickLoggedInUserStatus="onClickLoggedInUserStatus"
+      />
     </div>
   </div>
 </template>
@@ -297,17 +233,26 @@ console.log("props.swVersion", props.swVersion);
   }
 }
 
-.desc-inner-html {
-  overflow: hidden;
-  max-height: 300px;
-  margin: 20px 0;
-  &.expand {
-    max-height: none;
-    :deep(img) {
-      border: 1px solid #ececec;
+.desc-wrap {
+  position: relative;
+  .edit-btn {
+    position: absolute;
+    top: 0;
+    right: 0;
+  }
+  .desc-inner-html {
+    overflow: hidden;
+    max-height: 300px;
+    margin: 20px 0;
+    &.expand {
+      max-height: none;
+      :deep(img) {
+        border: 1px solid #ececec;
+      }
     }
   }
 }
+
 .version-ctrl-con {
   display: flex;
   flex-direction: column;

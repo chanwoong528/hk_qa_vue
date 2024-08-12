@@ -5,6 +5,13 @@ export interface ILoginInfo {
   pw: string;
 }
 
+export interface ILogInfo {
+  id: string;
+  logType: string;
+  content: any;
+  createdAt: string;
+}
+
 export interface IUserInfo {
   id: string;
   username: string;
@@ -44,6 +51,7 @@ export interface ISwVersion {
   user: IUserInfo;
   swType: ISwType;
   testSessions: ITestSession[];
+
 }
 
 export interface ITestSession {
@@ -52,6 +60,7 @@ export interface ITestSession {
   createdAt: string
   updatedAt: string
   finishedAt?: string
+  reasonContent?: string
   user: IUserInfo
 }
 

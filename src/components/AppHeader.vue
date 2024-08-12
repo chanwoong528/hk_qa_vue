@@ -19,9 +19,9 @@ const { loggedInUser } = storeToRefs(store);
 
 const openResetPwModal = computed(() => {
   if (!!loggedInUser.value?.isPwDefault) return true;
-
   return false;
 });
+
 const fetchAuthByAccToken = () => {
   return authApi
     .GET_loginCheck()

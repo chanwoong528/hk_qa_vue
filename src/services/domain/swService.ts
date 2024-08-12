@@ -30,7 +30,6 @@ export const swVersionApi = {
     })
   },
   POST_swVersion: (swVersion: Partial<Omit<ISwVersion, 'fileSrc'>> & {
-
     swTypeId: string,
     versionTitle: string,
     versionDesc: string,
@@ -44,16 +43,40 @@ export const swVersionApi = {
       formData.append('versionDesc', swVersion.versionDesc)
       formData.append('tag', swVersion.tag)
       if (!!swVersion.file) {
-        console.log("upload!!")
         formData.append('file', swVersion.file)
-
       }
-      console.log(formData)
       const apiResult = await http.post("/sw-version", formData,
         { headers: { 'Content-Type': 'multipart/form-data' } }
       )
       const data = await apiResult.data
       return data
     })
+  },
+
+  PATCH_swVersion: (swVersion: Partial<Omit<ISwVersion, 'fileSrc'>> & {
+    swVersionId: string,
+    versionTitle: string,
+    versionDesc: string,
+    tag: string,
+    file?: File
+  }): Promise<void> => {
+    return ExceptionWrapper(async () => {
+      const formData = new FormData()
+      formData.append('swVersionId', swVersion.swVersionId)
+      formData.append('versionTitle', swVersion.versionTitle)
+      formData.append('versionDesc', swVersion.versionDesc)
+      formData.append('tag', swVersion.tag)
+      if (!!swVersion.file) {
+        formData.append('file', swVersion.file)
+      }
+
+      const apiResult = await http.post(`/sw-version/edit/${swVersion.swVersionId}`, formData,
+        { headers: { 'Content-Type': 'multipart/form-data' } }
+      )
+      const data = await apiResult.data
+      return data
+    })
+
   }
+
 }

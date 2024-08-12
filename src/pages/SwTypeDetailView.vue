@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, onMounted } from "vue";
+import { ref, watch, onMounted, reactive } from "vue";
 import { useRoute } from "vue-router";
 import { storeToRefs } from "pinia";
 
@@ -26,10 +26,13 @@ const swStore = useSwStore();
 const { swTypes } = storeToRefs(swStore);
 
 const swVersionList = ref<ISwVersion[]>([]);
-
 const openModalNewVersion = ref<boolean>(false);
-const submitErrorFlag = ref<boolean>(true);
+const editVersionFlag = ref<boolean>(false);
+const editVersionInfo = reactive<Partial<ISwVersion & { swTypeId: string }>>(
+  {}
+);
 
+const submitErrorFlag = ref<boolean>(true);
 const swTypeInfo = ref<ISwType>();
 
 onMounted(() => onFetchSwVersionList(route.params.id as string));
@@ -65,19 +68,30 @@ const onFetchSwVersionList = (swTypeId: string) => {
     .then((res) => (swVersionList.value = res as ISwVersion[]));
 };
 
-const onSubmitStatus = (selectedTestSession: Partial<ITestSession>) => {
+const onSubmitStatus = (
+  selectedTestSession: Partial<ITestSession>,
+  openModalUpdateStatus: any
+) => {
   //TODO: typescript better way than partial
-  if (!!selectedTestSession.sessionId && !!selectedTestSession.status) {
-    testSessionApi
+  if (
+    !!selectedTestSession.sessionId &&
+    !!selectedTestSession.status &&
+    !!selectedTestSession.reasonContent
+  ) {
+    return testSessionApi
       .PATCH_testSession(
         selectedTestSession.sessionId,
-        selectedTestSession.status
+        selectedTestSession.status,
+        selectedTestSession.reasonContent
       )
       .then((_) => {
         //TODO: handle success instead of call api again
         submitErrorFlag.value = true;
+        openModalUpdateStatus.value = false;
         onFetchSwVersionList(route.params.id as string);
       });
+  } else {
+    return alert("Please fill out all fields");
   }
 };
 
@@ -109,15 +123,49 @@ const onSubmitNewVersion = (
 
   return alert("Error: swTypeId is not found");
 };
+
+const onSubmitEditVersion = (
+  swVersionId: string,
+  versionTitle: string,
+  versionDesc: string,
+  tag: string,
+  file?: File
+) => {
+  return swVersionApi
+    .PATCH_swVersion({
+      swVersionId,
+      versionTitle,
+      versionDesc,
+      tag,
+      ...(file && { file }),
+    })
+    .then((res) => {
+      submitErrorFlag.value = false;
+      openModalNewVersion.value = false;
+      onFetchSwVersionList(route.params.id as string);
+    });
+};
+
+const onClickEditVersion = (curSwVer: ISwVersion) => {
+  openModalNewVersion.value = true;
+  editVersionFlag.value = true;
+  // console.log("onClickEditVersion top class", curSwVer);
+  Object.assign(editVersionInfo, curSwVer);
+};
 </script>
 
 <template>
   <ModalWrap
     v-model="openModalNewVersion"
-    title="신규 버전"
+    :title="editVersionFlag ? '버전 정보 수정' : '신규 버전'"
     :type="E_ModalType.full"
   >
-    <NewVersionForm @onSubmitNewVersion="onSubmitNewVersion" />
+    <NewVersionForm
+      @onSubmitNewVersion="onSubmitNewVersion"
+      @onSubmitEditVersion="onSubmitEditVersion"
+      :editFlag="editVersionFlag"
+      :editVersionInfo="editVersionInfo"
+    />
   </ModalWrap>
   <DefaultLayout>
     <header class="sw-detail-header">
@@ -126,7 +174,12 @@ const onSubmitNewVersion = (
         v-if="loggedInUser?.role !== E_Role.tester"
         variant="outlined"
         color="primary"
-        @click="openModalNewVersion = true"
+        @click="
+          () => {
+            openModalNewVersion = true;
+            editVersionFlag = false;
+          }
+        "
       >
         새로운 버전 등록
         <v-icon icon="mdi-plus"></v-icon>
@@ -137,6 +190,7 @@ const onSubmitNewVersion = (
       :swVersionList="swVersionList"
       :onFetchSwVersionList="onFetchSwVersionList"
       @onSubmitStatus="onSubmitStatus"
+      @onClickEditVersion="onClickEditVersion"
     />
   </DefaultLayout>
 </template>
