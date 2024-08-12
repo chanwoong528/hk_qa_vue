@@ -103,7 +103,7 @@ const onSubmitNewService = (title: string, desc: string) => {
         <div class="side-ctrl-con">
           <p>{{ loggedInUser?.role }}</p>
           <v-btn
-            variant="link"
+            variant="plain"
             icon="mdi-logout-variant"
             color="error"
             @click="onClickLogout"

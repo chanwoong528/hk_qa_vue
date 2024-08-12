@@ -50,14 +50,11 @@ const testSessionsPassStatus = computed(() => {
 
 const onClickLoggedInUserStatus = (tester: ITestSession) => {
   if (!!props.toggleModal) {
-    if (tester.user.id === loggedInUser.value?.id) {
-      props.toggleModal();
-      return emit("onClickTester", tester, loggedInUser.value?.id);
-    }
     if (tester.status === E_TestStatus.pending)
       return alert("테스트가 진행중입니다.");
 
-    return props.toggleModal(E_SwVersionModalType.testerLog, tester.user.id);
+    props.toggleModal();
+    return emit("onClickTester", tester, loggedInUser.value?.id);
   }
 };
 const onClickEditVersion = () => {

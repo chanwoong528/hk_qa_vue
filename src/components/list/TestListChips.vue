@@ -4,6 +4,7 @@ import { useUserStore } from "@/store/userStore";
 
 import { E_TestStatus } from "@/types/enum.d";
 import type { ISwVersion, ITestSession } from "@/types/types.d";
+import { formatDateTime } from "@/utils/common/formatter";
 
 const store = useUserStore();
 const { loggedInUser } = storeToRefs(store);
@@ -75,7 +76,9 @@ const onClickLoggedInUserStatus = (tester: ITestSession) => {
           </p>
         </div>
         <div v-else>
-          <p>[{{ tester.user.username }}]</p>
+          <p>
+            [{{ tester.user.username }}] {{ formatDateTime(tester.updatedAt) }}
+          </p>
           <div class="html-con" v-html="tester.reasonContent"></div>
         </div>
       </v-tooltip>

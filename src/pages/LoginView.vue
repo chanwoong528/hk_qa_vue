@@ -44,9 +44,15 @@ const handleLogin = (error: Object, email: string, pw: string) => {
         return router.push("/");
       })
       .catch((err) => {
-        console.warn("handleLogin[err]: ", err);
-        if (err.statusCode === 401) {
-          return alert("Invalid email or password");
+        const errorCode = err.statusCode;
+
+        switch (errorCode) {
+          case 401:
+            return alert("Invalid email or password");
+          case 404:
+            return alert("User does not exist");
+          default:
+            return alert("Something went wrong");
         }
       });
   }

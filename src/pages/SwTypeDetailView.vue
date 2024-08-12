@@ -70,6 +70,7 @@ const onFetchSwVersionList = (swTypeId: string) => {
 
 const onSubmitStatus = (
   selectedTestSession: Partial<ITestSession>,
+  dbSavedTestSession: Partial<ITestSession>,
   openModalUpdateStatus: any
 ) => {
   //TODO: typescript better way than partial
@@ -78,6 +79,13 @@ const onSubmitStatus = (
     !!selectedTestSession.status &&
     !!selectedTestSession.reasonContent
   ) {
+    if (
+      selectedTestSession.status === dbSavedTestSession.status &&
+      selectedTestSession.reasonContent === dbSavedTestSession.reasonContent
+    ) {
+      return alert("바뀐점이 없습니다.");
+    }
+
     return testSessionApi
       .PATCH_testSession(
         selectedTestSession.sessionId,
