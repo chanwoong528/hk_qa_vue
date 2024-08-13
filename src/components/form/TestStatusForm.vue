@@ -90,7 +90,7 @@ const renderRadioBtnTestStatus = (status: E_TestStatus) => {
   <v-tabs-window v-model="curTab">
     <v-tabs-window-item :value="E_Tab.formTestStatus">
       <div>
-        <v-radio-group v-model="state.status" hide-details disabled>
+        <v-radio-group v-model="state.status" hide-details>
           <v-radio
             v-for="btn in btnList"
             :key="btn.code"

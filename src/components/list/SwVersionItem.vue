@@ -50,7 +50,10 @@ const testSessionsPassStatus = computed(() => {
 
 const onClickLoggedInUserStatus = (tester: ITestSession) => {
   if (!!props.toggleModal) {
-    if (tester.status === E_TestStatus.pending)
+    if (
+      tester.status === E_TestStatus.pending &&
+      loggedInUser.value?.id !== tester.user.id
+    )
       return alert("테스트가 진행중입니다.");
 
     props.toggleModal();

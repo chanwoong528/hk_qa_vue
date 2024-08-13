@@ -1,11 +1,15 @@
 <script setup lang="ts">
 import { computed, watch } from "vue";
-import { useRoute, useRouter, RouterLink } from "vue-router";
+import {
+  useRoute,
+  useRouter,
+  // RouterLink
+} from "vue-router";
 import { storeToRefs } from "pinia";
 
 import { useUserStore } from "@/store/userStore";
 import { authApi } from "@/services/domain/authService";
-import { NAV_LIST } from "@/router/index.ts";
+// import { NAV_LIST } from "@/router/index.ts";
 
 import type { IUserInfo } from "@/types/types";
 
@@ -54,11 +58,7 @@ watch(
     <ResetPwForm :fetchAuthByAccToken="fetchAuthByAccToken" />
   </ModalWrap>
   <template v-if="!loggedInUser?.id">
-    <template>
-      <h1>Hello App!</h1>
-    </template>
-    <p><strong>Current route path:</strong> {{ route.fullPath }}</p>
-    <nav>
+    <!-- <nav>
       <ul>
         <template v-for="navItem in NAV_LIST">
           <li
@@ -72,7 +72,7 @@ watch(
           </li>
         </template>
       </ul>
-    </nav>
+    </nav> -->
   </template>
   <template v-else>
     <SideHeader />
