@@ -54,6 +54,16 @@ export interface ISwVersion {
 
 }
 
+export interface ITestUnit {
+  testUnitId: string
+  unitDesc: string
+  createdAt: string
+  updatedAt: string
+
+  user: IUserInfo
+  swVersion: ISwVersion
+}
+
 export interface ITestSession {
   sessionId: string
   status: E_TestStatus
@@ -62,6 +72,7 @@ export interface ITestSession {
   finishedAt?: string
   reasonContent?: string
   user: IUserInfo
+  swVersion: ISwVersion
 }
 
 

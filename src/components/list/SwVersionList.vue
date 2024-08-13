@@ -101,6 +101,7 @@ const onClickTester = (testerInfo: ITestSession, loggedInUserId: string) => {
   selectedTestSession.status = testerInfo.status;
   selectedTestSession.reasonContent = testerInfo.reasonContent;
   selectedTestSession.user = testerInfo.user;
+  selectedTestSession.swVersion = testerInfo.swVersion;
 
   dbSavedTestSession.sessionId = testerInfo.sessionId;
   dbSavedTestSession.status = testerInfo.status;

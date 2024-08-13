@@ -3,8 +3,9 @@ import { reactive, ref } from "vue";
 import { useVuelidate } from "@vuelidate/core";
 import { required, helpers } from "@vuelidate/validators";
 
-import RichEditor from "../RichEditor.vue";
-import type { ISwVersion } from "@/types/types.d";
+import RichEditor from "@/components/RichEditor.vue";
+import AddTestUnitForm from "@/components/form/AddTestUnitForm.vue";
+import type { ISwVersion, ITestUnit } from "@/types/types.d";
 const props = defineProps({
   editVersionInfo: {
     type: Object as () => Partial<ISwVersion>,
@@ -15,6 +16,9 @@ const props = defineProps({
     required: false,
   },
 });
+
+const unitTestList = ref<Partial<ITestUnit>[]>([{ unitDesc: "" }]);
+
 const initialState = !!props.editFlag
   ? {
       versionTitle: props.editVersionInfo?.versionTitle,
@@ -79,6 +83,7 @@ const onSubmitNewVersion = () => {
 };
 </script>
 <template>
+  {{ unitTestList }}
   <form @submit.prevent="">
     <v-text-field
       :error-messages="
@@ -136,7 +141,7 @@ const onSubmitNewVersion = () => {
       variant="outlined"
       @change="state.file = $event.target.files[0]"
     ></v-file-input>
-
+    <AddTestUnitForm v-model="unitTestList" />
     <v-btn
       color="blue"
       size="large"
