@@ -69,7 +69,8 @@ const onSubmitNewVersion = () => {
       state.versionTitle,
       state.versionDesc,
       state.tag,
-      state.file
+      state.file,
+      unitTestList.value
     );
     return;
   }
@@ -78,7 +79,8 @@ const onSubmitNewVersion = () => {
     state.versionTitle,
     state.versionDesc,
     state.tag,
-    state.file
+    state.file,
+    unitTestList.value
   );
 };
 </script>

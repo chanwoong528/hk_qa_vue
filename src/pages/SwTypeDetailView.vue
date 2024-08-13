@@ -5,10 +5,15 @@ import { storeToRefs } from "pinia";
 
 import { useUserStore } from "@/store/userStore";
 
-import { swVersionApi } from "@/services/domain/swService";
+import { swVersionApi, testUnitApi } from "@/services/domain/swService";
 import { testSessionApi } from "@/services/domain/testSessionService";
 
-import type { ISwType, ISwVersion, ITestSession } from "@/types/types";
+import type {
+  ISwType,
+  ISwVersion,
+  ITestSession,
+  ITestUnit,
+} from "@/types/types";
 import { E_ModalType, E_Role } from "@/types/enum.d";
 
 import SwVersionList from "@/components/list/SwVersionList.vue";
@@ -103,33 +108,48 @@ const onSubmitStatus = (
   }
 };
 
-const onSubmitNewVersion = (
+const onSubmitNewVersion = async (
   versionTitle: string,
   versionDesc: string,
   tag: string,
-  file?: File
+  file?: File,
+  unitTestList?: Partial<ITestUnit>[]
 ) => {
   // console.log("onSubmitNewVersion", versionTitle, versionDesc, tag, file);
-
-  if (!!route.params.id) {
-    return swVersionApi
-      .POST_swVersion({
-        swTypeId: Array.isArray(route.params.id)
-          ? route.params.id[0]
-          : route.params.id,
-        versionTitle,
-        versionDesc,
-        tag,
-        ...(file && { file }),
-      })
-      .then((res) => {
-        submitErrorFlag.value = false;
-        onFetchSwVersionList(res.swType.swTypeId);
-        openModalNewVersion.value = false;
-      });
+  try {
+    const createSwVersion = await swVersionApi.POST_swVersion({
+      swTypeId: Array.isArray(route.params.id)
+        ? route.params.id[0]
+        : route.params.id,
+      versionTitle,
+      versionDesc,
+      tag,
+      ...(file && { file }),
+      ...(file && { file }),
+    });
+    if (!!unitTestList && unitTestList?.length > 0) {
+      const createTestUnitList = await testUnitApi.POST_testUnits(
+        unitTestList,
+        createSwVersion.swVersionId
+      );
+      console.log(createTestUnitList);
+    }
+    submitErrorFlag.value = false;
+    openModalNewVersion.value = false;
+    return onFetchSwVersionList(createSwVersion.swType.swTypeId);
+  } catch (error) {
+    return alert("Error: swTypeId is not found");
   }
 
-  return alert("Error: swTypeId is not found");
+  // if (!!route.params.id) {
+  //   return
+  //     .then((res) => {
+  //       submitErrorFlag.value = false;
+  //       onFetchSwVersionList(res.swType.swTypeId);
+  //       openModalNewVersion.value = false;
+
+  //     });
+  // }
 };
 
 const onSubmitEditVersion = (

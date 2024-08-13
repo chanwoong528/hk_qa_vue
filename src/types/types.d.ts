@@ -15,20 +15,20 @@ export interface ILogInfo {
 export interface IUserInfo {
   id: string;
   username: string;
-  role: E_Role
+  role: E_Role;
   email: string;
-  userStatus: E_UserStatus
+  userStatus: E_UserStatus;
   isPwDefault?: boolean;
   createdAt?: string;
   access_token?: string;
   refresh_token?: string;
 }
 
-export interface IUserUpdateInfo extends Partial<Omit<IUserInfo, 'access_token' | 'refresh_token'>> {
+export interface IUserUpdateInfo
+  extends Partial<Omit<IUserInfo, "access_token" | "refresh_token">> {
   id: string;
   pw?: string;
 }
-
 
 export interface ISwType {
   swTypeId: string;
@@ -37,7 +37,7 @@ export interface ISwType {
   showStatus: string;
   createdAt: string;
   updatedAt: string;
-  user: IUserInfo
+  user: IUserInfo;
 }
 
 export interface ISwVersion {
@@ -51,30 +51,29 @@ export interface ISwVersion {
   user: IUserInfo;
   swType: ISwType;
   testSessions: ITestSession[];
-
+  testUnits: ITestUnit[];
 }
 
 export interface ITestUnit {
-  testUnitId: string
-  unitDesc: string
-  createdAt: string
-  updatedAt: string
+  testUnitId: string;
+  unitDesc: string;
+  createdAt: string;
+  updatedAt: string;
 
-  user: IUserInfo
-  swVersion: ISwVersion
+  user: IUserInfo;
+  swVersion: ISwVersion;
 }
 
 export interface ITestSession {
-  sessionId: string
-  status: E_TestStatus
-  createdAt: string
-  updatedAt: string
-  finishedAt?: string
-  reasonContent?: string
-  user: IUserInfo
-  swVersion: ISwVersion
+  sessionId: string;
+  status: E_TestStatus;
+  createdAt: string;
+  updatedAt: string;
+  finishedAt?: string;
+  reasonContent?: string;
+  user: IUserInfo;
+  swVersion: ISwVersion;
 }
-
 
 export interface INetworkException {
   statusCode: number;
@@ -83,12 +82,10 @@ export interface INetworkException {
   message: string;
 }
 
-
 export interface INetworkSuccess {
   code: number;
-  message: string
+  message: string;
 }
-
 
 export interface IComment {
   commentId: string;
@@ -98,5 +95,5 @@ export interface IComment {
 
   user: IUserInfo;
   swVersion: ISwVersion;
-  childComments: IComment[]
+  childComments: IComment[];
 }

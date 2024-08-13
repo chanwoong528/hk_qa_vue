@@ -18,6 +18,24 @@ const props = defineProps({
   toggleModal: Function,
 });
 
+const REACT_BTN_LIST = [
+  {
+    type: "check",
+    icon: "mdi-check",
+    color: "teal",
+  },
+  // {
+  //   type: "good",
+  //   icon: "mdi mdi-thumb-up",
+  //   color: "blue-lighten-2",
+  // },
+  {
+    type: "fail",
+    icon: "mdi-close-circle",
+    color: "error",
+  },
+];
+
 const emit = defineEmits([
   "onClickTester",
   "onClickAddTester",
@@ -87,6 +105,9 @@ const renderIconForVersionStatus = (status: E_TestStatus) => {
       return "mdi-alert-circle";
   }
 };
+const onClickReactionBtn = (btnType: string, testUnitId: string) => {
+  console.log(btnType, testUnitId, loggedInUser.value?.id);
+};
 const renderColorIcon = (status: E_TestStatus) => {
   switch (status) {
     case E_TestStatus.failed:
@@ -135,6 +156,43 @@ const renderColorIcon = (status: E_TestStatus) => {
       <a v-if="props.swVersion?.fileSrc" :href="props.swVersion?.fileSrc"
         >첨부 파일</a
       >
+
+      <section>
+        <h5>유닛 테스트 목록</h5>
+        <ul class="test-unit-list">
+          <li
+            v-for="testUnit in props.swVersion?.testUnits"
+            :key="testUnit.testUnitId"
+          >
+            <v-speed-dial
+              location="right center"
+              transition="fade-transition"
+              open-on-hover
+            >
+              <template v-slot:activator="{ props: activatorProps }">
+                <v-btn variant="text" v-bind="activatorProps">
+                  {{ testUnit.unitDesc }}
+                </v-btn>
+              </template>
+              <v-btn
+                v-for="btn in REACT_BTN_LIST"
+                :key="btn.icon"
+                icon
+                size="x-small"
+                @click="
+                  onClickReactionBtn(
+                    btn.type as string,
+                    testUnit.testUnitId as string
+                  )
+                "
+              >
+                <v-icon :icon="btn.icon" :color="btn.color"></v-icon>
+              </v-btn>
+            </v-speed-dial>
+          </li>
+        </ul>
+      </section>
+
       <div class="version-ctrl-con">
         <v-divider :thickness="2"></v-divider>
         <TestListChips
@@ -264,5 +322,10 @@ const renderColorIcon = (status: E_TestStatus) => {
       margin: 10px 0;
     }
   }
+}
+.test-unit-list {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 24px 16px;
 }
 </style>
