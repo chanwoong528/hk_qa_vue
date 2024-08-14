@@ -1,4 +1,4 @@
-import { E_TestStatus } from "./enum";
+import { E_ReactionParentType, E_ReactionType, E_TestStatus } from "./enum";
 
 export interface ILoginInfo {
   email: string;
@@ -62,6 +62,26 @@ export interface ITestUnit {
 
   user: IUserInfo;
   swVersion: ISwVersion;
+  reactions: IReaction[];
+  counts?: {
+    [key in E_ReactionType]: number;
+  };
+
+}
+
+export interface IReaction {
+  id: string;
+  parentType: E_ReactionParentType;
+  reactionType: E_ReactionType;
+
+  createdAt: string;
+  updatedAt: string;
+
+  user: IUserInfo;
+
+  parentComment?: IComment;
+  parentTestUnit?: ITestUnit;
+
 }
 
 export interface ITestSession {

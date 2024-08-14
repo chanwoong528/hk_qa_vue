@@ -100,14 +100,19 @@ export const testUnitApi = {
       return data;
     });
   },
-  // PATCH_testUnit: (testUnit: any): Promise<any> => {
-  //   return ExceptionWrapper(async () => {
-  //     const apiResult = await http.patch(
-  //       `/test-unit/${testUnit.testUnitId}`,
-  //       testUnit
-  //     );
-  //     const data = await apiResult.data;
-  //     return data;
-  //   });
-  // },
+  GET_testUnitsBySwVersionId: (swVersionId: string): Promise<ITestUnit[]> => {
+    return ExceptionWrapper(async () => {
+      const apiResult = await http.get(`/test-unit/${swVersionId}`);
+      const data = await apiResult.data;
+      return data;
+    });
+  },
+
+  PATCH_testUnit: (testUnits: Partial<ITestUnit>[], swVersionId: string): Promise<any> => {
+    return ExceptionWrapper(async () => {
+      const apiResult = await http.patch(`/test-unit/${swVersionId}`, testUnits);
+      const data = await apiResult.data;
+      return data;
+    });
+  },
 };

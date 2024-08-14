@@ -2,7 +2,6 @@
 import type { ITestUnit } from "@/types/types.d";
 
 const unitTestListModel = defineModel<Partial<ITestUnit>[]>();
-
 const onClickAddUnit = () => {
   if (!!unitTestListModel.value) unitTestListModel.value.push({ unitDesc: "" });
 };
@@ -23,7 +22,9 @@ const onClickDeleteUnit = (idx: number) => {
   <section>
     <h4>테스트 맹점 항목</h4>
     <v-text-field
-      v-for="(_, idx) in unitTestListModel"
+      v-for="(item, idx) in unitTestListModel"
+      :key="idx"
+      v-model="item.unitDesc"
       @input="(e: Event) => onInput(e, idx)"
     >
       <template v-slot:append>

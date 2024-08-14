@@ -1,11 +1,24 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref, watch } from "vue";
 import { useUserStore } from "@/store/userStore";
 import { storeToRefs } from "pinia";
 
-import { E_Role, E_SwVersionModalType, E_TestStatus } from "@/types/enum.d";
+import {
+  E_ReactionParentType,
+  E_ReactionType,
+  E_Role,
+  E_SwVersionModalType,
+  E_TestStatus,
+} from "@/types/enum.d";
 import { formatDateTime } from "@/utils/common/formatter";
-import type { ISwVersion, ITestSession } from "@/types/types.d";
+import type {
+  IReaction,
+  ISwVersion,
+  ITestSession,
+  ITestUnit,
+} from "@/types/types.d";
+import { testUnitApi } from "@/services/domain/swService";
+import { reactionApi } from "@/services/domain/reactionService";
 
 const store = useUserStore();
 const { loggedInUser } = storeToRefs(store);
@@ -14,27 +27,67 @@ const props = defineProps({
   swVersion: {
     type: Object as () => ISwVersion,
   },
+  isCurOpen: Boolean,
   itemType: String,
   toggleModal: Function,
 });
+const unitList = ref<ITestUnit[]>([]);
 
-const REACT_BTN_LIST = [
-  {
-    type: "check",
-    icon: "mdi-check",
-    color: "teal",
-  },
-  // {
-  //   type: "good",
-  //   icon: "mdi mdi-thumb-up",
-  //   color: "blue-lighten-2",
-  // },
-  {
-    type: "fail",
-    icon: "mdi-close-circle",
-    color: "error",
-  },
-];
+function countReactions(reactions: IReaction[]): Record<string, number> {
+  const reactionCounts: Record<string, number> = {};
+
+  reactions.forEach((reaction) => {
+    const type = reaction.reactionType;
+    if (!!type) {
+      if (reactionCounts[type]) {
+        reactionCounts[type]++;
+      } else {
+        reactionCounts[type] = 1;
+      }
+    }
+  });
+  return reactionCounts;
+}
+
+watch(
+  () => [props.isCurOpen, props.swVersion?.swVersionId],
+  ([newOpen, newVerId]) => {
+    if (!!newOpen && !!newVerId) {
+      fetchUnitList(newVerId as string);
+    }
+  }
+);
+
+const fetchUnitList = (swVersionId: string) => {
+  testUnitApi.GET_testUnitsBySwVersionId(swVersionId).then((res) => {
+    const unitListWithReactionCount = res.map((unit) => {
+      return {
+        ...unit,
+        counts: countReactions(unit.reactions),
+      };
+    });
+    return (unitList.value = unitListWithReactionCount as ITestUnit[]);
+  });
+};
+
+const REACT_BTN_LIST: { type: E_ReactionType; icon: string; color: string }[] =
+  [
+    {
+      type: E_ReactionType.check,
+      icon: "mdi-check",
+      color: "teal",
+    },
+    // {
+    //   type: "good",
+    //   icon: "mdi mdi-thumb-up",
+    //   color: "blue-lighten-2",
+    // },
+    {
+      type: E_ReactionType.stop,
+      icon: "mdi-close-circle",
+      color: "error",
+    },
+  ];
 
 const emit = defineEmits([
   "onClickTester",
@@ -105,8 +158,25 @@ const renderIconForVersionStatus = (status: E_TestStatus) => {
       return "mdi-alert-circle";
   }
 };
-const onClickReactionBtn = (btnType: string, testUnitId: string) => {
-  console.log(btnType, testUnitId, loggedInUser.value?.id);
+
+const renderIconForReaction = (reactionType: E_ReactionType) => {
+  switch (reactionType) {
+    case E_ReactionType.check:
+      return { icon: "mdi-check", color: "teal" };
+
+    case E_ReactionType.stop:
+      return { icon: "mdi-close-circle", color: "error" };
+    default:
+      return { icon: "mdi-alert-circle", color: "warning" };
+  }
+};
+
+const onClickReactionBtn = (btnType: E_ReactionType, testUnitId: string) => {
+  return reactionApi
+    .POST_reaction(E_ReactionParentType.testUnit, btnType, testUnitId)
+    .then(() => {
+      fetchUnitList(props.swVersion?.swVersionId as string);
+    });
 };
 const renderColorIcon = (status: E_TestStatus) => {
   switch (status) {
@@ -157,13 +227,40 @@ const renderColorIcon = (status: E_TestStatus) => {
         >첨부 파일</a
       >
 
-      <section>
+      <section v-if="unitList.length > 0">
         <h5>유닛 테스트 목록</h5>
         <ul class="test-unit-list">
-          <li
-            v-for="testUnit in props.swVersion?.testUnits"
-            :key="testUnit.testUnitId"
-          >
+          <li v-for="testUnit in unitList" :key="testUnit.testUnitId">
+            <ul v-if="testUnit.reactions" class="reactions-con">
+              <li v-for="reactionKey in Object.keys(testUnit.counts as object)">
+                <v-chip
+                  link
+                  v-if="testUnit?.counts && !!testUnit?.counts"
+                  @click="
+                    onClickReactionBtn(
+                      reactionKey as E_ReactionType,
+                      testUnit.testUnitId as string
+                    )
+                  "
+                >
+                  <v-icon
+                    :icon="renderIconForReaction(reactionKey as E_ReactionType).icon"
+                    :color="renderIconForReaction(reactionKey as E_ReactionType).color"
+                  ></v-icon>
+                  {{ testUnit.counts[reactionKey as E_ReactionType] }}
+
+                  <v-tooltip activator="parent" location="end" max-width="300">
+                    <p
+                      v-for="person in testUnit.reactions.filter(
+                        (reaction) => reaction.reactionType === reactionKey
+                      )"
+                    >
+                      {{ person.user.username }}
+                    </p>
+                  </v-tooltip>
+                </v-chip>
+              </li>
+            </ul>
             <v-speed-dial
               location="right center"
               transition="fade-transition"
@@ -180,10 +277,7 @@ const renderColorIcon = (status: E_TestStatus) => {
                 icon
                 size="x-small"
                 @click="
-                  onClickReactionBtn(
-                    btn.type as string,
-                    testUnit.testUnitId as string
-                  )
+                  onClickReactionBtn(btn.type, testUnit.testUnitId as string)
                 "
               >
                 <v-icon :icon="btn.icon" :color="btn.color"></v-icon>
@@ -243,17 +337,27 @@ const renderColorIcon = (status: E_TestStatus) => {
 </template>
 
 <style scoped lang="scss">
+.test-unit-list {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 24px 16px;
+  > li {
+    position: relative;
+    padding-bottom: 30px;
+  }
+  .reactions-con {
+    display: flex;
+    position: absolute;
+    list-style: none;
+    gap: 4px;
+    bottom: 0;
+  }
+}
 .modify-tester-btn-con {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-top: 20px;
-}
-.v-chip:hover {
-  cursor: not-allowed;
-}
-.v-chip.on:hover {
-  cursor: pointer;
 }
 
 .default-type-item {
@@ -264,6 +368,7 @@ const renderColorIcon = (status: E_TestStatus) => {
 
   margin-top: 20px;
 }
+
 .v-expansion-panel-title {
   background-color: #ececec;
   .title-header {
@@ -322,10 +427,5 @@ const renderColorIcon = (status: E_TestStatus) => {
       margin: 10px 0;
     }
   }
-}
-.test-unit-list {
-  display: flex;
-  flex-direction: column;
-  padding: 8px 24px 16px;
 }
 </style>

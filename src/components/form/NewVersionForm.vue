@@ -17,7 +17,14 @@ const props = defineProps({
   },
 });
 
-const unitTestList = ref<Partial<ITestUnit>[]>([{ unitDesc: "" }]);
+const unitTestList = ref<Partial<ITestUnit>[]>(
+  !!props.editFlag
+    ? !!props.editVersionInfo?.testUnits &&
+      props.editVersionInfo?.testUnits?.length > 0
+      ? props.editVersionInfo?.testUnits
+      : [{ unitDesc: "" }]
+    : [{ unitDesc: "" }]
+);
 
 const initialState = !!props.editFlag
   ? {
@@ -85,7 +92,6 @@ const onSubmitNewVersion = () => {
 };
 </script>
 <template>
-  {{ unitTestList }}
   <form @submit.prevent="">
     <v-text-field
       :error-messages="

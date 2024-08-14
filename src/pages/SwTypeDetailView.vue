@@ -125,59 +125,54 @@ const onSubmitNewVersion = async (
       versionDesc,
       tag,
       ...(file && { file }),
-      ...(file && { file }),
     });
     if (!!unitTestList && unitTestList?.length > 0) {
-      const createTestUnitList = await testUnitApi.POST_testUnits(
+      await testUnitApi.POST_testUnits(
         unitTestList,
         createSwVersion.swVersionId
       );
-      console.log(createTestUnitList);
     }
     submitErrorFlag.value = false;
     openModalNewVersion.value = false;
     return onFetchSwVersionList(createSwVersion.swType.swTypeId);
   } catch (error) {
-    return alert("Error: swTypeId is not found");
+    return alert("Error:Something wrong with creating new version");
   }
-
-  // if (!!route.params.id) {
-  //   return
-  //     .then((res) => {
-  //       submitErrorFlag.value = false;
-  //       onFetchSwVersionList(res.swType.swTypeId);
-  //       openModalNewVersion.value = false;
-
-  //     });
-  // }
 };
 
-const onSubmitEditVersion = (
+const onSubmitEditVersion = async (
   swVersionId: string,
   versionTitle: string,
   versionDesc: string,
   tag: string,
-  file?: File
+  file?: File,
+  unitTestList?: Partial<ITestUnit>[]
 ) => {
-  return swVersionApi
-    .PATCH_swVersion({
+  try {
+    const patchSwVersion = await swVersionApi.PATCH_swVersion({
       swVersionId,
       versionTitle,
       versionDesc,
       tag,
       ...(file && { file }),
-    })
-    .then((res) => {
-      submitErrorFlag.value = false;
-      openModalNewVersion.value = false;
-      onFetchSwVersionList(route.params.id as string);
     });
+    console.log(patchSwVersion);
+    if (!!unitTestList && unitTestList?.length > 0) {
+      await testUnitApi.PATCH_testUnit(unitTestList, swVersionId);
+    }
+    submitErrorFlag.value = false;
+    openModalNewVersion.value = false;
+    onFetchSwVersionList(route.params.id as string);
+  } catch (error) {
+    console.log(error);
+    return alert("Error:Something wrong with editing version");
+  }
 };
 
 const onClickEditVersion = (curSwVer: ISwVersion) => {
   openModalNewVersion.value = true;
   editVersionFlag.value = true;
-  // console.log("onClickEditVersion top class", curSwVer);
+
   Object.assign(editVersionInfo, curSwVer);
 };
 </script>

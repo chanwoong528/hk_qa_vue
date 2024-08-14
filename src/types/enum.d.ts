@@ -41,3 +41,17 @@ export enum E_ModalType {
 export enum E_EditorType {
   comment = "comment",
 }
+export enum E_ReactionType {
+  check = 'check',
+  stop = 'stop',
+
+  like = 'like',
+  dislike = 'dislike',
+  love = 'love',
+  sad = 'sad',
+  wow = 'wow',
+}
+export enum E_ReactionParentType {
+  comment = 'comment',
+  testUnit = 'testUnit',
+}
