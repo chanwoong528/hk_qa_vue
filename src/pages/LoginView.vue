@@ -11,6 +11,7 @@ import ModalWrap from "@/components/ModalWrap.vue";
 
 import type { IUserInfo } from "@/types/types";
 import HIQ_LOGO from "@/assets/hiq_logo_text.svg";
+import { userApi } from "@/services/domain/userService";
 
 const router = useRouter();
 const store = useUserStore();
@@ -22,13 +23,16 @@ const toggleDialog = () => {
   isDialogOpen.value = !isDialogOpen.value;
 };
 
-const handleForgotPw = (errors: Object, email: String, closeFlag?: boolean) => {
+const handleForgotPw = (errors: Object, email: string, closeFlag?: boolean) => {
   if (!!closeFlag) {
     return toggleDialog();
   }
   if (!errors) {
     // console.log("Forgot pw no error", email);
     //TODO: api call forget pw -> send verfication email
+    userApi.POST_forgetPw( email ).then((res)=>{
+      alert("이메일 전송 완료")
+    });
   }
 };
 
@@ -60,11 +64,8 @@ const handleLogin = (error: Object, email: string, pw: string) => {
 </script>
 
 <template>
-  <ModalWrap
-    v-model="isDialogOpen"
-    title="Send Verification Email for Reset Password"
-  >
-    <ForgotPwForm @userEmail="handleForgotPw" />
+  <ModalWrap v-model="isDialogOpen" title="비밀번호 초기화할 이메일을 입력해 주세요">
+    <ForgotPwForm @handleForgotPw="handleForgotPw" />
   </ModalWrap>
   <div>
     <v-card

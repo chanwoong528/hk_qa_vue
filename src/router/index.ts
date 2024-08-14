@@ -7,6 +7,7 @@ import UsersView from "@/pages/UsersView.vue";
 // import SwTypeView from "@/pages/SwTypeView.vue";
 import SwTypeDetailView from "@/pages/SwTypeDetailView.vue";
 import VerifyView from "@/pages/VerifyView.vue";
+import ResetPwView from "@/pages/ResetPwView.vue";
 
 interface NavItem {
   path: string;
@@ -72,6 +73,13 @@ export const NAV_LIST: NavItem[] = [
     component: VerifyView,
     label: "Verify Email",
     code: "Verify Email",
+    meta: { requiresAuth: false },
+  },
+  {
+    path: "/reset-password",
+    component: ResetPwView,
+    label: "Reset Password",
+    code: "Reset Password",
     meta: { requiresAuth: false },
   },
 ];

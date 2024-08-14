@@ -17,10 +17,10 @@ const state = reactive({
 });
 const rules = {
   email: {
-    required: helpers.withMessage("Email is required", required),
-    email: helpers.withMessage("Enter valid Email form", email),
+    required: helpers.withMessage("이메일을 입력해주세요", required),
+    email: helpers.withMessage("이메일 형식이 아닙니다", email),
   },
-  pw: { required: helpers.withMessage("Password is required", required) },
+  pw: { required: helpers.withMessage("패스워드를 입력해주세요", required) },
 };
 const v$ = useVuelidate(rules, state);
 const emit = defineEmits(["handleLogin", "toggleDialog"]);
@@ -40,7 +40,7 @@ const handleSubmitEmail = () => {
     <v-text-field
       :error-messages="v$.email.$errors.map((e) => e.$message).join(', ')"
       density="compact"
-      placeholder="Email address"
+      placeholder="이메일"
       prepend-inner-icon="mdi-email-outline"
       variant="outlined"
       @blur="v$.email.$touch"
@@ -56,7 +56,7 @@ const handleSubmitEmail = () => {
         class="text-caption text-blue"
         @click="props.toggleDialog"
       >
-        Forgot login password?
+        비밀번호 찾기
       </v-btn>
     </div>
     <v-text-field
@@ -64,7 +64,7 @@ const handleSubmitEmail = () => {
       :append-inner-icon="pwVisible ? 'mdi-eye-off' : 'mdi-eye'"
       :type="pwVisible ? 'text' : 'password'"
       density="compact"
-      placeholder="Enter your password"
+      placeholder="비밀번호"
       prepend-inner-icon="mdi-lock-outline"
       variant="outlined"
       @click:append-inner="pwVisible = !pwVisible"

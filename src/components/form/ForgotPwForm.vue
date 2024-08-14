@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { reactive } from "vue";
 import { useVuelidate } from "@vuelidate/core";
-import { email, required } from "@vuelidate/validators";
+import { email, required, helpers } from "@vuelidate/validators";
 
 const initialState = {
   email: "",
@@ -12,17 +12,20 @@ const state = reactive({
 });
 
 const rules = {
-  email: { required, email },
+  email: {
+    required: helpers.withMessage("이메일을 입력해주세요", required),
+    email: helpers.withMessage("이메일 형식이 아닙니다", email),
+  },
 };
 
 const v$ = useVuelidate(rules, state);
 
-const emit = defineEmits(["userEmail"]);
+const emit = defineEmits(["handleForgotPw"]);
 
 const handleSubmitEmail = (closeFlag?: boolean) => {
   if (!!v$.value.$errors.map((e) => e.$message).join(", ")) return;
   emit(
-    "userEmail",
+    "handleForgotPw",
     v$.value.$errors.map((e) => e.$message).join(", "),
     state.email,
     closeFlag
@@ -52,7 +55,7 @@ const handleSubmitEmail = (closeFlag?: boolean) => {
         }
       "
     >
-      Send Verification Email
+      이메일 보내기
     </v-btn>
     <v-btn
       type="close"
@@ -60,7 +63,7 @@ const handleSubmitEmail = (closeFlag?: boolean) => {
       variant="outlined"
       color="error"
     >
-      close
+      닫기
     </v-btn>
   </form>
 </template>

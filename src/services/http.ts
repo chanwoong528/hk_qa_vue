@@ -1,10 +1,9 @@
 import axios from "axios";
-console.log("process.env.NODE_ENV", process.env.NODE_ENV);
 
-
-const DEV_BASE_RESTAPI = process.env.NODE_ENV === 'dev'
-  ? "http://localhost:3000"
-  : "http://ec2-3-36-178-244.ap-northeast-2.compute.amazonaws.com:5000";
+const DEV_BASE_RESTAPI =
+  process.env.NODE_ENV === "dev"
+    ? "http://localhost:3000"
+    : "http://ec2-3-36-178-244.ap-northeast-2.compute.amazonaws.com:5000";
 
 export const http = axios.create({
   baseURL: DEV_BASE_RESTAPI,
@@ -53,15 +52,12 @@ http.interceptors.request.use((config) => {
 //   }
 // );
 
-
-
-
 export const ExceptionWrapper = async <T>(callback: Function): Promise<T> => {
   try {
     return await callback();
   } catch (error) {
     if (axios.isAxiosError(error)) throw error.response?.data;
 
-    throw new Error('different error than axios' + error);
+    throw new Error("different error than axios" + error);
   }
-}
+};

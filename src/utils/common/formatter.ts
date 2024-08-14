@@ -1,19 +1,41 @@
+import { E_ReactionType } from "@/types/enum.d";
+
 export function formatDateTime(isoString: string): string {
   // ISO 문자열을 Date 객체로 변환
   const date: Date = new Date(isoString);
 
   // 옵션 설정: 날짜와 24시간 형식의 시간(시간과 분까지만) 포함
   const options: Intl.DateTimeFormatOptions = {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: 'numeric',
-    hour12: false,  // 24시간 형식 사용
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    hour12: false, // 24시간 형식 사용
   };
 
   // 형식을 지정하여 날짜와 시간 포맷팅
-  const formattedDate: string = new Intl.DateTimeFormat('ko-KR', options).format(date);
+  const formattedDate: string = new Intl.DateTimeFormat(
+    "ko-KR",
+    options
+  ).format(date);
 
   return formattedDate;
+}
+
+export function renderIconForReaction(reactionType: E_ReactionType) {
+  switch (reactionType) {
+    case E_ReactionType.check:
+      return { icon: "mdi-check", color: "teal" };
+
+    case E_ReactionType.stop:
+      return { icon: "mdi-close-circle", color: "error" };
+    case E_ReactionType.like:
+      return { icon: "mdi mdi-thumb-up", color: "yellow-darken-2" };
+    case E_ReactionType.wow:
+      return { icon: "mdi mdi-emoticon-cool", color: "indigo-darken-4" };
+
+    default:
+      return { icon: "mdi-alert-circle", color: "warning" };
+  }
 }

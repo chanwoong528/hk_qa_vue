@@ -19,6 +19,7 @@ import type {
 } from "@/types/types.d";
 import { testUnitApi } from "@/services/domain/swService";
 import { reactionApi } from "@/services/domain/reactionService";
+import { renderIconForReaction } from "@/utils/common/formatter";
 
 const store = useUserStore();
 const { loggedInUser } = storeToRefs(store);
@@ -132,7 +133,16 @@ const onClickLoggedInUserStatus = (tester: ITestSession) => {
   }
 };
 const onClickEditVersion = () => {
-  emit("onClickEditVersion", props.swVersion?.swVersionId);
+  const testers = props.swVersion?.testSessions;
+  const versionAuthor = props.swVersion?.user;
+  if (
+    testers?.some((tester) => tester.user.id === loggedInUser.value?.id) ||
+    versionAuthor?.id === loggedInUser.value?.id
+  ) {
+    return emit("onClickEditVersion", props.swVersion?.swVersionId);
+  }
+
+  return alert("테스트 참여자 또는 버전 작성자만 수정 가능합니다.");
 };
 const onClickAddTester = () => {
   if (!!props.toggleModal) {
@@ -159,19 +169,16 @@ const renderIconForVersionStatus = (status: E_TestStatus) => {
   }
 };
 
-const renderIconForReaction = (reactionType: E_ReactionType) => {
-  switch (reactionType) {
-    case E_ReactionType.check:
-      return { icon: "mdi-check", color: "teal" };
-
-    case E_ReactionType.stop:
-      return { icon: "mdi-close-circle", color: "error" };
-    default:
-      return { icon: "mdi-alert-circle", color: "warning" };
-  }
-};
-
 const onClickReactionBtn = (btnType: E_ReactionType, testUnitId: string) => {
+  const testers = props.swVersion?.testSessions;
+  const versionAuthor = props.swVersion?.user;
+
+  if (
+    !testers?.some((tester) => tester.user.id === loggedInUser.value?.id) &&
+    versionAuthor?.id !== loggedInUser.value?.id
+  ) {
+    return alert("테스트 참여자 또는 버전 작성자만 가능합니다.");
+  }
   return reactionApi
     .POST_reaction(E_ReactionParentType.testUnit, btnType, testUnitId)
     .then(() => {

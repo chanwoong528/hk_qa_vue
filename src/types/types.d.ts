@@ -66,7 +66,6 @@ export interface ITestUnit {
   counts?: {
     [key in E_ReactionType]: number;
   };
-
 }
 
 export interface IReaction {
@@ -81,7 +80,6 @@ export interface IReaction {
 
   parentComment?: IComment;
   parentTestUnit?: ITestUnit;
-
 }
 
 export interface ITestSession {
@@ -116,4 +114,8 @@ export interface IComment {
   user: IUserInfo;
   swVersion: ISwVersion;
   childComments: IComment[];
+  reactions: IReaction[];
+  counts?: {
+    [key in E_ReactionType]: number;
+  };
 }

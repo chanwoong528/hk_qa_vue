@@ -149,14 +149,14 @@ const onSubmitEditVersion = async (
   unitTestList?: Partial<ITestUnit>[]
 ) => {
   try {
-    const patchSwVersion = await swVersionApi.PATCH_swVersion({
+    await swVersionApi.PATCH_swVersion({
       swVersionId,
       versionTitle,
       versionDesc,
       tag,
       ...(file && { file }),
     });
-    console.log(patchSwVersion);
+
     if (!!unitTestList && unitTestList?.length > 0) {
       await testUnitApi.PATCH_testUnit(unitTestList, swVersionId);
     }

@@ -8,6 +8,7 @@ import type {
   ITestSession,
   IUserInfo,
   IComment,
+  IReaction,
 } from "@/types/types";
 
 import {
@@ -110,6 +111,41 @@ const onClickTester = (testerInfo: ITestSession, loggedInUserId: string) => {
   dbSavedTestSession.user = testerInfo.user;
 };
 
+function countReactions(reactions: IReaction[]): Record<string, number> {
+  const reactionCounts: Record<string, number> = {};
+
+  reactions.forEach((reaction) => {
+    const type = reaction.reactionType;
+    if (!!type) {
+      if (reactionCounts[type]) {
+        reactionCounts[type]++;
+      } else {
+        reactionCounts[type] = 1;
+      }
+    }
+  });
+  return reactionCounts;
+}
+
+const onFetchCommentsBySwVersionId = (swVersionId?: string) => {
+  return commentApi
+    .GET_commentsBySwVersionId(swVersionId ? swVersionId : curSwVersionId.value)
+    .then((res) => {
+      const commentListWithReactionCount = res.map((comment) => {
+        return {
+          ...comment,
+          counts: countReactions(comment.reactions),
+          childComments: comment.childComments.map((child) => {
+            return {
+              ...child,
+              counts: countReactions(child.reactions),
+            };
+          }),
+        };
+      });
+      commentListForVersion.value = commentListWithReactionCount as IComment[];
+    });
+};
 const onClickAddTester = (swVerId: string) => {
   curSwVersionId.value = swVerId;
   const targetSwVersion = props.swVersionList?.find(
@@ -130,7 +166,7 @@ const onClickDetailView = (swVerId: string) => {
   curSwVersionId.value = swVerId;
   return commentApi
     .GET_commentsBySwVersionId(swVerId)
-    .then((res) => (commentListForVersion.value = res));
+    .then((res) => onFetchCommentsBySwVersionId(swVerId));
 };
 
 const onClickEditVersion = (swVerId: string) => {
@@ -203,6 +239,7 @@ const onSubmitAddTesters = (testers: IUserInfo[]) => {
     <CommentList
       v-model="commentListForVersion"
       :swVersion="curSwVersionInfo"
+      @onFetchCommentsBySwVersionId="onFetchCommentsBySwVersionId"
     />
   </ModalWrap>
   <!-- Detail Modal for Specific Version -->

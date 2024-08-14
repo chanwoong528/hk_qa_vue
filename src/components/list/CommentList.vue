@@ -14,6 +14,8 @@ const props = defineProps({
     type: Object as () => ISwVersion,
   },
 });
+const emit = defineEmits(["onFetchCommentsBySwVersionId"]);
+
 const userStore = useUserStore();
 const { loggedInUser } = storeToRefs(userStore);
 
@@ -37,6 +39,14 @@ const onBlurEditorCon = (isFocusOut: boolean) => {
     isEditorFocused.value = false;
   }
 };
+
+const onFetchCommentsBySwVersionId = (swVersionId?: string) => {
+  emit(
+    "onFetchCommentsBySwVersionId",
+    swVersionId ? swVersionId : props.swVersion?.swVersionId
+  );
+};
+
 const onSubmitComment = (parentId?: string, reCommentVal?: string) => {
   if (
     (isCommentEmpty.value && !reCommentVal) ||
@@ -52,12 +62,8 @@ const onSubmitComment = (parentId?: string, reCommentVal?: string) => {
     ...(typeof parentId === "string" && { parentId: parentId }),
   };
   return commentApi.POST_comment(params).then((res) => {
-    return commentApi
-      .GET_commentsBySwVersionId(params.swVersionId)
-      .then((res) => {
-        commentListModel.value = res;
-        return (commentVal.value = "");
-      });
+    commentVal.value = "";
+    return onFetchCommentsBySwVersionId(params.swVersionId);
   });
 };
 </script>
@@ -73,12 +79,14 @@ const onSubmitComment = (parentId?: string, reCommentVal?: string) => {
       <v-btn @click="onSubmitComment">댓글</v-btn>
     </div>
   </div>
-  <div>
-    <v-list lines="three" class="p-2">
+  <div class="comment-list-con">
+    <v-list lines="three" class="p-20">
       <CommentItem
         v-for="comment in commentListModel"
+        :key="comment.commentId"
         :comment="comment"
         @onSubmitComment="onSubmitComment"
+        @onFetchCommentsBySwVersionId="onFetchCommentsBySwVersionId"
       />
     </v-list>
   </div>

@@ -43,7 +43,6 @@ const onSubmitAddUser = (
   newUser: Partial<IUserInfo> & { username: string; email: string }
 ) => {
   return userApi.POST_user(newUser).then((res) => {
-    console.log(res);
     fetchUsers();
     alert("New user added successfully!");
     openModalNewUser.value = false;

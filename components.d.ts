@@ -13,6 +13,7 @@ declare module 'vue' {
     AppHeader: typeof import('./src/components/AppHeader.vue')['default']
     CommentItem: typeof import('./src/components/list/CommentItem.vue')['default']
     CommentList: typeof import('./src/components/list/CommentList.vue')['default']
+    CommentReactionList: typeof import('./src/components/list/CommentReactionList.vue')['default']
     ForgotPwForm: typeof import('./src/components/form/ForgotPwForm.vue')['default']
     HistoryList: typeof import('./src/components/list/HistoryList.vue')['default']
     LoginForm: typeof import('./src/components/form/LoginForm.vue')['default']
