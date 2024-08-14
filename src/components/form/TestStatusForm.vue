@@ -30,15 +30,23 @@ const btnList = ref<{ code: E_TestStatus; label: string }[]>([
 const isEditorFocused = ref<boolean>(false);
 
 const onClickHistoryTab = () => {
-  if (testSessionModel?.value?.user?.id) {
-    return fetchLogForUser(testSessionModel.value?.user?.id);
+  if (
+    testSessionModel?.value?.user?.id &&
+    testSessionModel.value.swVersion?.swVersionId
+  ) {
+    return fetchLogForUser(
+      testSessionModel.value?.user?.id,
+      testSessionModel.value.swVersion?.swVersionId
+    );
   }
 };
 
-const fetchLogForUser = (userId: string) => {
-  return logApi.GET_testerStatusUpdateLogByUserId(userId).then((res) => {
-    logListByUser.value = res;
-  });
+const fetchLogForUser = (userId: string, swVersionId: string) => {
+  return logApi
+    .GET_testerStatusUpdateLogByUserId(userId, swVersionId)
+    .then((res) => {
+      logListByUser.value = res;
+    });
 };
 
 const onFocusEditorCon = (clickedCon: boolean) => {

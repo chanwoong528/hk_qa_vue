@@ -40,6 +40,7 @@ const props = defineProps({
 const userStore = useUserStore();
 const { loggedInUser } = storeToRefs(userStore);
 
+const panelOpened = ref(0);
 const emit = defineEmits(["onSubmitStatus", "onClickEditVersion"]);
 
 const userList = ref<IUserInfo[]>([]);
@@ -101,6 +102,7 @@ const onClickTester = (testerInfo: ITestSession, loggedInUserId: string) => {
   selectedTestSession.status = testerInfo.status;
   selectedTestSession.reasonContent = testerInfo.reasonContent;
   selectedTestSession.user = testerInfo.user;
+  selectedTestSession.swVersion = testerInfo.swVersion;
 
   dbSavedTestSession.sessionId = testerInfo.sessionId;
   dbSavedTestSession.status = testerInfo.status;
@@ -205,12 +207,13 @@ const onSubmitAddTesters = (testers: IUserInfo[]) => {
   </ModalWrap>
   <!-- Detail Modal for Specific Version -->
 
-  <v-expansion-panels>
+  <v-expansion-panels v-model="panelOpened">
     <SwVersionItem
-      v-for="swVersion in props.swVersionList"
+      v-for="(swVersion, idx) in props.swVersionList"
       :key="swVersion.swVersionId"
       :swVersion="swVersion"
       :toggleModal="toggleModal"
+      :isCurOpen="idx === panelOpened"
       itemType="panel"
       @onClickTester="onClickTester"
       @onClickAddTester="onClickAddTester"
