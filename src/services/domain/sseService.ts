@@ -14,8 +14,6 @@ export const sseApi = () => {
       const data = JSON.parse(e.data);
       const triggerData = { type: data.type, date: new Date().toISOString() }
       Object.assign(sseTrigger, triggerData)
-      console.log(triggerData)
-
       return data
     }
   }

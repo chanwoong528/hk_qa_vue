@@ -252,7 +252,6 @@ const onSubmitAddTesters = (testers: IUserInfo[]) => {
     :type="E_ModalType.full"
     :title="curSwVersionInfo?.versionTitle + '버전'"
   >
-    <p>{{ sseTrigger }}</p>
     <SwVersionItem
       :swVersion="curSwVersionInfo"
       :toggleModal="toggleModal"
