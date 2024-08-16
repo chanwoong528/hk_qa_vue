@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, ref, computed } from "vue";
+import { reactive, ref, computed, watch } from "vue";
 import { storeToRefs } from "pinia";
 
 import { useUserStore } from "@/store/userStore";
@@ -20,6 +20,7 @@ import {
 import { userApi } from "@/services/domain/userService";
 import { testSessionApi } from "@/services/domain/testSessionService";
 import { commentApi } from "@/services/domain/commentService";
+import { sseApi } from "@/services/domain/sseService";
 
 import AddTesterForm from "@/components/form/AddTesterForm.vue";
 import TestStatusForm from "@/components/form/TestStatusForm.vue";
@@ -68,6 +69,27 @@ const selectedTestSession = reactive<Partial<ITestSession>>({
   status: E_TestStatus.pending,
   reasonContent: "",
 });
+
+const sseTrigger = reactive({ type: "", date: "" });
+
+const eventSse = sseApi();
+
+watch(
+  () => [openModalDetailView.value],
+  ([newToggle]) => {
+    if (!!newToggle) {
+      eventSse.onMsg(curSwVersionId.value as string, sseTrigger);
+    } else {
+      eventSse.close();
+    }
+  }
+);
+watch(
+  () => sseTrigger.date,
+  (newDate) => {
+    onFetchCommentsBySwVersionId(curSwVersionId.value);
+  }
+);
 
 const curSwVersionInfo = computed(() => {
   return props.swVersionList?.find(
@@ -164,6 +186,7 @@ const onClickAddTester = (swVerId: string) => {
 
 const onClickDetailView = (swVerId: string) => {
   curSwVersionId.value = swVerId;
+
   return commentApi
     .GET_commentsBySwVersionId(swVerId)
     .then((res) => onFetchCommentsBySwVersionId(swVerId));
@@ -229,6 +252,7 @@ const onSubmitAddTesters = (testers: IUserInfo[]) => {
     :type="E_ModalType.full"
     :title="curSwVersionInfo?.versionTitle + '버전'"
   >
+    <p>{{ sseTrigger }}</p>
     <SwVersionItem
       :swVersion="curSwVersionInfo"
       :toggleModal="toggleModal"

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
-import { useUserStore } from "@/store/userStore";
 import { storeToRefs } from "pinia";
+import { useUserStore } from "@/store/userStore";
 
 import {
   E_ReactionParentType,
@@ -10,16 +10,20 @@ import {
   E_SwVersionModalType,
   E_TestStatus,
 } from "@/types/enum.d";
-import { formatDateTime } from "@/utils/common/formatter";
 import type {
   IReaction,
   ISwVersion,
   ITestSession,
   ITestUnit,
 } from "@/types/types.d";
+
 import { testUnitApi } from "@/services/domain/swService";
 import { reactionApi } from "@/services/domain/reactionService";
-import { renderIconForReaction } from "@/utils/common/formatter";
+
+import {
+  renderIconForReaction,
+  formatDateTime,
+} from "@/utils/common/formatter";
 
 const store = useUserStore();
 const { loggedInUser } = storeToRefs(store);
@@ -78,11 +82,6 @@ const REACT_BTN_LIST: { type: E_ReactionType; icon: string; color: string }[] =
       icon: "mdi-check",
       color: "teal",
     },
-    // {
-    //   type: "good",
-    //   icon: "mdi mdi-thumb-up",
-    //   color: "blue-lighten-2",
-    // },
     {
       type: E_ReactionType.stop,
       icon: "mdi-close-circle",
