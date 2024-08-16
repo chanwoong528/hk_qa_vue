@@ -20,6 +20,7 @@
     "quill-magic-url": "^4.2.0",
     "quill-resize-image": "^1.0.4",
     "roboto-fontface": "*",
+    "socket.io-client": "^4.7.5",
     "vue": "^3.4.21",
     "vue-router": "^4.4.0",
     "vuetify": "^3.6.14"

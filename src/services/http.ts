@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const DEV_BASE_RESTAPI =
+export const DEV_BASE_RESTAPI =
   process.env.NODE_ENV === "dev"
     ? "http://localhost:3000"
     : "http://ec2-3-36-178-244.ap-northeast-2.compute.amazonaws.com:5000";
