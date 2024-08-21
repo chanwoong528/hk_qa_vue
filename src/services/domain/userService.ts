@@ -20,6 +20,15 @@ export const userApi = {
       return data;
     });
   },
+  POST_sendVerificationEmail: (email: string) => {
+    return ExceptionWrapper(async () => {
+      const apiResult = await http.post("/user/send-verification", {
+        email: email,
+      });
+      const data = await apiResult.data;
+      return data;
+    });
+  },
   POST_forgetPw: (email: string): Promise<any> => {
     return ExceptionWrapper(async () => {
       const apiResult = await http.post("/user/forgot-password", {

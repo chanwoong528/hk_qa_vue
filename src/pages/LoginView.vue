@@ -30,7 +30,7 @@ const handleForgotPw = (errors: Object, email: string, closeFlag?: boolean) => {
   if (!errors) {
     // console.log("Forgot pw no error", email);
     //TODO: api call forget pw -> send verfication email
-    userApi.POST_forgetPw( email ).then((res)=>{
+    userApi.POST_forgetPw(email).then((res) => {
       alert("이메일 전송 완료")
     });
   }
@@ -49,10 +49,11 @@ const handleLogin = (error: Object, email: string, pw: string) => {
       })
       .catch((err) => {
         const errorCode = err.statusCode;
-
+        const errorMsg = err.message;
+        console.log(errorMsg)
         switch (errorCode) {
           case 401:
-            return alert("Invalid email or password");
+            return alert(errorMsg);
           case 404:
             return alert("User does not exist");
           default:
@@ -68,12 +69,7 @@ const handleLogin = (error: Object, email: string, pw: string) => {
     <ForgotPwForm @handleForgotPw="handleForgotPw" />
   </ModalWrap>
   <div>
-    <v-card
-      class="mx-auto pa-12 pb-8"
-      elevation="8"
-      max-width="448"
-      rounded="lg"
-    >
+    <v-card class="mx-auto pa-12 pb-8" elevation="8" max-width="448" rounded="lg">
       <h1>
         <img :src="HIQ_LOGO" alt="HK QA Tester" />
       </h1>
@@ -87,6 +83,7 @@ const handleLogin = (error: Object, email: string, pw: string) => {
 h1 {
   width: 50%;
   margin: 0 auto;
+
   img {
     width: 100%;
   }
