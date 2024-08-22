@@ -127,6 +127,10 @@ const onSubmitNewVersion = async (
       ...(file && { file }),
     });
     if (!!unitTestList && unitTestList?.length > 0) {
+      if (unitTestList.some((item) => !item.unitDesc)) {
+        return alert("유닛테스트를 작성 해주세요");
+      }
+
       await testUnitApi.POST_testUnits(
         unitTestList,
         createSwVersion.swVersionId
@@ -158,8 +162,13 @@ const onSubmitEditVersion = async (
     });
 
     if (!!unitTestList && unitTestList?.length > 0) {
+      if (unitTestList.some((item) => !item.unitDesc)) {
+        return alert("유닛테스트를 작성 해주세요");
+      }
+
       await testUnitApi.PATCH_testUnit(unitTestList, swVersionId);
     }
+
     submitErrorFlag.value = false;
     openModalNewVersion.value = false;
     onFetchSwVersionList(route.params.id as string);
