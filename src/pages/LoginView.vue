@@ -50,7 +50,6 @@ const handleLogin = (error: Object, email: string, pw: string) => {
       .catch((err) => {
         const errorCode = err.statusCode;
         const errorMsg = err.message;
-        console.log(errorMsg)
         switch (errorCode) {
           case 401:
             return alert(errorMsg);
