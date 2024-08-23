@@ -24,8 +24,6 @@ const headers = ref([
   { title: "Created Date ", key: "createdAt" },
   { title: "Role/Status", key: "actions", sortable: false },
 ] as const);
-
-console.log(props.swList);
 </script>
 
 <template>
