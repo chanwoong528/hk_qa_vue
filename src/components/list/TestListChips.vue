@@ -41,19 +41,11 @@ const onClickLoggedInUserStatus = (tester: ITestSession) => {
 };
 </script>
 <template>
-  <div
-    class="tester-con"
-    v-if="
-      !!props.swVersion?.testSessions &&
-      props.swVersion?.testSessions.length > 0
-    "
-  >
+  <div class="tester-con" v-if="!!props.swVersion?.testSessions && props.swVersion?.testSessions.length > 0">
     <p>현재 테스터</p>
 
     <v-chip
-      v-for="tester in props.swVersion?.testSessions.sort((a, b) =>
-        a.createdAt > b.createdAt ? 1 : -1
-      )"
+      v-for="tester in props.swVersion?.testSessions.sort((a, b) => (a.createdAt > b.createdAt ? 1 : -1))"
       :class="tester.user.id === loggedInUser?.id ? ' on' : ''"
       class="mr-2 mb-2"
       :variant="tester.user.id === loggedInUser?.id ? 'tonal' : 'outlined'"
@@ -71,14 +63,10 @@ const onClickLoggedInUserStatus = (tester: ITestSession) => {
         max-width="300"
       >
         <div v-if="tester.status === E_TestStatus.pending">
-          <p>
-            [{{ tester.user.username }}] <br />아직 QA를 진행하지 않았습니다.
-          </p>
+          <p>[{{ tester.user.username }}] <br />아직 QA를 진행하지 않았습니다.</p>
         </div>
         <div v-else>
-          <p>
-            [{{ tester.user.username }}] {{ formatDateTime(tester.updatedAt) }}
-          </p>
+          <p>[{{ tester.user.username }}] {{ formatDateTime(tester.updatedAt) }}</p>
           <div class="html-con" v-html="tester.reasonContent"></div>
         </div>
       </v-tooltip>

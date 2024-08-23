@@ -1,32 +1,22 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
+import { useDate } from "vuetify";
+
 import { storeToRefs } from "pinia";
 import { useUserStore } from "@/store/userStore";
 
-import {
-  E_ReactionParentType,
-  E_ReactionType,
-  E_Role,
-  E_SwVersionModalType,
-  E_TestStatus,
-} from "@/types/enum.d";
-import type {
-  IReaction,
-  ISwVersion,
-  ITestSession,
-  ITestUnit,
-} from "@/types/types.d";
+import { E_ReactionParentType, E_ReactionType, E_Role, E_SwVersionModalType, E_TestStatus } from "@/types/enum.d";
+import type { IReaction, ISwVersion, ITestSession, ITestUnit } from "@/types/types.d";
 
-import { testUnitApi } from "@/services/domain/swService";
+import { swVersionApi, testUnitApi } from "@/services/domain/swService";
 import { reactionApi } from "@/services/domain/reactionService";
 
-import {
-  renderIconForReaction,
-  formatDateTime,
-} from "@/utils/common/formatter";
+import { renderIconForReaction, formatDateTime, formatDate, formatDateForServer } from "@/utils/common/formatter";
 
 const store = useUserStore();
 const { loggedInUser } = storeToRefs(store);
+
+const dateAdapter = useDate();
 
 const props = defineProps({
   swVersion: {
@@ -37,6 +27,8 @@ const props = defineProps({
   toggleModal: Function,
 });
 const unitList = ref<ITestUnit[]>([]);
+const openCalender = ref<boolean>(false);
+const selectedDate = ref<string>();
 
 function countReactions(reactions: IReaction[]): Record<string, number> {
   const reactionCounts: Record<string, number> = {};
@@ -59,8 +51,12 @@ watch(
   ([newOpen, newVerId]) => {
     if (!!newOpen && !!newVerId) {
       fetchUnitList(newVerId as string);
+
+      if (!!props.swVersion?.dueDate) {
+        selectedDate.value = dateAdapter.parseISO(props.swVersion.dueDate) as string;
+      }
     }
-  }
+  },
 );
 
 const fetchUnitList = (swVersionId: string) => {
@@ -75,43 +71,26 @@ const fetchUnitList = (swVersionId: string) => {
   });
 };
 
-const REACT_BTN_LIST: { type: E_ReactionType; icon: string; color: string }[] =
-  [
-    {
-      type: E_ReactionType.check,
-      icon: "mdi-check",
-      color: "teal",
-    },
-    {
-      type: E_ReactionType.stop,
-      icon: "mdi-close-circle",
-      color: "error",
-    },
-  ];
+const REACT_BTN_LIST: { type: E_ReactionType; icon: string; color: string }[] = [
+  {
+    type: E_ReactionType.check,
+    icon: "mdi-check",
+    color: "teal",
+  },
+  {
+    type: E_ReactionType.stop,
+    icon: "mdi-close-circle",
+    color: "error",
+  },
+];
 
-const emit = defineEmits([
-  "onClickTester",
-  "onClickAddTester",
-  "onClickDetailView",
-  "onClickEditVersion",
-]);
+const emit = defineEmits(["onClickTester", "onClickAddTester", "onClickDetailView", "onClickEditVersion"]);
 
 const testSessionsPassStatus = computed(() => {
-  if (
-    props.swVersion?.testSessions &&
-    props.swVersion?.testSessions.length > 0
-  ) {
-    if (
-      props.swVersion?.testSessions.some(
-        (tester) => tester.status === E_TestStatus.failed
-      )
-    )
+  if (props.swVersion?.testSessions && props.swVersion?.testSessions.length > 0) {
+    if (props.swVersion?.testSessions.some((tester) => tester.status === E_TestStatus.failed))
       return E_TestStatus.failed;
-    if (
-      props.swVersion?.testSessions.every(
-        (tester) => tester.status === E_TestStatus.passed
-      )
-    )
+    if (props.swVersion?.testSessions.every((tester) => tester.status === E_TestStatus.passed))
       return E_TestStatus.passed;
 
     return E_TestStatus.pending;
@@ -121,10 +100,7 @@ const testSessionsPassStatus = computed(() => {
 
 const onClickLoggedInUserStatus = (tester: ITestSession) => {
   if (!!props.toggleModal) {
-    if (
-      tester.status === E_TestStatus.pending &&
-      loggedInUser.value?.id !== tester.user.id
-    )
+    if (tester.status === E_TestStatus.pending && loggedInUser.value?.id !== tester.user.id)
       return alert("테스트가 진행중입니다.");
 
     props.toggleModal();
@@ -178,11 +154,9 @@ const onClickReactionBtn = (btnType: E_ReactionType, testUnitId: string) => {
   ) {
     return alert("테스트 참여자 또는 버전 작성자만 가능합니다.");
   }
-  return reactionApi
-    .POST_reaction(E_ReactionParentType.testUnit, btnType, testUnitId)
-    .then(() => {
-      fetchUnitList(props.swVersion?.swVersionId as string);
-    });
+  return reactionApi.POST_reaction(E_ReactionParentType.testUnit, btnType, testUnitId).then(() => {
+    fetchUnitList(props.swVersion?.swVersionId as string);
+  });
 };
 const renderColorIcon = (status: E_TestStatus) => {
   switch (status) {
@@ -193,6 +167,16 @@ const renderColorIcon = (status: E_TestStatus) => {
     default:
       return "warning";
   }
+};
+
+const onSubmitDueDate = () => {
+  if (!selectedDate.value) return alert("마감일을 선택해주세요");
+
+  swVersionApi
+    .PATCH_swVersionDueDate(props.swVersion?.swVersionId as string, formatDateForServer(selectedDate.value))
+    .then((res) => {
+      console.log(res);
+    });
 };
 </script>
 
@@ -223,15 +207,30 @@ const renderColorIcon = (status: E_TestStatus) => {
 
     <v-expansion-panel-text>
       <div class="desc-wrap">
-        <v-btn class="edit-btn" variant="outlined" @click="onClickEditVersion">
-          <v-icon class="mdi mdi-application-edit" start></v-icon>
-          수정
-        </v-btn>
+        <div class="edit-btn-con">
+          <div>
+            <v-btn class="edit-btn" variant="outlined" @click="openCalender = true">
+              <template v-if="!selectedDate">
+                <v-icon class="mdi mdi-calendar-check" start></v-icon>
+                마감일
+              </template>
+              <template v-else> Due: {{ formatDate(selectedDate) }} </template>
+            </v-btn>
+            <div class="date-picker" v-if="!!openCalender">
+              <v-btn class="close-btn" icon="mdi-close" @click="openCalender = false" variant="plain"></v-btn>
+              <v-date-picker v-model="selectedDate" show-adjacent-months> </v-date-picker>
+              <v-btn variant="plain" @click="onSubmitDueDate">ok</v-btn>
+            </div>
+          </div>
+
+          <v-btn class="edit-btn" variant="outlined" @click="onClickEditVersion">
+            <v-icon class="mdi mdi-application-edit" start></v-icon>
+            수정
+          </v-btn>
+        </div>
         <div class="desc-inner-html" v-html="props.swVersion?.versionDesc" />
       </div>
-      <a v-if="props.swVersion?.fileSrc" :href="props.swVersion?.fileSrc"
-        >첨부 파일</a
-      >
+      <a v-if="props.swVersion?.fileSrc" :href="props.swVersion?.fileSrc">첨부 파일</a>
 
       <section v-if="unitList.length > 0">
         <h5>유닛 테스트 목록</h5>
@@ -242,12 +241,7 @@ const renderColorIcon = (status: E_TestStatus) => {
                 <v-chip
                   link
                   v-if="testUnit?.counts && !!testUnit?.counts"
-                  @click="
-                    onClickReactionBtn(
-                      reactionKey as E_ReactionType,
-                      testUnit.testUnitId as string
-                    )
-                  "
+                  @click="onClickReactionBtn(reactionKey as E_ReactionType, testUnit.testUnitId as string)"
                 >
                   <v-icon
                     :icon="renderIconForReaction(reactionKey as E_ReactionType).icon"
@@ -256,22 +250,14 @@ const renderColorIcon = (status: E_TestStatus) => {
                   {{ testUnit.counts[reactionKey as E_ReactionType] }}
 
                   <v-tooltip activator="parent" location="end" max-width="300">
-                    <p
-                      v-for="person in testUnit.reactions.filter(
-                        (reaction) => reaction.reactionType === reactionKey
-                      )"
-                    >
+                    <p v-for="person in testUnit.reactions.filter((reaction) => reaction.reactionType === reactionKey)">
                       {{ person.user.username }}
                     </p>
                   </v-tooltip>
                 </v-chip>
               </li>
             </ul>
-            <v-speed-dial
-              location="right center"
-              transition="fade-transition"
-              open-on-hover
-            >
+            <v-speed-dial location="right center" transition="fade-transition" open-on-hover>
               <template v-slot:activator="{ props: activatorProps }">
                 <v-btn variant="text" v-bind="activatorProps">
                   {{ testUnit.unitDesc }}
@@ -282,9 +268,7 @@ const renderColorIcon = (status: E_TestStatus) => {
                 :key="btn.icon"
                 icon
                 size="x-small"
-                @click="
-                  onClickReactionBtn(btn.type, testUnit.testUnitId as string)
-                "
+                @click="onClickReactionBtn(btn.type, testUnit.testUnitId as string)"
               >
                 <v-icon :icon="btn.icon" :color="btn.color"></v-icon>
               </v-btn>
@@ -295,10 +279,7 @@ const renderColorIcon = (status: E_TestStatus) => {
 
       <div class="version-ctrl-con">
         <v-divider :thickness="2"></v-divider>
-        <TestListChips
-          :swVersion="props.swVersion"
-          @onClickLoggedInUserStatus="onClickLoggedInUserStatus"
-        />
+        <TestListChips :swVersion="props.swVersion" @onClickLoggedInUserStatus="onClickLoggedInUserStatus" />
 
         <div class="modify-tester-btn-con">
           <v-btn
@@ -310,11 +291,7 @@ const renderColorIcon = (status: E_TestStatus) => {
             <v-icon icon="mdi-account-multiple-plus" start></v-icon>
             테스터 관리
           </v-btn>
-          <v-btn
-            @click="onClickDetailView"
-            class="text-none text-subtitle-1"
-            variant="outlined"
-          >
+          <v-btn @click="onClickDetailView" class="text-none text-subtitle-1" variant="outlined">
             상세보기
             <v-icon icon="mdi-dots-horizontal-circle-outline" end></v-icon>
           </v-btn>
@@ -324,20 +301,12 @@ const renderColorIcon = (status: E_TestStatus) => {
   </v-expansion-panel>
 
   <div class="default-type-item" v-else>
-    <a v-if="props.swVersion?.fileSrc" :href="props.swVersion?.fileSrc"
-      >Download File</a
-    >
-    <div
-      class="desc-inner-html expand"
-      v-html="props.swVersion?.versionDesc"
-    ></div>
+    <a v-if="props.swVersion?.fileSrc" :href="props.swVersion?.fileSrc">Download File</a>
+    <div class="desc-inner-html expand" v-html="props.swVersion?.versionDesc"></div>
 
     <div class="version-ctrl-con">
       <v-divider :thickness="2"></v-divider>
-      <TestListChips
-        :swVersion="props.swVersion"
-        @onClickLoggedInUserStatus="onClickLoggedInUserStatus"
-      />
+      <TestListChips :swVersion="props.swVersion" @onClickLoggedInUserStatus="onClickLoggedInUserStatus" />
     </div>
   </div>
 </template>
@@ -404,11 +373,32 @@ const renderColorIcon = (status: E_TestStatus) => {
 
 .desc-wrap {
   position: relative;
-  .edit-btn {
+  .edit-btn-con {
+    display: flex;
+    gap: 10px;
     position: absolute;
     top: 0;
     right: 0;
+    .date-picker {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      justify-content: center;
+      position: absolute;
+      right: 0;
+      z-index: 1000;
+      box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.8);
+      background-color: #fff;
+      border-radius: 8px;
+      // border: 10px solid red;
+      .close-btn {
+        position: absolute;
+        top: 0;
+        right: 0;
+      }
+    }
   }
+
   .desc-inner-html {
     overflow: hidden;
     max-height: 300px;

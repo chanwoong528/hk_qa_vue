@@ -47,6 +47,7 @@ export interface ISwVersion {
   fileSrc: string;
   tag: string;
   createdAt: string;
+  dueDate?: string;
 
   user: IUserInfo;
   swType: ISwType;

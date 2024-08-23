@@ -10,11 +10,19 @@ import { commentApi } from "@/services/domain/commentService";
 const commentListModel = defineModel<IComment[]>();
 
 const props = defineProps({
+  page: {
+    type: Number,
+    required: false,
+  },
+  computedLastPage: {
+    type: Boolean,
+    required: false,
+  },
   swVersion: {
     type: Object as () => ISwVersion,
   },
 });
-const emit = defineEmits(["onFetchCommentsBySwVersionId"]);
+const emit = defineEmits(["onFetchCommentsBySwVersionId", "onClickLoadNextPage"]);
 
 const userStore = useUserStore();
 const { loggedInUser } = storeToRefs(userStore);
@@ -40,19 +48,15 @@ const onBlurEditorCon = (isFocusOut: boolean) => {
   }
 };
 
+const onClickLoadNextPage = () => {
+  emit("onClickLoadNextPage");
+};
 const onFetchCommentsBySwVersionId = (swVersionId?: string) => {
-  emit(
-    "onFetchCommentsBySwVersionId",
-    swVersionId ? swVersionId : props.swVersion?.swVersionId
-  );
+  emit("onFetchCommentsBySwVersionId", swVersionId ? swVersionId : props.swVersion?.swVersionId);
 };
 
 const onSubmitComment = (parentId?: string, reCommentVal?: string) => {
-  if (
-    (isCommentEmpty.value && !reCommentVal) ||
-    !loggedInUser.value?.id ||
-    !props.swVersion?.swVersionId
-  )
+  if ((isCommentEmpty.value && !reCommentVal) || !loggedInUser.value?.id || !props.swVersion?.swVersionId)
     return alert("Please write a comment");
 
   let params = {
@@ -79,6 +83,7 @@ const onSubmitComment = (parentId?: string, reCommentVal?: string) => {
       <v-btn @click="onSubmitComment">댓글</v-btn>
     </div>
   </div>
+
   <div class="comment-list-con">
     <v-list lines="three" class="p-20">
       <CommentItem
@@ -89,6 +94,7 @@ const onSubmitComment = (parentId?: string, reCommentVal?: string) => {
         @onFetchCommentsBySwVersionId="onFetchCommentsBySwVersionId"
       />
     </v-list>
+    <v-btn v-if="!props.computedLastPage" @click="onClickLoadNextPage">Load More</v-btn>
   </div>
 </template>
 

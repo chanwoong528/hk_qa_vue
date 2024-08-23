@@ -65,6 +65,7 @@ export const swVersionApi = {
       versionTitle: string;
       versionDesc: string;
       tag: string;
+      dueDate?: string;
       file?: File;
     }
   ): Promise<void> => {
@@ -87,6 +88,14 @@ export const swVersionApi = {
       return data;
     });
   },
+
+  PATCH_swVersionDueDate: (swVersionId: string, date: string): Promise<void> => {
+    return ExceptionWrapper(async () => {
+      const apiResult = await http.post(`/sw-version/edit/${swVersionId}`, { dueDate: date });
+      const data = await apiResult.data;
+      return data;
+    });
+  }
 };
 
 export const testUnitApi = {

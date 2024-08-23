@@ -19,11 +19,10 @@ const props = defineProps({
 
 const unitTestList = ref<Partial<ITestUnit>[]>(
   !!props.editFlag
-    ? !!props.editVersionInfo?.testUnits &&
-      props.editVersionInfo?.testUnits?.length > 0
+    ? !!props.editVersionInfo?.testUnits && props.editVersionInfo?.testUnits?.length > 0
       ? props.editVersionInfo?.testUnits
       : [{ unitDesc: "" }]
-    : [{ unitDesc: "" }]
+    : [{ unitDesc: "" }],
 );
 
 const initialState = !!props.editFlag
@@ -77,26 +76,17 @@ const onSubmitNewVersion = () => {
       state.versionDesc,
       state.tag,
       state.file,
-      unitTestList.value
+      unitTestList.value,
     );
     return;
   }
-  emit(
-    "onSubmitNewVersion",
-    state.versionTitle,
-    state.versionDesc,
-    state.tag,
-    state.file,
-    unitTestList.value
-  );
+  emit("onSubmitNewVersion", state.versionTitle, state.versionDesc, state.tag, state.file, unitTestList.value);
 };
 </script>
 <template>
   <form @submit.prevent="">
     <v-text-field
-      :error-messages="
-        v$.versionTitle.$errors.map((e) => e.$message).join(', ')
-      "
+      :error-messages="v$.versionTitle.$errors.map((e) => e.$message).join(', ')"
       density="compact"
       placeholder="버전 제목"
       prepend-inner-icon="mdi-xml"
@@ -118,11 +108,7 @@ const onSubmitNewVersion = () => {
         <v-icon icon="mdi-text-box-multiple-outline"></v-icon>
         버전 설명
       </p>
-      <RichEditor
-        v-model="state.versionDesc"
-        :isEditorFocused="isEditorFocused"
-        @onBlurEditorCon="onBlurEditorCon"
-      />
+      <RichEditor v-model="state.versionDesc" :isEditorFocused="isEditorFocused" @onBlurEditorCon="onBlurEditorCon" />
     </div>
 
     <v-text-field
@@ -135,13 +121,7 @@ const onSubmitNewVersion = () => {
       @input="v$.tag.$touch"
       v-model="state.tag"
     />
-    <a
-      v-if="initialState.fileSrc"
-      class="cur-file-btn"
-      :href="initialState.fileSrc"
-      target="_blank"
-      >현재 파일</a
-    >
+    <a v-if="initialState.fileSrc" class="cur-file-btn" :href="initialState.fileSrc" target="_blank">현재 파일</a>
     <v-file-input
       label="파일 첨부(필요시)"
       chips
@@ -174,19 +154,18 @@ form {
   flex-direction: column;
   gap: 10px;
   padding: 20px 0;
-
-  .cur-file-btn {
-  }
-
+  // .cur-file-btn {}
   .editor-con {
     border: 1px solid #9d9d9d;
     border-radius: 4px;
     display: flex;
     flex-direction: column;
     min-height: 300px;
+
     &.focus {
       border: 2px solid #212121;
     }
+
     p {
       padding: 8px 0 8px 12px;
     }

@@ -5,9 +5,9 @@ import { http, ExceptionWrapper } from "../http"
 
 
 export const commentApi = {
-  GET_commentsBySwVersionId: (swVersionId: string): Promise<IComment[]> => {
+  GET_commentsBySwVersionId: (swVersionId: string, page?: number): Promise<IComment[]> => {
     return ExceptionWrapper(async () => {
-      const apiResult = await http.get(`/comment/${swVersionId}`)
+      const apiResult = await http.get(`/comment/${swVersionId}`, { params: { page } })
       const data = await apiResult.data;
       return data;
     })

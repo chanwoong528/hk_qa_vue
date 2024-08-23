@@ -3,19 +3,9 @@ import { reactive, ref, computed, watch } from "vue";
 import { storeToRefs } from "pinia";
 
 import { useUserStore } from "@/store/userStore";
-import type {
-  ISwVersion,
-  ITestSession,
-  IUserInfo,
-  IComment,
-  IReaction,
-} from "@/types/types";
+import type { ISwVersion, ITestSession, IUserInfo, IComment, IReaction } from "@/types/types";
 
-import {
-  E_TestStatus,
-  E_SwVersionModalType,
-  E_ModalType,
-} from "@/types/enum.d";
+import { E_TestStatus, E_SwVersionModalType, E_ModalType } from "@/types/enum.d";
 
 import { userApi } from "@/services/domain/userService";
 import { testSessionApi } from "@/services/domain/testSessionService";
@@ -51,6 +41,8 @@ const testSessionUserList = ref<IUserInfo[]>([]);
 const curSwVersionId = ref<string>("");
 
 const commentListForVersion = ref<IComment[]>([]);
+const commentPage = ref<number>(1);
+const commnetLastPage = ref<number>(1);
 
 const openModalDetailView = ref<boolean>(false);
 const openModalAddTester = ref<boolean>(false);
@@ -79,22 +71,33 @@ watch(
   ([newToggle]) => {
     if (!!newToggle) {
       eventSse.onMsg(curSwVersionId.value as string, sseTrigger);
+      commentPage.value = 1;
     } else {
       eventSse.close();
     }
-  }
+  },
 );
+
 watch(
   () => sseTrigger.date,
   (newDate) => {
     onFetchCommentsBySwVersionId(curSwVersionId.value);
-  }
+  },
 );
 
+watch(
+  () => commentPage.value,
+  (newPage) => {
+    onFetchCommentsBySwVersionId(curSwVersionId.value, newPage as number);
+  },
+);
+
+const computedIsLastPage = computed(() => {
+  return commentPage.value === commnetLastPage.value;
+});
+
 const curSwVersionInfo = computed(() => {
-  return props.swVersionList?.find(
-    (sw) => sw.swVersionId === curSwVersionId.value
-  );
+  return props.swVersionList?.find((sw) => sw.swVersionId === curSwVersionId.value);
 });
 
 const toggleModal = (type?: E_SwVersionModalType, testerId?: string) => {
@@ -112,12 +115,7 @@ const toggleModal = (type?: E_SwVersionModalType, testerId?: string) => {
 };
 
 const onSubmitStatus = () => {
-  emit(
-    "onSubmitStatus",
-    selectedTestSession,
-    dbSavedTestSession,
-    openModalUpdateStatus
-  );
+  emit("onSubmitStatus", selectedTestSession, dbSavedTestSession, openModalUpdateStatus);
 };
 
 const onClickTester = (testerInfo: ITestSession, loggedInUserId: string) => {
@@ -148,31 +146,45 @@ function countReactions(reactions: IReaction[]): Record<string, number> {
   });
   return reactionCounts;
 }
+const onClickLoadNextPage = () => {
+  commentPage.value++;
+};
 
-const onFetchCommentsBySwVersionId = (swVersionId?: string) => {
-  return commentApi
-    .GET_commentsBySwVersionId(swVersionId ? swVersionId : curSwVersionId.value)
-    .then((res) => {
-      const commentListWithReactionCount = res.map((comment) => {
-        return {
-          ...comment,
-          counts: countReactions(comment.reactions),
-          childComments: comment.childComments.map((child) => {
-            return {
-              ...child,
-              counts: countReactions(child.reactions),
-            };
-          }),
-        };
-      });
-      commentListForVersion.value = commentListWithReactionCount as IComment[];
+const onFetchCommentsBySwVersionId = (swVersionId?: string, page?: number) => {
+  return commentApi.GET_commentsBySwVersionId(swVersionId ? swVersionId : curSwVersionId.value, page).then((res) => {
+    const { commentList, page, lastPage } = res as unknown as {
+      commentList: IComment[];
+      page: number;
+      total: number;
+      lastPage: number;
+    };
+
+    commnetLastPage.value = lastPage;
+
+    const commentListWithReactionCount = commentList.map((comment) => {
+      return {
+        ...comment,
+        counts: countReactions(comment.reactions),
+        childComments: comment.childComments.map((child) => {
+          return {
+            ...child,
+            counts: countReactions(child.reactions),
+          };
+        }),
+      };
     });
+    if (!!page && page > 1) {
+      return (commentListForVersion.value = [
+        ...commentListForVersion.value,
+        ...(commentListWithReactionCount as IComment[]),
+      ]);
+    }
+    commentListForVersion.value = commentListWithReactionCount as IComment[];
+  });
 };
 const onClickAddTester = (swVerId: string) => {
   curSwVersionId.value = swVerId;
-  const targetSwVersion = props.swVersionList?.find(
-    (sw) => sw.swVersionId === swVerId
-  );
+  const targetSwVersion = props.swVersionList?.find((sw) => sw.swVersionId === swVerId);
 
   return userApi.GET_users().then((usersData) => {
     const curTesters = targetSwVersion?.testSessions.map((tester) => {
@@ -187,9 +199,7 @@ const onClickAddTester = (swVerId: string) => {
 const onClickDetailView = (swVerId: string) => {
   curSwVersionId.value = swVerId;
 
-  return commentApi
-    .GET_commentsBySwVersionId(swVerId)
-    .then((res) => onFetchCommentsBySwVersionId(swVerId));
+  return commentApi.GET_commentsBySwVersionId(swVerId).then((res) => onFetchCommentsBySwVersionId(swVerId));
 };
 
 const onClickEditVersion = (swVerId: string) => {
@@ -199,25 +209,17 @@ const onClickEditVersion = (swVerId: string) => {
 
 const onSubmitAddTesters = (testers: IUserInfo[]) => {
   const tobeDeleted = testSessionUserList.value
-    .filter(
-      (tester) => !testers.some((newTester) => newTester.id === tester.id)
-    )
+    .filter((tester) => !testers.some((newTester) => newTester.id === tester.id))
     .map((tester) => tester.id);
 
   const tobeAdded = testers
-    .filter(
-      (tester) =>
-        !testSessionUserList.value.some(
-          (oldTester) => oldTester.id === tester.id
-        )
-    )
+    .filter((tester) => !testSessionUserList.value.some((oldTester) => oldTester.id === tester.id))
     .map((tester) => tester.id);
 
   return testSessionApi
     .PUT_deleteOrAddTestSession(curSwVersionId.value, tobeDeleted, tobeAdded)
     .then((res) => {
-      props.onFetchSwVersionList &&
-        props.onFetchSwVersionList(props.swVersionList?.[0]?.swType?.swTypeId);
+      props.onFetchSwVersionList && props.onFetchSwVersionList(props.swVersionList?.[0]?.swType?.swTypeId);
       toggleModal(E_SwVersionModalType.addTester);
     })
     .catch((error) => alert(error));
@@ -228,11 +230,7 @@ const onSubmitAddTesters = (testers: IUserInfo[]) => {
   <!-- //'QA 항목 상태 변경' -->
   <ModalWrap
     v-model="openModalUpdateStatus"
-    :title="
-      selectedTestSession.user?.id === loggedInUser?.id
-        ? '내 상태 변경'
-        : 'QA 항목 상태'
-    "
+    :title="selectedTestSession.user?.id === loggedInUser?.id ? '내 상태 변경' : 'QA 항목 상태'"
     haveBtnCtl
     @onSubmit="onSubmitStatus"
   >
@@ -240,18 +238,10 @@ const onSubmitAddTesters = (testers: IUserInfo[]) => {
   </ModalWrap>
 
   <ModalWrap v-model="openModalAddTester" title="테스터 관리">
-    <AddTesterForm
-      :userList="userList"
-      :curTesterList="testSessionUserList"
-      @onSubmitAddTesters="onSubmitAddTesters"
-    />
+    <AddTesterForm :userList="userList" :curTesterList="testSessionUserList" @onSubmitAddTesters="onSubmitAddTesters" />
   </ModalWrap>
   <!-- Detail Modal for Specific Version -->
-  <ModalWrap
-    v-model="openModalDetailView"
-    :type="E_ModalType.full"
-    :title="curSwVersionInfo?.versionTitle + '버전'"
-  >
+  <ModalWrap v-model="openModalDetailView" :type="E_ModalType.full" :title="curSwVersionInfo?.versionTitle + '버전'">
     <SwVersionItem
       :swVersion="curSwVersionInfo"
       :toggleModal="toggleModal"
@@ -261,8 +251,11 @@ const onSubmitAddTesters = (testers: IUserInfo[]) => {
     />
     <CommentList
       v-model="commentListForVersion"
+      :page="commentPage"
       :swVersion="curSwVersionInfo"
+      :computedLastPage="computedIsLastPage"
       @onFetchCommentsBySwVersionId="onFetchCommentsBySwVersionId"
+      @onClickLoadNextPage="onClickLoadNextPage"
     />
   </ModalWrap>
   <!-- Detail Modal for Specific Version -->
