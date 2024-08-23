@@ -38,6 +38,7 @@ export interface ISwType {
   createdAt: string;
   updatedAt: string;
   user: IUserInfo;
+  swVersions: ISwVersion[]
 }
 
 export interface ISwVersion {

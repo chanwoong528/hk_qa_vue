@@ -175,7 +175,7 @@ const onSubmitDueDate = () => {
   swVersionApi
     .PATCH_swVersionDueDate(props.swVersion?.swVersionId as string, formatDateForServer(selectedDate.value))
     .then((res) => {
-      console.log(res);
+      openCalender.value = false;
     });
 };
 </script>
