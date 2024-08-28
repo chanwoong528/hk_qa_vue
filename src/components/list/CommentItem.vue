@@ -1,11 +1,7 @@
 <script setup lang="ts">
 import type { IComment } from "@/types/types";
-import {
-  E_EditorType,
-  E_ReactionParentType,
-  E_ReactionType,
-} from "@/types/enum.d";
-import { ref, defineProps } from "vue";
+import { E_EditorType, E_ReactionParentType, E_ReactionType } from "@/types/enum.d";
+import { ref } from "vue";
 
 import { formatDateTime } from "@/utils/common/formatter";
 import CommentReactionList from "./CommentReactionList.vue";
@@ -58,11 +54,7 @@ const onClickReactionBtn = (btnType: E_ReactionType, parentId?: string) => {
   if (!props.comment?.commentId) return;
 
   reactionApi
-    .POST_reaction(
-      E_ReactionParentType.comment,
-      btnType,
-      parentId ? parentId : props.comment.commentId
-    )
+    .POST_reaction(E_ReactionParentType.comment, btnType, parentId ? parentId : props.comment.commentId)
     .then((res) => {
       mouseOver.value = false;
       return onFetchCommentsBySwVersionId();
@@ -71,25 +63,14 @@ const onClickReactionBtn = (btnType: E_ReactionType, parentId?: string) => {
 </script>
 
 <template>
-  <v-list-item
-    class="pr-0 pb-0 pt-6 comment-item"
-    @mouseleave="mouseOver = false"
-  >
-    <CommentReactionList
-      :isActivated="mouseOver"
-      @onClickReactionBtn="onClickReactionBtn"
-    />
+  <v-list-item class="pr-0 pb-0 pt-6 comment-item" @mouseleave="mouseOver = false">
+    <CommentReactionList :isActivated="mouseOver" @onClickReactionBtn="onClickReactionBtn" />
 
-    <v-card
-      class="mx-auto comment-card"
-      :variant="child ? 'tonal' : 'outlined'"
-    >
+    <v-card class="mx-auto comment-card" :variant="child ? 'tonal' : 'outlined'">
       <template v-slot:title>
         <p class="comment-title" @mouseover="mouseOver = true">
           {{ props.comment?.user.username }}
-          <span class="date" v-if="props.comment?.createdAt">{{
-            formatDateTime(props.comment?.createdAt)
-          }}</span>
+          <span class="date" v-if="props.comment?.createdAt">{{ formatDateTime(props.comment?.createdAt) }}</span>
         </p>
       </template>
       <v-card-text v-html="props.comment?.content"></v-card-text>
@@ -98,12 +79,7 @@ const onClickReactionBtn = (btnType: E_ReactionType, parentId?: string) => {
           <v-chip
             link
             v-if="props.comment?.counts && !!props.comment?.counts"
-            @click="
-              onClickReactionBtn(
-                reactionKey as E_ReactionType,
-                props.comment.commentId as string
-              )
-            "
+            @click="onClickReactionBtn(reactionKey as E_ReactionType, props.comment.commentId as string)"
           >
             <v-icon
               :icon="renderIconForReaction(reactionKey as E_ReactionType).icon"
@@ -112,11 +88,7 @@ const onClickReactionBtn = (btnType: E_ReactionType, parentId?: string) => {
             {{ props.comment.counts[reactionKey as E_ReactionType] }}
 
             <v-tooltip activator="parent" location="end" max-width="300">
-              <p
-                v-for="person in props.comment.reactions.filter(
-                  (reaction) => reaction.reactionType === reactionKey
-                )"
-              >
+              <p v-for="person in props.comment.reactions.filter((reaction) => reaction.reactionType === reactionKey)">
                 {{ person.user.username }}
               </p>
             </v-tooltip>
@@ -127,10 +99,7 @@ const onClickReactionBtn = (btnType: E_ReactionType, parentId?: string) => {
 
     <div class="comment-btn-con">
       <v-btn
-        v-if="
-          !!props.comment?.childComments &&
-          props.comment?.childComments.length > 0
-        "
+        v-if="!!props.comment?.childComments && props.comment?.childComments.length > 0"
         @click="openChildComments = !openChildComments"
         variant="plain"
       >
@@ -147,11 +116,7 @@ const onClickReactionBtn = (btnType: E_ReactionType, parentId?: string) => {
       </v-btn>
     </div>
 
-    <div
-      v-if="openEditorForReply"
-      class="child-comment-con"
-      @click="onFocusEditorCon(true)"
-    >
+    <div v-if="openEditorForReply" class="child-comment-con" @click="onFocusEditorCon(true)">
       <RichEditor
         :editorType="E_EditorType.comment"
         v-model="reCommentVal"
@@ -159,12 +124,7 @@ const onClickReactionBtn = (btnType: E_ReactionType, parentId?: string) => {
         @onBlurEditorCon="onBlurEditorCon"
       />
       <div class="reply-btn-con">
-        <v-btn
-          @click="openEditorForReply = false"
-          variant="outlined"
-          color="warning"
-          >취소</v-btn
-        >
+        <v-btn @click="openEditorForReply = false" variant="outlined" color="warning">취소</v-btn>
         <v-btn @click="onSubmitReComment">답글</v-btn>
       </div>
     </div>

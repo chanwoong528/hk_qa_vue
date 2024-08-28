@@ -85,6 +85,8 @@ export const NAV_LIST: NavItem[] = [
 ];
 
 export const router = createRouter({
+
   history: createWebHistory("/"),
   routes: NAV_LIST,
+
 });
