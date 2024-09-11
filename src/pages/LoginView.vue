@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 
 import { authApi } from "@/services/domain/authService";
@@ -15,8 +15,13 @@ import { userApi } from "@/services/domain/userService";
 import HIQ_LOGO from "@/assets/hiq_logo_text.svg";
 
 const router = useRouter();
+
 const store = useUserStore();
-const { setUser } = store;
+const { setUser, loggedInUser } = store;
+
+onMounted(() => {
+  if (!!loggedInUser?.id) return router.push("/");
+});
 
 const isDialogOpen = ref<boolean>(false);
 
