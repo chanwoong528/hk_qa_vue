@@ -15,7 +15,7 @@ import NewServiceForm from "@/components/form/NewServiceForm.vue";
 import { watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
-import HIQ_LOGO from "@/assets/hiq_logo_text.svg";
+import HIQ_LOGO from "@/assets/hiq_logo_text_black.svg";
 
 const route = useRoute();
 const router = useRouter();
@@ -36,7 +36,7 @@ watch(
   () => [route.path, loggedInUser.value?.id],
   ([newPath, newUserId]) => {
     if (!!newUserId) return fetchSw();
-  }
+  },
 );
 
 const fetchSw = () => {
@@ -54,9 +54,7 @@ const computedNavList = computed(() => {
   }
 
   if (loggedInUser.value?.role === E_Role.tester) {
-    return NAV_LIST.filter(
-      (navItem) => !navItem.meta.requiresAdmin && !navItem.meta.requiresMaster
-    );
+    return NAV_LIST.filter((navItem) => !navItem.meta.requiresAdmin && !navItem.meta.requiresMaster);
   }
 });
 
@@ -102,13 +100,7 @@ const onSubmitNewService = (title: string, desc: string) => {
         </v-list-item-subtitle>
         <div class="side-ctrl-con">
           <p>{{ loggedInUser?.role }}</p>
-          <v-btn
-            variant="plain"
-            icon="mdi-logout-variant"
-            color="error"
-            @click="onClickLogout"
-          >
-          </v-btn>
+          <v-btn variant="plain" icon="mdi-logout-variant" color="error" @click="onClickLogout"> </v-btn>
         </div>
       </v-list-item>
 
@@ -119,18 +111,12 @@ const onSubmitNewService = (title: string, desc: string) => {
           :key="navItem.label"
           link
           :to="navItem.path"
-          v-if="
-            !!navItem.meta.requiresAuth && !(navItem.code === 'SW Type Detail')
-          "
+          v-if="!!navItem.meta.requiresAuth && !(navItem.code === 'SW Type Detail')"
         >
           {{ navItem.label }}
         </v-list-item>
 
-        <v-list-group
-          v-else-if="!!(navItem.code === 'SW Type Detail')"
-          v-model="openGroups"
-          :value="navItem.label"
-        >
+        <v-list-group v-else-if="!!(navItem.code === 'SW Type Detail')" v-model="openGroups" :value="navItem.label">
           <template v-slot:activator="{ props }">
             <v-list-item v-bind="props" :title="navItem.label"></v-list-item>
           </template>
