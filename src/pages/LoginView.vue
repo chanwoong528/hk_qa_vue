@@ -101,11 +101,10 @@ const handleLogin = (error: Object, email: string, pw: string) => {
     color: #fff;
 
     width: 50%;
-    background-color: rgba(0, 0, 0, 0.5);
     background-image: url(~@/assets/login_bg.jpg);
-    background-size: 100% 100%;
+    background-size: 100%;
     background-position: center;
-    object-fit: cover;
+
     h1 {
       max-width: 164px;
       margin-bottom: 20px;
