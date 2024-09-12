@@ -29,6 +29,8 @@ const openGroups = ref<string[]>([]);
 const openNewServiceModal = ref<boolean>(false);
 
 onMounted(() => {
+  if (route.path === "/login" && !!loggedInUser.value?.id) return router.push("/");
+
   if (!!loggedInUser.value?.id) return fetchSw();
 });
 
