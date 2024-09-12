@@ -74,7 +74,7 @@ const handleSubmitEmail = () => {
   </form>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 form {
   max-width: 360px;
   width: 100%;
