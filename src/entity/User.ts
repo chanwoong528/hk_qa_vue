@@ -9,9 +9,27 @@ export default class UserClass {
   // access_token?: string;
   // refresh_token?: string;
 
-  public id = "";
   public email = "";
   public pw = "";
 
-  constructor() {}
+  //   public id = "";
+  //   public username = "";
+  //   public role = "";
+  //   public userStatus = "";
+  //   public isPwDefault = "";
+  //   public createdAt = "";
+  //   public access_token = "";
+  //   public refresh_token = "";
+
+  //   constructor({ id, username, role, email, userStatus, isPwDefault, createdAt, access_token, refresh_token }) {
+  // this.email = email;
+  // this.id = id;
+  // this.username = username;
+  // this.role = role;
+  // this.userStatus = userStatus;
+  // this.isPwDefault = isPwDefault;
+  // this.createdAt = createdAt;
+  // this.access_token = access_token;
+  // this.refresh_token = refresh_token;
+  //   }
 }
