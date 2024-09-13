@@ -2,19 +2,16 @@
 import { reactive, ref } from "vue";
 import { useVuelidate } from "@vuelidate/core";
 import { email, required, helpers } from "@vuelidate/validators";
+import UserClass from "@/entity/User";
+
 const props = defineProps({
   toggleDialog: Function,
 });
 
 const pwVisible = ref<boolean>(false);
 
-const initialState = {
-  email: "",
-  pw: "",
-};
-const state = reactive({
-  ...initialState,
-});
+const state = reactive(new UserClass());
+
 const rules = {
   email: {
     required: helpers.withMessage("이메일을 입력해주세요", required),
