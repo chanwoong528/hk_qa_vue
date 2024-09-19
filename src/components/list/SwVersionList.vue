@@ -3,7 +3,7 @@ import { reactive, ref, computed, watch } from "vue";
 import { storeToRefs } from "pinia";
 
 import { useUserStore } from "@/store/userStore";
-import type { ISwVersion, ITestSession, IUserInfo, IComment, IReaction } from "@/types/types";
+import type { ISwVersion, ITestSession, IUserInfo, IComment } from "@/types/types";
 
 import { E_TestStatus, E_SwVersionModalType, E_ModalType } from "@/types/enum.d";
 
@@ -19,6 +19,7 @@ import CommentList from "@/components/list/CommentList.vue";
 import SwVersionItem from "@/components/list/SwVersionItem.vue";
 
 import ModalWrap from "@/components/ModalWrap.vue";
+import { countReactions } from "@/utils/common/formatter";
 
 const props = defineProps({
   swVersionList: {
@@ -81,18 +82,22 @@ watch(
 watch(
   () => sseTrigger.date,
   (newDate) => {
-    onFetchCommentsBySwVersionId(curSwVersionId.value);
+    onFetchCommentsBySwVersionId();
   },
 );
 
 watch(
   () => commentPage.value,
   (newPage) => {
-    onFetchCommentsBySwVersionId(curSwVersionId.value, newPage as number);
+    onFetchCommentsBySwVersionId(newPage as number);
   },
 );
 
 const computedIsLastPage = computed(() => {
+  if (commnetLastPage.value === 0) {
+    return true;
+  }
+
   return commentPage.value === commnetLastPage.value;
 });
 
@@ -131,27 +136,12 @@ const onClickTester = (testerInfo: ITestSession, loggedInUserId: string) => {
   dbSavedTestSession.user = testerInfo.user;
 };
 
-function countReactions(reactions: IReaction[]): Record<string, number> {
-  const reactionCounts: Record<string, number> = {};
-
-  reactions.forEach((reaction) => {
-    const type = reaction.reactionType;
-    if (!!type) {
-      if (reactionCounts[type]) {
-        reactionCounts[type]++;
-      } else {
-        reactionCounts[type] = 1;
-      }
-    }
-  });
-  return reactionCounts;
-}
 const onClickLoadNextPage = () => {
   commentPage.value++;
 };
 
-const onFetchCommentsBySwVersionId = (swVersionId?: string, page?: number) => {
-  return commentApi.GET_commentsBySwVersionId(swVersionId ? swVersionId : curSwVersionId.value, page).then((res) => {
+const onFetchCommentsBySwVersionId = (page?: number) => {
+  return commentApi.GET_commentsBySwVersionId(curSwVersionId.value, page).then((res) => {
     const { commentList, page, lastPage } = res as unknown as {
       commentList: IComment[];
       page: number;
@@ -182,6 +172,16 @@ const onFetchCommentsBySwVersionId = (swVersionId?: string, page?: number) => {
     commentListForVersion.value = commentListWithReactionCount as IComment[];
   });
 };
+
+const onSubmitComment = (params: any) => {
+  if (!curSwVersionId.value) return alert("버전이 선택되지 않았습니다.");
+
+  params.swVersionId = curSwVersionId.value;
+  return commentApi.POST_comment(params).then((res) => {
+    return onFetchCommentsBySwVersionId();
+  });
+};
+
 const onClickAddTester = (swVerId: string) => {
   curSwVersionId.value = swVerId;
   const targetSwVersion = props.swVersionList?.find((sw) => sw.swVersionId === swVerId);
@@ -199,7 +199,7 @@ const onClickAddTester = (swVerId: string) => {
 const onClickDetailView = (swVerId: string) => {
   curSwVersionId.value = swVerId;
 
-  return commentApi.GET_commentsBySwVersionId(swVerId).then((res) => onFetchCommentsBySwVersionId(swVerId));
+  return commentApi.GET_commentsBySwVersionId(swVerId).then((res) => onFetchCommentsBySwVersionId());
 };
 
 const onClickEditVersion = (swVerId: string) => {
@@ -252,9 +252,9 @@ const onSubmitAddTesters = (testers: IUserInfo[]) => {
     <CommentList
       v-model="commentListForVersion"
       :page="commentPage"
-      :swVersion="curSwVersionInfo"
       :computedLastPage="computedIsLastPage"
       @onFetchCommentsBySwVersionId="onFetchCommentsBySwVersionId"
+      @onSubmitComment="onSubmitComment"
       @onClickLoadNextPage="onClickLoadNextPage"
     />
   </ModalWrap>

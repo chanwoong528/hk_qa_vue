@@ -4,6 +4,7 @@ import type { Component } from "vue";
 import HomeView from "@/pages/HomeView.vue";
 import LoginView from "@/pages/LoginView.vue";
 import UsersView from "@/pages/UsersView.vue";
+import BoardDetailView from "@/pages/BoardDetailView.vue";
 // import SwTypeView from "@/pages/SwTypeView.vue";
 import SwTypeDetailView from "@/pages/SwTypeDetailView.vue";
 import VerifyView from "@/pages/VerifyView.vue";
@@ -12,6 +13,7 @@ import ResetPwView from "@/pages/ResetPwView.vue";
 interface NavItem {
   path: string;
   component: Component;
+  props?: any;
   label: string;
   code: string;
   directTo?: string; // for dynamic route
@@ -19,6 +21,7 @@ interface NavItem {
     requiresAuth?: boolean;
     requiresAdmin?: boolean;
     requiresMaster?: boolean;
+    hidden?: boolean;
   };
 }
 
@@ -41,6 +44,17 @@ export const NAV_LIST: NavItem[] = [
       requiresMaster: true,
     },
   },
+  {
+    path: "/board/:id",
+    component: BoardDetailView,
+    label: "게시판 상세",
+    code: "Board",
+    props: true,
+    meta: {
+      requiresAuth: true,
+      hidden: true,
+    },
+  },
   // {
   //   path: "/sw-type",
   //   component: SwTypeView,
@@ -61,6 +75,7 @@ export const NAV_LIST: NavItem[] = [
       requiresAuth: true,
     },
   },
+
   {
     path: "/login",
     component: LoginView,

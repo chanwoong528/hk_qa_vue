@@ -16,11 +16,14 @@ import DefaultLayout from "@/layout/DefaultLayout.vue";
 import ModalWrap from "@/components/ModalWrap.vue";
 import NewVersionForm from "@/components/form/NewVersionForm.vue";
 import AddMaintainerForm from "@/components/form/AddMaintainerForm.vue";
+import NewBoardForm from "@/components/form/NewBoardForm.vue";
 
 import { useSwStore } from "@/store/swStore";
 import { userApi } from "@/services/domain/userService";
 
 import { maintainerApi } from "@/services/domain/maintainerService";
+import BoardClass from "@/entity/Board";
+import { boardApi } from "@/services/domain/boardService";
 
 const route = useRoute();
 
@@ -32,19 +35,30 @@ const { swTypes } = storeToRefs(swStore);
 
 const maintainerList = ref<IUserInfo[]>([]);
 const userList = ref<IUserInfo[]>([]);
-
 const swVersionList = ref<ISwVersion[]>([]);
-const openModalNewVersion = ref<boolean>(false);
+const boardList = ref<BoardClass[]>([]);
+
 const editVersionFlag = ref<boolean>(false);
 const editVersionInfo = reactive<Partial<ISwVersion & { swTypeId: string }>>({});
 
-const openModalAddMaintainer = ref<boolean>(false);
+const modalStatus = reactive({
+  openModalAddMaintainer: false,
+  openModalNewVersion: false,
+  openModalNewBoard: false,
+});
+
+const tabs = ["요청 사항", "업데이트 사항"];
+const curTab = ref<string>(tabs[0]);
 
 const submitErrorFlag = ref<boolean>(true);
 const swTypeInfo = ref<ISwType>();
 
 onMounted(() => {
-  Promise.all([onFetchMaintainerList(route.params.id as string), onFetchSwVersionList(route.params.id as string)]);
+  Promise.all([
+    onFetchMaintainerList(route.params.id as string),
+    onFetchSwVersionList(route.params.id as string),
+    onFetchBoardList(route.params.id as string),
+  ]);
 });
 
 watch(
@@ -53,12 +67,18 @@ watch(
     if (!!newSwTypes) {
       swTypeInfo.value = swTypes.value.find((swType) => swType.swTypeId === newId) as ISwType;
     }
+    curTab.value = tabs[0];
 
-    Promise.all([onFetchMaintainerList(newId as string), onFetchSwVersionList(newId as string)]);
+    Promise.all([
+      onFetchMaintainerList(newId as string),
+      onFetchSwVersionList(newId as string),
+      onFetchBoardList(newId as string),
+    ]);
   },
 );
+
 watch(
-  () => [openModalNewVersion.value, submitErrorFlag.value],
+  () => [modalStatus.openModalNewVersion, submitErrorFlag.value],
   ([newModalFlag, newErrFlag]) => {
     if (!!newModalFlag) {
       submitErrorFlag.value = true;
@@ -66,13 +86,26 @@ watch(
 
     if (!newModalFlag && newErrFlag) {
       let confirmFlag = confirm("Listed below will not be save, Sure to exit?");
-      if (!confirmFlag) return (openModalNewVersion.value = true);
+      if (!confirmFlag) return (modalStatus.openModalNewVersion = true);
     }
+  },
+);
+watch(
+  () => [curTab.value],
+  ([newTab]) => {
+    const boardType = newTab === "요청 사항" ? "req" : "update";
+    onFetchBoardList(route.params.id as string, boardType);
   },
 );
 
 const onFetchSwVersionList = (swTypeId: string) => {
   return swVersionApi.GET_swVersionsBySwTypeId(swTypeId).then((res) => (swVersionList.value = res as ISwVersion[]));
+};
+
+const onFetchBoardList = (swTypeId: string, boardType: "req" | "update" = "req") => {
+  return boardApi.GET_boardList(swTypeId, boardType).then((res) => {
+    boardList.value = res as BoardClass[];
+  });
 };
 
 const onSubmitStatus = (
@@ -126,7 +159,8 @@ const onSubmitNewVersion = async (
       await testUnitApi.POST_testUnits(unitTestList, createSwVersion.swVersionId);
     }
     submitErrorFlag.value = false;
-    openModalNewVersion.value = false;
+
+    modalStatus.openModalNewVersion = false;
     return onFetchSwVersionList(createSwVersion.swType.swTypeId);
   } catch (error) {
     return alert("Error:Something wrong with creating new version");
@@ -159,7 +193,8 @@ const onSubmitEditVersion = async (
     }
 
     submitErrorFlag.value = false;
-    openModalNewVersion.value = false;
+
+    modalStatus.openModalNewVersion = false;
     onFetchSwVersionList(route.params.id as string);
   } catch (error) {
     console.log(error);
@@ -168,7 +203,7 @@ const onSubmitEditVersion = async (
 };
 
 const onClickEditVersion = (curSwVer: ISwVersion) => {
-  openModalNewVersion.value = true;
+  modalStatus.openModalNewVersion = true;
   editVersionFlag.value = true;
 
   Object.assign(editVersionInfo, curSwVer);
@@ -182,7 +217,7 @@ const onFetchMaintainerList = (swTypeId: string) => {
 };
 
 const onClickManageMaintainer = () => {
-  openModalAddMaintainer.value = true;
+  modalStatus.openModalAddMaintainer = true;
 
   return userApi.GET_users().then((usersData) => {
     userList.value = usersData as IUserInfo[];
@@ -202,16 +237,24 @@ const onSubmitAddMaintainers = (maintainers: IUserInfo[]) => {
   maintainerApi
     .PUT_deleteOrAddMaintainer(route.params.id as string, tobeDeleted, tobeAdded)
     .then((res) => {
-      openModalAddMaintainer.value = false;
+      modalStatus.openModalAddMaintainer = false;
+
       onFetchMaintainerList(route.params.id as string);
     })
     .catch((error) => alert(error));
+};
+
+const onSubmitNewBoard = (boardParam: BoardClass) => {
+  boardApi.POST_newBoard({ ...boardParam, swTypeId: route.params.id as string }).then((res) => {
+    modalStatus.openModalNewBoard = false;
+    onFetchBoardList(route.params.id as string, curTab.value === "요청 사항" ? "req" : "update");
+  });
 };
 </script>
 
 <template>
   <ModalWrap
-    v-model="openModalNewVersion"
+    v-model="modalStatus.openModalNewVersion"
     :title="editVersionFlag ? '버전 정보 수정' : '신규 버전'"
     :type="E_ModalType.full"
   >
@@ -223,12 +266,16 @@ const onSubmitAddMaintainers = (maintainers: IUserInfo[]) => {
     />
   </ModalWrap>
 
-  <ModalWrap v-model="openModalAddMaintainer" title="관리자 관리">
+  <ModalWrap v-model="modalStatus.openModalAddMaintainer" title="관리자 관리">
     <AddMaintainerForm
       :userList="userList"
       :curMaintainerList="maintainerList"
       @onSubmitAddMaintainers="onSubmitAddMaintainers"
     />
+  </ModalWrap>
+
+  <ModalWrap v-model="modalStatus.openModalNewBoard" title="새로운 게시글">
+    <NewBoardForm @onSubmitNewBoard="onSubmitNewBoard" />
   </ModalWrap>
 
   <DefaultLayout>
@@ -245,7 +292,7 @@ const onSubmitAddMaintainers = (maintainers: IUserInfo[]) => {
           color="primary"
           @click="
             () => {
-              openModalNewVersion = true;
+              modalStatus.openModalNewVersion = true;
               editVersionFlag = false;
             }
           "
@@ -271,13 +318,46 @@ const onSubmitAddMaintainers = (maintainers: IUserInfo[]) => {
         </v-chip>
       </div>
     </section>
+    <div class="content-con">
+      <div class="list-con">
+        <SwVersionList
+          :swVersionList="swVersionList"
+          :onFetchSwVersionList="onFetchSwVersionList"
+          @onSubmitStatus="onSubmitStatus"
+          @onClickEditVersion="onClickEditVersion"
+        />
+      </div>
+      <v-card class="list-con">
+        <div class="board-con-header">
+          <v-tabs v-model="curTab" color="primary">
+            <v-tab v-for="tab in tabs" :key="tab" :value="tab">
+              {{ tab }}
+            </v-tab>
+          </v-tabs>
+          <v-btn
+            color="primary"
+            @click="
+              () => {
+                modalStatus.openModalNewBoard = true;
+              }
+            "
+          >
+            새로운 게시글 등록
+            <v-icon icon="mdi-plus"></v-icon>
+          </v-btn>
+        </div>
 
-    <SwVersionList
-      :swVersionList="swVersionList"
-      :onFetchSwVersionList="onFetchSwVersionList"
-      @onSubmitStatus="onSubmitStatus"
-      @onClickEditVersion="onClickEditVersion"
-    />
+        <v-tabs-window v-model="curTab">
+          <v-tabs-window-item :value="tabs[0]">
+            <BoardRequestList :boardList="boardList" :curTab="curTab" />
+          </v-tabs-window-item>
+          <v-tabs-window-item :value="tabs[1]">
+            <BoardRequestList :boardList="boardList" :curTab="curTab" />
+            <!-- <BoardUpdatesList :boardList="boardList" /> -->
+          </v-tabs-window-item>
+        </v-tabs-window>
+      </v-card>
+    </div>
   </DefaultLayout>
 </template>
 
@@ -296,5 +376,19 @@ const onSubmitAddMaintainers = (maintainers: IUserInfo[]) => {
   flex-direction: column;
   gap: 10px;
   padding-bottom: 10px;
+}
+.content-con {
+  display: flex;
+  gap: 40px;
+  .list-con {
+    flex: 1;
+  }
+  .board-con-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    border-bottom: 1px solid #ccc;
+  }
 }
 </style>
