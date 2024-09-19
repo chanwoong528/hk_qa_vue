@@ -1,4 +1,3 @@
-import BoardClass from "@/entity/Board";
 import { ExceptionWrapper, http } from "../http";
 
 export const boardApi = {
