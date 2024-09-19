@@ -2,10 +2,9 @@
 import { computed, ref } from "vue";
 import { E_EditorType } from "@/types/enum.d";
 import RichEditor from "../RichEditor.vue";
-import type { IComment, ISwVersion } from "@/types/types";
+import type { IComment } from "@/types/types";
 import { storeToRefs } from "pinia";
 import { useUserStore } from "@/store/userStore";
-import { commentApi } from "@/services/domain/commentService";
 
 const commentListModel = defineModel<IComment[]>();
 
@@ -18,11 +17,8 @@ const props = defineProps({
     type: Boolean,
     required: false,
   },
-  swVersion: {
-    type: Object as () => ISwVersion,
-  },
 });
-const emit = defineEmits(["onFetchCommentsBySwVersionId", "onClickLoadNextPage"]);
+const emit = defineEmits(["onFetchCommentsBySwVersionId", "onClickLoadNextPage", "onSubmitComment"]);
 
 const userStore = useUserStore();
 const { loggedInUser } = storeToRefs(userStore);
@@ -51,24 +47,20 @@ const onBlurEditorCon = (isFocusOut: boolean) => {
 const onClickLoadNextPage = () => {
   emit("onClickLoadNextPage");
 };
-const onFetchCommentsBySwVersionId = (swVersionId?: string) => {
-  emit("onFetchCommentsBySwVersionId", swVersionId ? swVersionId : props.swVersion?.swVersionId);
+const onFetchCommentsBySwVersionId = () => {
+  emit("onFetchCommentsBySwVersionId");
 };
 
 const onSubmitComment = (parentId?: string, reCommentVal?: string) => {
-  if ((isCommentEmpty.value && !reCommentVal) || !loggedInUser.value?.id || !props.swVersion?.swVersionId)
-    return alert("Please write a comment");
+  if ((isCommentEmpty.value && !reCommentVal) || !loggedInUser.value?.id) return alert("Please write a comment");
 
   let params = {
-    swVersionId: props.swVersion?.swVersionId,
     content: !!reCommentVal ? reCommentVal : commentVal.value,
     userId: loggedInUser.value?.id,
     ...(typeof parentId === "string" && { parentId: parentId }),
   };
-  return commentApi.POST_comment(params).then((res) => {
-    commentVal.value = "";
-    return onFetchCommentsBySwVersionId(params.swVersionId);
-  });
+  emit("onSubmitComment", params);
+  commentVal.value = "";
 };
 </script>
 <template>

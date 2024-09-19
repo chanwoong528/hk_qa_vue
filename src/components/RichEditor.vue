@@ -23,6 +23,9 @@ const props = defineProps({
     type: Boolean,
     required: false,
   },
+  placeHolder: {
+    type: String,
+  },
 });
 watch(
   () => modelValue.value,
@@ -32,7 +35,7 @@ watch(
     if (isValEmpty && editorRef.value) {
       return (editorRef.value as any).setHTML("");
     }
-  }
+  },
 );
 watch(
   () => props.isEditorFocused,
@@ -40,7 +43,7 @@ watch(
     if (!!newVal && editorRef.value) {
       (editorRef.value as any).focus();
     }
-  }
+  },
 );
 const emit = defineEmits(["onBlurEditorCon"]);
 
@@ -50,8 +53,9 @@ const onBlur = () => {
 
 const options = {
   theme: "",
-  placeholder:
-    props.editorType === E_EditorType.comment
+  placeholder: !!props.placeHolder
+    ? props.placeHolder
+    : props.editorType === E_EditorType.comment
       ? "댓글 추가"
       : "버전 설명을 입력해주세요",
   readOnly: false,
@@ -101,9 +105,7 @@ const modules = [
       theme="snow"
       contentType="html"
       v-model:content="modelValue"
-      :toolbar="
-        props.editorType === E_EditorType.comment ? 'essential' : 'full'
-      "
+      :toolbar="props.editorType === E_EditorType.comment ? 'essential' : 'full'"
       :modules="modules"
       :options="options"
       @blur="onBlur"

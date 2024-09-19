@@ -1,4 +1,5 @@
 import { E_ReactionType } from "@/types/enum.d";
+import { IReaction } from "@/types/types";
 
 export function formatDateTime(isoString: string): string {
   // ISO 문자열을 Date 객체로 변환
@@ -15,10 +16,7 @@ export function formatDateTime(isoString: string): string {
   };
 
   // 형식을 지정하여 날짜와 시간 포맷팅
-  const formattedDate: string = new Intl.DateTimeFormat(
-    "ko-KR",
-    options
-  ).format(date);
+  const formattedDate: string = new Intl.DateTimeFormat("ko-KR", options).format(date);
 
   return formattedDate;
 }
@@ -28,8 +26,8 @@ export function formatDateForServer(isoString: string): string {
 
   // 연도, 월, 일을 추출하여 2자리 형식으로 변환
   const year: string = date.getFullYear().toString();
-  const month: string = (date.getMonth() + 1).toString().padStart(2, '0');
-  const day: string = date.getDate().toString().padStart(2, '0');
+  const month: string = (date.getMonth() + 1).toString().padStart(2, "0");
+  const day: string = date.getDate().toString().padStart(2, "0");
 
   // YYYY-MM-DD 형식으로 반환
   return `${year}-${month}-${day}`;
@@ -47,10 +45,7 @@ export function formatDate(isoString: string): string {
   };
 
   // 형식을 지정하여 날짜와 시간 포맷팅
-  const formattedDate: string = new Intl.DateTimeFormat(
-    "ko-KR",
-    options
-  ).format(date);
+  const formattedDate: string = new Intl.DateTimeFormat("ko-KR", options).format(date);
 
   return formattedDate;
 }
@@ -70,4 +65,19 @@ export function renderIconForReaction(reactionType: E_ReactionType) {
     default:
       return { icon: "mdi-alert-circle", color: "warning" };
   }
+}
+export function countReactions(reactions: IReaction[]): Record<string, number> {
+  const reactionCounts: Record<string, number> = {};
+
+  reactions.forEach((reaction) => {
+    const type = reaction.reactionType;
+    if (!!type) {
+      if (reactionCounts[type]) {
+        reactionCounts[type]++;
+      } else {
+        reactionCounts[type] = 1;
+      }
+    }
+  });
+  return reactionCounts;
 }

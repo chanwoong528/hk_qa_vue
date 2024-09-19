@@ -3,6 +3,12 @@ export enum E_Role {
   admin = "admin",
   master = "master",
 }
+
+export enum E_BoardType {
+  req = "req",
+  update = "update",
+}
+
 export enum E_UserStatus {
   ok = "ok",
   pending = "pending",
@@ -15,12 +21,11 @@ export enum E_TestStatus {
   failed = "failed",
 }
 
-
 export enum E_SwVersionModalType {
   updateStatus = "updateStatus",
   addTester = "addTester",
   detailView = "detailView",
-  testerLog = "testerLog"
+  testerLog = "testerLog",
 }
 
 export enum E_UserListType {
@@ -31,27 +36,25 @@ export enum E_SwTypeListType {
   // page = "page",
 }
 
-
 export enum E_ModalType {
   full = "full",
   status = "status",
-
 }
 
 export enum E_EditorType {
   comment = "comment",
 }
 export enum E_ReactionType {
-  check = 'check',
-  stop = 'stop',
+  check = "check",
+  stop = "stop",
 
-  like = 'like',
-  dislike = 'dislike',
-  love = 'love',
-  sad = 'sad',
-  wow = 'wow',
+  like = "like",
+  dislike = "dislike",
+  love = "love",
+  sad = "sad",
+  wow = "wow",
 }
 export enum E_ReactionParentType {
-  comment = 'comment',
-  testUnit = 'testUnit',
+  comment = "comment",
+  testUnit = "testUnit",
 }

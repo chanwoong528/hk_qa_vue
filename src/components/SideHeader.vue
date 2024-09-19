@@ -47,16 +47,18 @@ const fetchSw = () => {
   });
 };
 const computedNavList = computed(() => {
-  if (!loggedInUser.value) return NAV_LIST;
+  const filterHiddenNavList = NAV_LIST.filter((navItem) => !navItem.meta.hidden);
 
-  if (loggedInUser.value?.role === E_Role.master) return NAV_LIST;
+  if (!loggedInUser.value) return filterHiddenNavList;
+
+  if (loggedInUser.value?.role === E_Role.master) return filterHiddenNavList;
 
   if (loggedInUser.value?.role === E_Role.admin) {
-    return NAV_LIST.filter((navItem) => !navItem.meta.requiresMaster);
+    return filterHiddenNavList.filter((navItem) => !navItem.meta.requiresMaster);
   }
 
   if (loggedInUser.value?.role === E_Role.tester) {
-    return NAV_LIST.filter((navItem) => !navItem.meta.requiresAdmin && !navItem.meta.requiresMaster);
+    return filterHiddenNavList.filter((navItem) => !navItem.meta.requiresAdmin && !navItem.meta.requiresMaster);
   }
 });
 
