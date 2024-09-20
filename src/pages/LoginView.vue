@@ -76,7 +76,10 @@ const handleLogin = (error: Object, email: string, pw: string) => {
       </h1>
 
       <h3><strong>품질 향상</strong>과 <strong>방향성</strong>을 <strong>제시</strong>하는 가이드</h3>
-      <p>Quality Improvement & Navigation Guide</p>
+      <p class="acronym-expand">
+        <span class="acronym">Q</span>uality <span class="acronym"> I</span>mprovement &
+        <span class="acronym">N</span>avigation <span class="acronym">G</span>uide
+      </p>
     </div>
     <div class="login-right-con">
       <LoginForm @handle-login="handleLogin" :toggleDialog="toggleDialog" />
@@ -138,6 +141,14 @@ h1 {
 
   img {
     width: 100%;
+  }
+}
+
+.acronym-expand {
+  .acronym {
+    font-size: 20px;
+    font-weight: 700;
+    color: #fff;
   }
 }
 </style>

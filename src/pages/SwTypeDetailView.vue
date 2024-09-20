@@ -327,36 +327,37 @@ const onSubmitNewBoard = (boardParam: BoardClass) => {
           @onClickEditVersion="onClickEditVersion"
         />
       </div>
-      <v-card class="list-con">
-        <div class="board-con-header">
-          <v-tabs v-model="curTab" color="primary">
-            <v-tab v-for="tab in tabs" :key="tab" :value="tab">
-              {{ tab }}
-            </v-tab>
-          </v-tabs>
-          <v-btn
-            color="primary"
-            @click="
-              () => {
-                modalStatus.openModalNewBoard = true;
-              }
-            "
-          >
-            새로운 게시글 등록
-            <v-icon icon="mdi-plus"></v-icon>
-          </v-btn>
-        </div>
+      <div class="list-con">
+        <v-card>
+          <div class="board-con-header">
+            <v-tabs v-model="curTab" color="primary">
+              <v-tab v-for="tab in tabs" :key="tab" :value="tab">
+                {{ tab }}
+              </v-tab>
+            </v-tabs>
+            <v-btn
+              color="primary"
+              @click="
+                () => {
+                  modalStatus.openModalNewBoard = true;
+                }
+              "
+            >
+              새로운 게시글 등록
+              <v-icon icon="mdi-plus"></v-icon>
+            </v-btn>
+          </div>
 
-        <v-tabs-window v-model="curTab">
-          <v-tabs-window-item :value="tabs[0]">
-            <BoardRequestList :boardList="boardList" :curTab="curTab" />
-          </v-tabs-window-item>
-          <v-tabs-window-item :value="tabs[1]">
-            <BoardRequestList :boardList="boardList" :curTab="curTab" />
-            <!-- <BoardUpdatesList :boardList="boardList" /> -->
-          </v-tabs-window-item>
-        </v-tabs-window>
-      </v-card>
+          <v-tabs-window v-model="curTab">
+            <v-tabs-window-item :value="tabs[0]">
+              <BoardRequestList :boardList="boardList" :curTab="curTab" />
+            </v-tabs-window-item>
+            <v-tabs-window-item :value="tabs[1]">
+              <BoardRequestList :boardList="boardList" :curTab="curTab" />
+            </v-tabs-window-item>
+          </v-tabs-window>
+        </v-card>
+      </div>
     </div>
   </DefaultLayout>
 </template>
@@ -388,7 +389,6 @@ const onSubmitNewBoard = (boardParam: BoardClass) => {
     justify-content: space-between;
     align-items: center;
     padding: 10px 20px;
-    border-bottom: 1px solid #ccc;
   }
 }
 </style>
