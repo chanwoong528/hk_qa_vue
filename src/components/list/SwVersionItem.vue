@@ -373,6 +373,7 @@ const onSubmitDueDate = () => {
 
 .desc-wrap {
   position: relative;
+  padding-top: 40px;
   .edit-btn-con {
     display: flex;
     gap: 10px;

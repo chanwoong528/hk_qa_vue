@@ -85,7 +85,9 @@ const onSubmitNewService = (title: string, desc: string) => {
         <div class="title-wrap">
           <v-list-item-title>
             <h1>
-              <img :src="HIQ_LOGO" alt="hiq logo" />
+              <a href="/">
+                <img :src="HIQ_LOGO" alt="qing logo" />
+              </a>
             </h1>
           </v-list-item-title>
           <v-btn

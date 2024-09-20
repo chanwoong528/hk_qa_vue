@@ -109,30 +109,30 @@ const onSubmitComment = (params: any) => {
 
 <template>
   <DefaultLayout>
-    <v-btn variant="plain" icon="mdi mdi-keyboard-backspace" @click="onClickBack"> </v-btn>
+    <v-btn variant="tonal" icon="mdi mdi-keyboard-backspace" @click="onClickBack"> </v-btn>
 
-    <section>
-      <header>
-        <h3>
-          {{ boardInfo.title }}
-        </h3>
-        <div>
-          <p>
-            <span>
+    <v-card class="pa-10 mb-10">
+      <section>
+        <header>
+          <h3>
+            {{ boardInfo.title }}
+          </h3>
+          <div class="left-con">
+            <p>
               {{ boardInfo.convertBoardTypeKor() }}
-            </span>
-            <span>
+            </p>
+            <p>
               {{ boardInfo.formatDate() }}
-            </span>
-            <span>
+            </p>
+            <p>
               {{ boardInfo.user.username }}
-            </span>
-          </p>
-        </div>
-      </header>
+            </p>
+          </div>
+        </header>
 
-      <div v-html="boardInfo.content"></div>
-    </section>
+        <div v-html="boardInfo.content" class="board-content"></div>
+      </section>
+    </v-card>
     <CommentList
       v-model="commetListForBoard"
       :computedLastPage="computedIsLastPage"
@@ -142,4 +142,30 @@ const onSubmitComment = (params: any) => {
   </DefaultLayout>
 </template>
 
-<style scoped></style>
+<style scoped lang="scss">
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e0e0e0;
+  h3 {
+    font-size: 24px;
+    font-weight: 700;
+  }
+
+  .left-con {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  p {
+    font-size: 14px;
+    margin-right: 10px;
+  }
+}
+.board-content {
+  padding-top: 20px;
+  min-height: 500px;
+}
+</style>

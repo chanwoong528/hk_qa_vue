@@ -22,9 +22,9 @@ export default class BoardClass {
   convertBoardTypeKor() {
     switch (this.boardType) {
       case "req":
-        return "요청";
+        return "요청 사항";
       case "update":
-        return "업데이트";
+        return "업데이트 공지";
 
       default:
         return "요청";
