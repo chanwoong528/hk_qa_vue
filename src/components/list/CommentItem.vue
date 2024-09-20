@@ -1,16 +1,20 @@
 <script setup lang="ts">
 import type { IComment } from "@/types/types";
-import { E_EditorType, E_ReactionParentType, E_ReactionType } from "@/types/enum.d";
+import { E_EditorType, E_ReactionParentType, E_ReactionType, E_Role } from "@/types/enum.d";
 import { ref, defineProps } from "vue";
 
-import { formatDateTime } from "@/utils/common/formatter";
 import CommentReactionList from "./CommentReactionList.vue";
+
+import { formatDateTime } from "@/utils/common/formatter";
 import { reactionApi } from "@/services/domain/reactionService";
 import { renderIconForReaction } from "@/utils/common/formatter";
+import { useUserStore } from "@/store/userStore";
+import { storeToRefs } from "pinia";
 const props = defineProps({
   comment: {
     type: Object as () => IComment,
   },
+  hideAdmin: Boolean,
 
   child: Boolean,
 });
@@ -22,6 +26,9 @@ const openChildComments = ref<boolean>(false);
 const openEditorForReply = ref<boolean>(false);
 const curCommentId = ref<string>("");
 const reCommentVal = ref<string>("");
+
+const userStore = useUserStore();
+const { loggedInUser } = storeToRefs(userStore);
 
 const emit = defineEmits(["onSubmitComment", "onFetchCommentsBySwVersionId"]);
 const onBlurEditorCon = (isFocusOut: boolean) => {
@@ -69,7 +76,7 @@ const onClickReactionBtn = (btnType: E_ReactionType, parentId?: string) => {
     <v-card class="mx-auto comment-card" :variant="child ? 'tonal' : 'outlined'">
       <template v-slot:title>
         <p class="comment-title" @mouseover="mouseOver = true">
-          {{ props.comment?.user.username }}
+          {{ !!hideAdmin && loggedInUser?.role === E_Role.tester ? "admin" : props.comment?.user.username }}
           <span class="date" v-if="props.comment?.createdAt">{{ formatDateTime(props.comment?.createdAt) }}</span>
         </p>
       </template>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, ref, computed, watch } from "vue";
+import { reactive, ref, computed, watch, onMounted } from "vue";
 import { storeToRefs } from "pinia";
 
 import { useUserStore } from "@/store/userStore";
@@ -21,6 +21,10 @@ import SwVersionItem from "@/components/list/SwVersionItem.vue";
 import ModalWrap from "@/components/ModalWrap.vue";
 import { countReactions } from "@/utils/common/formatter";
 
+import { useRoute } from "vue-router";
+
+const route = useRoute();
+
 const props = defineProps({
   swVersionList: {
     type: Array as () => ISwVersion[],
@@ -33,7 +37,7 @@ const props = defineProps({
 const userStore = useUserStore();
 const { loggedInUser } = storeToRefs(userStore);
 
-const panelOpened = ref(0);
+const panelOpened = ref(props.swVersionList?.[0]?.swVersionId ?? 0);
 const emit = defineEmits(["onSubmitStatus", "onClickEditVersion"]);
 
 const userList = ref<IUserInfo[]>([]);
@@ -66,6 +70,12 @@ const selectedTestSession = reactive<Partial<ITestSession>>({
 const sseTrigger = reactive({ type: "", date: "" });
 
 const eventSse = sseApi();
+
+onMounted(() => {
+  if (!!route.query.open) {
+    return (panelOpened.value = route.query.open as string);
+  }
+});
 
 watch(
   () => [openModalDetailView.value],
@@ -262,11 +272,11 @@ const onSubmitAddTesters = (testers: IUserInfo[]) => {
 
   <v-expansion-panels v-model="panelOpened">
     <SwVersionItem
-      v-for="(swVersion, idx) in props.swVersionList"
+      v-for="swVersion in props.swVersionList"
       :key="swVersion.swVersionId"
       :swVersion="swVersion"
       :toggleModal="toggleModal"
-      :isCurOpen="idx === panelOpened"
+      :isCurOpen="swVersion.swVersionId === panelOpened"
       itemType="panel"
       @onClickTester="onClickTester"
       @onClickAddTester="onClickAddTester"

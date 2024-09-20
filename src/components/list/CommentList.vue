@@ -6,6 +6,8 @@ import type { IComment } from "@/types/types";
 import { storeToRefs } from "pinia";
 import { useUserStore } from "@/store/userStore";
 
+import CommentItem from "./CommentItem.vue";
+
 const commentListModel = defineModel<IComment[]>();
 
 const props = defineProps({
@@ -14,6 +16,10 @@ const props = defineProps({
     required: false,
   },
   computedLastPage: {
+    type: Boolean,
+    required: false,
+  },
+  hideAdmin: {
     type: Boolean,
     required: false,
   },
@@ -82,6 +88,7 @@ const onSubmitComment = (parentId?: string, reCommentVal?: string) => {
         v-for="comment in commentListModel"
         :key="comment.commentId"
         :comment="comment"
+        :hideAdmin="props.hideAdmin"
         @onSubmitComment="onSubmitComment"
         @onFetchCommentsBySwVersionId="onFetchCommentsBySwVersionId"
       />

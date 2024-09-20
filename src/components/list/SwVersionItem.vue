@@ -181,7 +181,7 @@ const onSubmitDueDate = () => {
 </script>
 
 <template>
-  <v-expansion-panel v-if="itemType === 'panel'">
+  <v-expansion-panel v-if="itemType === 'panel'" :value="props.swVersion?.swVersionId">
     <v-expansion-panel-title>
       <div class="title-header">
         <h3>

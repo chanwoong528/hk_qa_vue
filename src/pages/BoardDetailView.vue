@@ -134,6 +134,7 @@ const onSubmitComment = (params: any) => {
       </section>
     </v-card>
     <CommentList
+      hideAdmin
       v-model="commetListForBoard"
       :computedLastPage="computedIsLastPage"
       @onClickLoadNextPage="onClickLoadNextPage"

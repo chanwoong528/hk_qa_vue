@@ -19,6 +19,8 @@ const computedBoardList = computed(() => {
 </script>
 <template>
   <v-list lines="two">
+    <v-list-item v-if="computedBoardList.length < 1">게시글이 없습니다.</v-list-item>
+
     <v-list-item
       v-for="board in computedBoardList"
       :key="board.boardId"
@@ -26,7 +28,7 @@ const computedBoardList = computed(() => {
       link
       :to="`/board/${board.boardId}`"
     >
-      <v-list-item-subtitle>
+      <v-list-item-subtitle class="subtitle">
         <span>
           {{ board.user.username }}
         </span>
@@ -38,4 +40,10 @@ const computedBoardList = computed(() => {
   </v-list>
 </template>
 
-<style scoped></style>
+<style scoped lang="scss">
+.subtitle {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4px;
+}
+</style>
