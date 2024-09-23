@@ -10,13 +10,7 @@ export const swApi = {
       return data;
     });
   },
-  POST_sw: ({
-    typeTitle,
-    typeDesc,
-  }: {
-    typeTitle: string;
-    typeDesc: string;
-  }): Promise<ISwType> => {
+  POST_sw: ({ typeTitle, typeDesc }: { typeTitle: string; typeDesc: string }): Promise<ISwType> => {
     return ExceptionWrapper(async () => {
       const apiResult = await http.post("/sw-type", { typeTitle, typeDesc });
       const data = await apiResult.data;
@@ -40,7 +34,7 @@ export const swVersionApi = {
       versionDesc: string;
       tag: string;
       file?: File;
-    }
+    },
   ): Promise<ISwVersion> => {
     return ExceptionWrapper(async () => {
       const formData = new FormData();
@@ -67,7 +61,7 @@ export const swVersionApi = {
       tag: string;
       dueDate?: string;
       file?: File;
-    }
+    },
   ): Promise<void> => {
     return ExceptionWrapper(async () => {
       const formData = new FormData();
@@ -79,11 +73,9 @@ export const swVersionApi = {
         formData.append("file", swVersion.file);
       }
 
-      const apiResult = await http.post(
-        `/sw-version/edit/${swVersion.swVersionId}`,
-        formData,
-        { headers: { "Content-Type": "multipart/form-data" } }
-      );
+      const apiResult = await http.post(`/sw-version/edit/${swVersion.swVersionId}`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
       const data = await apiResult.data;
       return data;
     });
@@ -95,14 +87,11 @@ export const swVersionApi = {
       const data = await apiResult.data;
       return data;
     });
-  }
+  },
 };
 
 export const testUnitApi = {
-  POST_testUnits: (
-    testUnit: Partial<ITestUnit>[],
-    swVersionId: string
-  ): Promise<any> => {
+  POST_testUnits: (testUnit: Partial<ITestUnit>[], swVersionId: string): Promise<any> => {
     return ExceptionWrapper(async () => {
       const apiResult = await http.post(`/test-unit/${swVersionId}`, testUnit);
       const data = await apiResult.data;

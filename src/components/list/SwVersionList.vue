@@ -76,6 +76,14 @@ onMounted(() => {
     return (panelOpened.value = route.query.open as string);
   }
 });
+watch(
+  () => route.params.id as string,
+  (newId) => {
+    if (!!newId) {
+      return (panelOpened.value = 0);
+    }
+  },
+);
 
 watch(
   () => [openModalDetailView.value],
@@ -214,6 +222,7 @@ const onClickDetailView = (swVerId: string) => {
 
 const onClickEditVersion = (swVerId: string) => {
   curSwVersionId.value = swVerId;
+  console.log(curSwVersionId.value);
   emit("onClickEditVersion", curSwVersionInfo.value);
 };
 
@@ -270,26 +279,68 @@ const onSubmitAddTesters = (testers: IUserInfo[]) => {
   </ModalWrap>
   <!-- Detail Modal for Specific Version -->
 
-  <v-expansion-panels v-model="panelOpened">
-    <SwVersionItem
-      v-for="swVersion in props.swVersionList"
-      :key="swVersion.swVersionId"
-      :swVersion="swVersion"
-      :toggleModal="toggleModal"
-      :isCurOpen="swVersion.swVersionId === panelOpened"
-      itemType="panel"
-      @onClickTester="onClickTester"
-      @onClickAddTester="onClickAddTester"
-      @onClickDetailView="onClickDetailView"
-      @onClickEditVersion="onClickEditVersion"
-    />
-  </v-expansion-panels>
+  <section class="version-list-con">
+    <header>
+      <h4>진행중인 버전</h4>
+    </header>
+    <v-expansion-panels v-model="panelOpened">
+      <SwVersionItem
+        v-for="(swVersion, idx) in props.swVersionList?.filter((ver) => {
+          if (ver.testSessions.every((tester) => tester.status !== E_TestStatus.passed)) return ver;
+        })"
+        :key="swVersion.swVersionId"
+        :swVersion="swVersion"
+        :toggleModal="toggleModal"
+        :isCurOpen="swVersion.swVersionId === panelOpened || idx === 0"
+        itemType="panel"
+        @onClickTester="onClickTester"
+        @onClickAddTester="onClickAddTester"
+        @onClickDetailView="onClickDetailView"
+        @onClickEditVersion="onClickEditVersion"
+      />
+    </v-expansion-panels>
+  </section>
+  <section
+    class="version-list-con"
+    v-if="
+      (props.swVersionList ?? []).filter((ver) => {
+        if (ver.testSessions.every((tester) => tester.status === E_TestStatus.passed) && ver.testSessions.length > 0)
+          return ver;
+      }).length > 0
+    "
+  >
+    <header>
+      <h4>종료된 버전</h4>
+    </header>
+    <v-expansion-panels>
+      <SwVersionItem
+        v-for="(swVersion, idx) in props.swVersionList?.filter((ver) => {
+          if (ver.testSessions.every((tester) => tester.status === E_TestStatus.passed) && ver.testSessions.length > 0)
+            return ver;
+        })"
+        :key="swVersion.swVersionId"
+        :swVersion="swVersion"
+        :toggleModal="toggleModal"
+        :isCurOpen="swVersion.swVersionId === panelOpened || idx === 0"
+        itemType="panel"
+        @onClickTester="onClickTester"
+        @onClickAddTester="onClickAddTester"
+        @onClickDetailView="onClickDetailView"
+        @onClickEditVersion="onClickEditVersion"
+      />
+    </v-expansion-panels>
+  </section>
 </template>
 
 <style scoped lang="scss">
-.test-status-modal {
-  :deep(".v-card") {
-    border: 10px solid red;
+.version-list-con {
+  padding: 20px 0;
+  header {
+    h4 {
+      font-size: 20px;
+      font-weight: 700;
+      padding-bottom: 10px;
+    }
   }
 }
 </style>

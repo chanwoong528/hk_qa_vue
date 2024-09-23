@@ -21,8 +21,9 @@ const unitTestList = ref<Partial<ITestUnit>[]>(
   !!props.editFlag
     ? !!props.editVersionInfo?.testUnits && props.editVersionInfo?.testUnits?.length > 0
       ? props.editVersionInfo?.testUnits
-      : [{ unitDesc: "" }]
-    : [{ unitDesc: "" }],
+      : []
+    : // : [{ unitDesc: "" }],
+      [],
 );
 
 const initialState = !!props.editFlag
@@ -78,9 +79,10 @@ const onSubmitNewVersion = () => {
       state.file,
       unitTestList.value,
     );
+    console.log("!!!!");
     return;
   }
-  emit("onSubmitNewVersion", state.versionTitle, state.versionDesc, state.tag, state.file, unitTestList.value);
+  return emit("onSubmitNewVersion", state.versionTitle, state.versionDesc, state.tag, state.file, unitTestList.value);
 };
 </script>
 <template>

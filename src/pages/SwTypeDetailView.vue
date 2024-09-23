@@ -183,14 +183,15 @@ const onSubmitEditVersion = async (
       tag,
       ...(file && { file }),
     });
+    // console.log("@@@@ ", unitTestList, !!unitTestList, unitTestList?.length > 0);
 
-    if (!!unitTestList && unitTestList?.length > 0) {
-      if (unitTestList.some((item) => !item.unitDesc)) {
-        return alert("유닛테스트를 작성 해주세요");
-      }
-
-      await testUnitApi.PATCH_testUnit(unitTestList, swVersionId);
+    // if (!!unitTestList && unitTestList?.length > 0) {
+    if (unitTestList?.some((item) => !item.unitDesc)) {
+      return alert("유닛테스트를 작성 해주세요");
     }
+
+    await testUnitApi.PATCH_testUnit(unitTestList ?? [], swVersionId);
+    // }
 
     submitErrorFlag.value = false;
 
@@ -327,27 +328,26 @@ const onSubmitNewBoard = (boardParam: BoardClass) => {
           @onClickEditVersion="onClickEditVersion"
         />
       </div>
-      <div class="list-con">
+      <section class="list-con">
+        <div class="board-con-header">
+          <v-tabs v-model="curTab" color="primary">
+            <v-tab v-for="tab in tabs" :key="tab" :value="tab">
+              {{ tab }}
+            </v-tab>
+          </v-tabs>
+          <v-btn
+            color="primary"
+            @click="
+              () => {
+                modalStatus.openModalNewBoard = true;
+              }
+            "
+          >
+            새로운 게시글 등록
+            <v-icon icon="mdi-plus"></v-icon>
+          </v-btn>
+        </div>
         <v-card>
-          <div class="board-con-header">
-            <v-tabs v-model="curTab" color="primary">
-              <v-tab v-for="tab in tabs" :key="tab" :value="tab">
-                {{ tab }}
-              </v-tab>
-            </v-tabs>
-            <v-btn
-              color="primary"
-              @click="
-                () => {
-                  modalStatus.openModalNewBoard = true;
-                }
-              "
-            >
-              새로운 게시글 등록
-              <v-icon icon="mdi-plus"></v-icon>
-            </v-btn>
-          </div>
-
           <v-tabs-window v-model="curTab">
             <v-tabs-window-item :value="tabs[0]">
               <BoardRequestList :boardList="boardList" :curTab="curTab" />
@@ -357,7 +357,7 @@ const onSubmitNewBoard = (boardParam: BoardClass) => {
             </v-tabs-window-item>
           </v-tabs-window>
         </v-card>
-      </div>
+      </section>
     </div>
   </DefaultLayout>
 </template>
@@ -389,6 +389,10 @@ const onSubmitNewBoard = (boardParam: BoardClass) => {
     justify-content: space-between;
     align-items: center;
     padding: 10px 20px;
+    button {
+      font-size: 16px;
+      font-weight: 700;
+    }
   }
 }
 </style>

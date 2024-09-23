@@ -114,7 +114,9 @@ const onClickEditVersion = () => {
     testers?.some((tester) => tester.user.id === loggedInUser.value?.id) ||
     versionAuthor?.id === loggedInUser.value?.id
   ) {
-    return emit("onClickEditVersion", props.swVersion?.swVersionId);
+    emit("onClickEditVersion", props.swVersion?.swVersionId);
+
+    return fetchUnitList(props.swVersion?.swVersionId as string);
   }
 
   return alert("테스트 참여자 또는 버전 작성자만 수정 가능합니다.");
