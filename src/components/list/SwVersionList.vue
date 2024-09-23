@@ -286,7 +286,11 @@ const onSubmitAddTesters = (testers: IUserInfo[]) => {
     <v-expansion-panels v-model="panelOpened">
       <SwVersionItem
         v-for="(swVersion, idx) in props.swVersionList?.filter((ver) => {
-          if (!ver.testSessions.every((tester) => tester.status === E_TestStatus.passed)) return ver;
+          if (
+            !ver.testSessions.every((tester) => tester.status === E_TestStatus.passed) ||
+            ver.testSessions.length === 0
+          )
+            return ver;
         })"
         :key="swVersion.swVersionId"
         :swVersion="swVersion"
