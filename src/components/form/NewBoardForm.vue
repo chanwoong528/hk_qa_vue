@@ -64,13 +64,10 @@ const onSubmit = () => {
 <template>
   <form @submit.prevent="">
     <div class="boardtype-con">
-      <p>
-        <!-- <v-icon icon="mdi-text-box-multiple-outline"></v-icon> -->
-        게시판 타입
-      </p>
       <v-select
         v-if="loggedInUser?.role !== E_Role.tester"
         v-model="state.boardType"
+        label="게시판 타입"
         :items="boardTypeLabel"
         hide-details
         max-width="200"
