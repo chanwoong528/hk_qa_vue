@@ -1,4 +1,4 @@
-import { E_ReactionType } from "@/types/enum.d";
+import { E_ReactionType, E_TestStatus } from "@/types/enum.d";
 import { IReaction } from "@/types/types";
 
 export function formatDateTime(isoString: string): string {
@@ -81,3 +81,25 @@ export function countReactions(reactions: IReaction[]): Record<string, number> {
   });
   return reactionCounts;
 }
+
+export const renderIconForVersionStatus = (status: E_TestStatus) => {
+  switch (status) {
+    case E_TestStatus.failed:
+      return "mdi-close-circle";
+    case E_TestStatus.passed:
+      return "mdi-check";
+    default:
+      return "mdi-alert-circle";
+  }
+};
+
+export const renderTestStatus = (type: E_TestStatus) => {
+  switch (type) {
+    case E_TestStatus.failed:
+      return "error";
+    case E_TestStatus.passed:
+      return "teal";
+    default:
+      return "warning";
+  }
+};

@@ -35,8 +35,10 @@ declare module 'vue' {
     SwVersionItem: typeof import('./src/components/list/SwVersionItem.vue')['default']
     SwVersionList: typeof import('./src/components/list/SwVersionList.vue')['default']
     TempSocketInfo: typeof import('./src/components/TempSocketInfo.vue')['default']
+    TestListChart: typeof import('./src/components/list/TestListChart.vue')['default']
     TestListChips: typeof import('./src/components/list/TestListChips.vue')['default']
     TestStatusForm: typeof import('./src/components/form/TestStatusForm.vue')['default']
+    UnitTestList: typeof import('./src/components/list/UnitTestList.vue')['default']
     UserList: typeof import('./src/components/list/UserList.vue')['default']
   }
 }

@@ -184,8 +184,8 @@ const onClickReactionBtn = (btnType: E_ReactionType, parentId?: string) => {
     gap: 10px;
   }
 }
-.reaction-btn-con {
-}
+// .reaction-btn-con {
+// }
 
 .comment-title {
   display: flex;

@@ -79,7 +79,6 @@ const onSubmitNewVersion = () => {
       state.file,
       unitTestList.value,
     );
-    console.log("!!!!");
     return;
   }
   return emit("onSubmitNewVersion", state.versionTitle, state.versionDesc, state.tag, state.file, unitTestList.value);

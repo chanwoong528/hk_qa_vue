@@ -5,13 +5,21 @@ import { useDate } from "vuetify";
 import { storeToRefs } from "pinia";
 import { useUserStore } from "@/store/userStore";
 
-import { E_ReactionParentType, E_ReactionType, E_Role, E_SwVersionModalType, E_TestStatus } from "@/types/enum.d";
+import {
+  //  E_ReactionParentType, E_ReactionType,
+  E_Role,
+  E_SwVersionModalType,
+  E_TestStatus,
+} from "@/types/enum.d";
 import type { IReaction, ISwVersion, ITestSession, ITestUnit } from "@/types/types.d";
 
 import { swVersionApi, testUnitApi } from "@/services/domain/swService";
-import { reactionApi } from "@/services/domain/reactionService";
+// import { reactionApi } from "@/services/domain/reactionService";
 
-import { renderIconForReaction, formatDateTime, formatDate, formatDateForServer } from "@/utils/common/formatter";
+import { formatDateTime, formatDate, formatDateForServer } from "@/utils/common/formatter";
+import UnitTestList from "./UnitTestList.vue";
+import TestListChips from "./TestListChips.vue";
+
 
 const store = useUserStore();
 const { loggedInUser } = storeToRefs(store);
@@ -71,19 +79,6 @@ const fetchUnitList = (swVersionId: string) => {
   });
 };
 
-const REACT_BTN_LIST: { type: E_ReactionType; icon: string; color: string }[] = [
-  {
-    type: E_ReactionType.check,
-    icon: "mdi-check",
-    color: "teal",
-  },
-  {
-    type: E_ReactionType.stop,
-    icon: "mdi-close-circle",
-    color: "error",
-  },
-];
-
 const emit = defineEmits(["onClickTester", "onClickAddTester", "onClickDetailView", "onClickEditVersion"]);
 
 const testSessionsPassStatus = computed(() => {
@@ -108,6 +103,8 @@ const onClickLoggedInUserStatus = (tester: ITestSession) => {
   }
 };
 const onClickEditVersion = () => {
+  openCalender.value = false;
+
   const testers = props.swVersion?.testSessions;
   const versionAuthor = props.swVersion?.user;
   if (
@@ -146,20 +143,20 @@ const renderIconForVersionStatus = (status: E_TestStatus) => {
   }
 };
 
-const onClickReactionBtn = (btnType: E_ReactionType, testUnitId: string) => {
-  const testers = props.swVersion?.testSessions;
-  const versionAuthor = props.swVersion?.user;
+// const onClickReactionBtn = (btnType: E_ReactionType, testUnitId: string) => {
+//   const testers = props.swVersion?.testSessions;
+//   const versionAuthor = props.swVersion?.user;
 
-  if (
-    !testers?.some((tester) => tester.user.id === loggedInUser.value?.id) &&
-    versionAuthor?.id !== loggedInUser.value?.id
-  ) {
-    return alert("테스트 참여자 또는 버전 작성자만 가능합니다.");
-  }
-  return reactionApi.POST_reaction(E_ReactionParentType.testUnit, btnType, testUnitId).then(() => {
-    fetchUnitList(props.swVersion?.swVersionId as string);
-  });
-};
+//   if (
+//     !testers?.some((tester) => tester.user.id === loggedInUser.value?.id) &&
+//     versionAuthor?.id !== loggedInUser.value?.id
+//   ) {
+//     return alert("테스트 참여자 또는 버전 작성자만 가능합니다.");
+//   }
+//   return reactionApi.POST_reaction(E_ReactionParentType.testUnit, btnType, testUnitId).then(() => {
+//     fetchUnitList(props.swVersion?.swVersionId as string);
+//   });
+// };
 const renderColorIcon = (status: E_TestStatus) => {
   switch (status) {
     case E_TestStatus.failed:
@@ -200,32 +197,30 @@ const onSubmitDueDate = () => {
       </div>
       <template v-slot:actions="{ expanded }">
         <v-icon :icon="!!expanded ? 'mdi-minus' : 'mdi-plus'"></v-icon>
-        <v-icon
-          :color="renderColorIcon(testSessionsPassStatus)"
-          :icon="renderIconForVersionStatus(testSessionsPassStatus)"
-        ></v-icon>
+        <v-icon :color="renderColorIcon(testSessionsPassStatus)"
+          :icon="renderIconForVersionStatus(testSessionsPassStatus)"></v-icon>
       </template>
     </v-expansion-panel-title>
 
-    <v-expansion-panel-text>
+    <v-expansion-panel-text @Click.stop="onClickDetailView">
       <div class="desc-wrap">
         <div class="edit-btn-con">
           <div>
-            <v-btn class="edit-btn" variant="outlined" @click="openCalender = true">
+            <v-btn class="edit-btn" variant="outlined" @click.stop="openCalender = true">
               <template v-if="!selectedDate">
                 <v-icon class="mdi mdi-calendar-check" start></v-icon>
                 마감일
               </template>
               <template v-else> Due: {{ formatDate(selectedDate) }} </template>
             </v-btn>
-            <div class="date-picker" v-if="!!openCalender">
+            <div class="date-picker" v-if="!!openCalender" @click.stop>
               <v-btn class="close-btn" icon="mdi-close" @click="openCalender = false" variant="plain"></v-btn>
               <v-date-picker v-model="selectedDate" show-adjacent-months> </v-date-picker>
               <v-btn variant="plain" @click="onSubmitDueDate">ok</v-btn>
             </div>
           </div>
 
-          <v-btn class="edit-btn" variant="outlined" @click="onClickEditVersion">
+          <v-btn class="edit-btn" variant="outlined" @click.stop="onClickEditVersion">
             <v-icon class="mdi mdi-application-edit" start></v-icon>
             수정
           </v-btn>
@@ -234,66 +229,19 @@ const onSubmitDueDate = () => {
       </div>
       <a v-if="props.swVersion?.fileSrc" :href="props.swVersion?.fileSrc">첨부 파일</a>
 
-      <section v-if="unitList.length > 0">
-        <h5>유닛 테스트 목록</h5>
-        <ul class="test-unit-list">
-          <li v-for="testUnit in unitList" :key="testUnit.testUnitId">
-            <ul v-if="testUnit.reactions" class="reactions-con">
-              <li v-for="reactionKey in Object.keys(testUnit.counts as object)">
-                <v-chip
-                  link
-                  v-if="testUnit?.counts && !!testUnit?.counts"
-                  @click="onClickReactionBtn(reactionKey as E_ReactionType, testUnit.testUnitId as string)"
-                >
-                  <v-icon
-                    :icon="renderIconForReaction(reactionKey as E_ReactionType).icon"
-                    :color="renderIconForReaction(reactionKey as E_ReactionType).color"
-                  ></v-icon>
-                  {{ testUnit.counts[reactionKey as E_ReactionType] }}
-
-                  <v-tooltip activator="parent" location="end" max-width="300">
-                    <p v-for="person in testUnit.reactions.filter((reaction) => reaction.reactionType === reactionKey)">
-                      {{ person.user.username }}
-                    </p>
-                  </v-tooltip>
-                </v-chip>
-              </li>
-            </ul>
-            <v-speed-dial location="right center" transition="fade-transition" open-on-hover>
-              <template v-slot:activator="{ props: activatorProps }">
-                <v-btn variant="text" v-bind="activatorProps">
-                  {{ testUnit.unitDesc }}
-                </v-btn>
-              </template>
-              <v-btn
-                v-for="btn in REACT_BTN_LIST"
-                :key="btn.icon"
-                icon
-                size="x-small"
-                @click="onClickReactionBtn(btn.type, testUnit.testUnitId as string)"
-              >
-                <v-icon :icon="btn.icon" :color="btn.color"></v-icon>
-              </v-btn>
-            </v-speed-dial>
-          </li>
-        </ul>
-      </section>
+      <UnitTestList :swVersion="props.swVersion" />
 
       <div class="version-ctrl-con">
         <v-divider :thickness="2"></v-divider>
         <TestListChips :swVersion="props.swVersion" @onClickLoggedInUserStatus="onClickLoggedInUserStatus" />
 
         <div class="modify-tester-btn-con">
-          <v-btn
-            v-if="loggedInUser?.role !== E_Role.tester"
-            @click="onClickAddTester"
-            class="text-none text-subtitle-1"
-            variant="outlined"
-          >
+          <v-btn v-if="loggedInUser?.role !== E_Role.tester" @click.stop="onClickAddTester"
+            class="text-none text-subtitle-1" variant="outlined">
             <v-icon icon="mdi-account-multiple-plus" start></v-icon>
             테스터 관리
           </v-btn>
-          <v-btn @click="onClickDetailView" class="text-none text-subtitle-1" variant="outlined">
+          <v-btn @click.stop="onClickDetailView" class="text-none text-subtitle-1" variant="outlined">
             상세보기
             <v-icon icon="mdi-dots-horizontal-circle-outline" end></v-icon>
           </v-btn>
@@ -308,7 +256,7 @@ const onSubmitDueDate = () => {
 
     <div class="version-ctrl-con">
       <v-divider :thickness="2"></v-divider>
-      <TestListChips :swVersion="props.swVersion" @onClickLoggedInUserStatus="onClickLoggedInUserStatus" />
+      <!-- <TestListChips :swVersion="props.swVersion" @onClickLoggedInUserStatus="onClickLoggedInUserStatus" /> -->
     </div>
   </div>
 </template>
@@ -318,10 +266,12 @@ const onSubmitDueDate = () => {
   display: flex;
   flex-direction: column;
   padding: 8px 24px 16px;
-  > li {
+
+  >li {
     position: relative;
     padding-bottom: 30px;
   }
+
   .reactions-con {
     display: flex;
     position: absolute;
@@ -330,6 +280,7 @@ const onSubmitDueDate = () => {
     bottom: 0;
   }
 }
+
 .modify-tester-btn-con {
   display: flex;
   justify-content: space-between;
@@ -348,11 +299,13 @@ const onSubmitDueDate = () => {
 
 .v-expansion-panel-title {
   background-color: #ececec;
+
   .title-header {
     width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: center;
+
     &--left {
       padding: 0 8px;
       display: flex;
@@ -360,12 +313,14 @@ const onSubmitDueDate = () => {
 
       justify-content: center;
       gap: 4px;
+
       p {
         font-size: 0.8rem;
         color: #999;
         font-weight: 600;
       }
     }
+
     // .date {
     // }
     // .author {
@@ -376,12 +331,14 @@ const onSubmitDueDate = () => {
 .desc-wrap {
   position: relative;
   padding-top: 40px;
+
   .edit-btn-con {
     display: flex;
     gap: 10px;
     position: absolute;
     top: 0;
     right: 0;
+
     .date-picker {
       display: flex;
       flex-direction: column;
@@ -393,6 +350,7 @@ const onSubmitDueDate = () => {
       box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.8);
       background-color: #fff;
       border-radius: 8px;
+
       // border: 10px solid red;
       .close-btn {
         position: absolute;
@@ -406,8 +364,10 @@ const onSubmitDueDate = () => {
     overflow: hidden;
     max-height: 300px;
     margin: 20px 0;
+
     &.expand {
       max-height: none;
+
       :deep(img) {
         border: 1px solid #ececec;
       }
@@ -419,6 +379,7 @@ const onSubmitDueDate = () => {
   display: flex;
   flex-direction: column;
   gap: 20px;
+
   .tester-con {
     p {
       font-size: 1rem;
