@@ -112,7 +112,6 @@ const modules = [
     >
     </QuillEditor>
   </div>
-  <!-- @ready="(edit) => console.log('editor is ready', edit.editor)" -->
 </template>
 
 <style lang="scss">

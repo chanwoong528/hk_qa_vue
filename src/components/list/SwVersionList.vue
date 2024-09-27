@@ -22,6 +22,10 @@ import ModalWrap from "@/components/ModalWrap.vue";
 import { countReactions } from "@/utils/common/formatter";
 
 import { useRoute } from "vue-router";
+import TestListChart from "./TestListChart.vue";
+import UnitTestList from "./UnitTestList.vue";
+// import UnitTestList from "./UnitTestList.vue";
+// import TestListChips from "./TestListChips.vue";
 
 const route = useRoute();
 
@@ -33,6 +37,9 @@ const props = defineProps({
     type: Function,
   },
 });
+
+const detailViewTabs = ["버전 개요", "테스터"];
+const curModalTab = ref<string>("버전 개요");
 
 const userStore = useUserStore();
 const { loggedInUser } = storeToRefs(userStore);
@@ -92,6 +99,7 @@ watch(
       eventSse.onMsg(curSwVersionId.value as string, sseTrigger);
       commentPage.value = 1;
     } else {
+      curModalTab.value = detailViewTabs[0]
       eventSse.close();
     }
   },
@@ -111,6 +119,7 @@ watch(
   },
 );
 
+
 const computedIsLastPage = computed(() => {
   if (commnetLastPage.value === 0) {
     return true;
@@ -122,6 +131,9 @@ const computedIsLastPage = computed(() => {
 const curSwVersionInfo = computed(() => {
   return props.swVersionList?.find((sw) => sw.swVersionId === curSwVersionId.value);
 });
+
+
+
 
 const toggleModal = (type?: E_SwVersionModalType, testerId?: string) => {
   switch (type) {
@@ -222,7 +234,6 @@ const onClickDetailView = (swVerId: string) => {
 
 const onClickEditVersion = (swVerId: string) => {
   curSwVersionId.value = swVerId;
-  console.log(curSwVersionId.value);
   emit("onClickEditVersion", curSwVersionInfo.value);
 };
 
@@ -247,12 +258,9 @@ const onSubmitAddTesters = (testers: IUserInfo[]) => {
 
 <template>
   <!-- //'QA 항목 상태 변경' -->
-  <ModalWrap
-    v-model="openModalUpdateStatus"
-    :title="selectedTestSession.user?.id === loggedInUser?.id ? '내 상태 변경' : 'QA 항목 상태'"
-    haveBtnCtl
-    @onSubmit="onSubmitStatus"
-  >
+  <ModalWrap v-model="openModalUpdateStatus"
+    :title="selectedTestSession.user?.id === loggedInUser?.id ? '내 상태 변경' : 'QA 항목 상태'" haveBtnCtl
+    @onSubmit="onSubmitStatus">
     <TestStatusForm v-model="selectedTestSession" />
   </ModalWrap>
 
@@ -260,22 +268,28 @@ const onSubmitAddTesters = (testers: IUserInfo[]) => {
     <AddTesterForm :userList="userList" :curTesterList="testSessionUserList" @onSubmitAddTesters="onSubmitAddTesters" />
   </ModalWrap>
   <!-- Detail Modal for Specific Version -->
-  <ModalWrap v-model="openModalDetailView" :type="E_ModalType.full" :title="curSwVersionInfo?.versionTitle + '버전'">
-    <SwVersionItem
-      :swVersion="curSwVersionInfo"
-      :toggleModal="toggleModal"
-      @onClickTester="onClickTester"
-      @onClickAddTester="onClickAddTester"
-      @onClickDetailView="onClickDetailView"
-    />
-    <CommentList
-      v-model="commentListForVersion"
-      :page="commentPage"
-      :computedLastPage="computedIsLastPage"
-      @onFetchCommentsBySwVersionId="onFetchCommentsBySwVersionId"
-      @onSubmitComment="onSubmitComment"
-      @onClickLoadNextPage="onClickLoadNextPage"
-    />
+  <ModalWrap v-model="openModalDetailView" :type="E_ModalType.full" :title="curSwVersionInfo?.versionTitle + ' 버전'">
+    <div>
+      <v-tabs v-model="curModalTab" color="primary">
+        <v-tab v-for="tab in detailViewTabs" :key="tab" :value="tab">
+          {{ tab }}
+        </v-tab>
+      </v-tabs>
+    </div>
+    <v-tabs-window v-model="curModalTab" class="tab-window">
+      <v-tabs-window-item :value="detailViewTabs[0]">
+        <SwVersionItem :swVersion="curSwVersionInfo" :toggleModal="toggleModal" @onClickTester="onClickTester"
+          @onClickAddTester="onClickAddTester" @onClickDetailView="onClickDetailView" />
+        <UnitTestList :swVersion="curSwVersionInfo" />
+        <CommentList v-model="commentListForVersion" :page="commentPage" :computedLastPage="computedIsLastPage"
+          @onFetchCommentsBySwVersionId="onFetchCommentsBySwVersionId" @onSubmitComment="onSubmitComment"
+          @onClickLoadNextPage="onClickLoadNextPage" />
+      </v-tabs-window-item>
+
+      <v-tabs-window-item :value="detailViewTabs[1]">
+        <TestListChart :swVersion="curSwVersionInfo" />
+      </v-tabs-window-item>
+    </v-tabs-window>
   </ModalWrap>
   <!-- Detail Modal for Specific Version -->
 
@@ -284,54 +298,34 @@ const onSubmitAddTesters = (testers: IUserInfo[]) => {
       <h4>진행중인 버전</h4>
     </header>
     <v-expansion-panels v-model="panelOpened">
-      <SwVersionItem
-        v-for="(swVersion, idx) in props.swVersionList?.filter((ver) => {
-          if (
-            !ver.testSessions.every((tester) => tester.status === E_TestStatus.passed) ||
-            ver.testSessions.length === 0
-          )
-            return ver;
-        })"
-        :key="swVersion.swVersionId"
-        :swVersion="swVersion"
-        :toggleModal="toggleModal"
-        :isCurOpen="swVersion.swVersionId === panelOpened || idx === 0"
-        itemType="panel"
-        @onClickTester="onClickTester"
-        @onClickAddTester="onClickAddTester"
-        @onClickDetailView="onClickDetailView"
-        @onClickEditVersion="onClickEditVersion"
-      />
+      <SwVersionItem v-for="(swVersion, idx) in props.swVersionList?.filter((ver) => {
+        if (
+          !ver.testSessions.every((tester) => tester.status === E_TestStatus.passed) ||
+          ver.testSessions.length === 0
+        )
+          return ver;
+      })" :key="swVersion.swVersionId" :swVersion="swVersion" :toggleModal="toggleModal"
+        :isCurOpen="swVersion.swVersionId === panelOpened || idx === 0" itemType="panel" @onClickTester="onClickTester"
+        @onClickAddTester="onClickAddTester" @onClickDetailView="onClickDetailView"
+        @onClickEditVersion="onClickEditVersion" />
     </v-expansion-panels>
   </section>
-  <section
-    class="version-list-con"
-    v-if="
-      (props.swVersionList ?? []).filter((ver) => {
-        if (ver.testSessions.every((tester) => tester.status === E_TestStatus.passed) && ver.testSessions.length > 0)
-          return ver;
-      }).length > 0
-    "
-  >
+  <section class="version-list-con" v-if="(props.swVersionList ?? []).filter((ver) => {
+    if (ver.testSessions.every((tester) => tester.status === E_TestStatus.passed) && ver.testSessions.length > 0)
+      return ver;
+  }).length > 0
+    ">
     <header>
       <h4>종료된 버전</h4>
     </header>
     <v-expansion-panels>
-      <SwVersionItem
-        v-for="(swVersion, idx) in props.swVersionList?.filter((ver) => {
-          if (ver.testSessions.every((tester) => tester.status === E_TestStatus.passed) && ver.testSessions.length > 0)
-            return ver;
-        })"
-        :key="swVersion.swVersionId"
-        :swVersion="swVersion"
-        :toggleModal="toggleModal"
-        :isCurOpen="swVersion.swVersionId === panelOpened || idx === 0"
-        itemType="panel"
-        @onClickTester="onClickTester"
-        @onClickAddTester="onClickAddTester"
-        @onClickDetailView="onClickDetailView"
-        @onClickEditVersion="onClickEditVersion"
-      />
+      <SwVersionItem v-for="(swVersion, idx) in props.swVersionList?.filter((ver) => {
+        if (ver.testSessions.every((tester) => tester.status === E_TestStatus.passed) && ver.testSessions.length > 0)
+          return ver;
+      })" :key="swVersion.swVersionId" :swVersion="swVersion" :toggleModal="toggleModal"
+        :isCurOpen="swVersion.swVersionId === panelOpened || idx === 0" itemType="panel" @onClickTester="onClickTester"
+        @onClickAddTester="onClickAddTester" @onClickDetailView="onClickDetailView"
+        @onClickEditVersion="onClickEditVersion" />
     </v-expansion-panels>
   </section>
 </template>
@@ -339,6 +333,7 @@ const onSubmitAddTesters = (testers: IUserInfo[]) => {
 <style scoped lang="scss">
 .version-list-con {
   padding: 20px 0;
+
   header {
     h4 {
       font-size: 20px;
@@ -346,5 +341,9 @@ const onSubmitAddTesters = (testers: IUserInfo[]) => {
       padding-bottom: 10px;
     }
   }
+}
+
+.tab-window {
+  // min-height: 400px;
 }
 </style>
