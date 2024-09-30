@@ -51,15 +51,24 @@ const computedData = computed(() => {
 });
 
 const computeFormatTableHeader = (testSessions: ITestSession[]) => {
-  return [...testSessions].sort((a, b) => (a.createdAt > b.createdAt ? 1 : -1))
-    .map((tester) => {
-      return {
-        tester: tester.user.username,
-        status: tester.status,
-        createdAt: formatDateTime(tester.createdAt),
-        comment: tester.reasonContent,
-      };
-    })
+  return testSessions.toSorted((a, b) => (a.createdAt > b.createdAt ? 1 : -1)).map((tester) => {
+    return {
+      tester: tester.user.username,
+      status: tester.status,
+      createdAt: formatDateTime(tester.createdAt),
+      comment: tester.reasonContent,
+    };
+  });
+
+  // return [...testSessions].sort((a, b) => (a.createdAt > b.createdAt ? 1 : -1))
+  //   .map((tester) => {
+  //     return {
+  //       tester: tester.user.username,
+  //       status: tester.status,
+  //       createdAt: formatDateTime(tester.createdAt),
+  //       comment: tester.reasonContent,
+  //     };
+  //   })
 }
 
 

@@ -7,6 +7,7 @@ import { storeToRefs } from "pinia";
 import { useUserStore } from "@/store/userStore";
 
 import CommentItem from "./CommentItem.vue";
+import { checkEditorValueEmpty } from "@/utils/common/validator";
 
 const commentListModel = defineModel<IComment[]>();
 
@@ -35,10 +36,10 @@ const isCommentEmpty = computed(() => {
   return checkEditorValueEmpty(commentVal.value);
 });
 
-const checkEditorValueEmpty = (content: string) => {
-  let regex = /(<([^>]+)>)/gi;
-  return content.replace(regex, "").length === 0;
-};
+// const checkEditorValueEmpty = (content: string) => {
+//   let regex = /(<([^>]+)>)/gi;
+//   return content.replace(regex, "").length === 0;
+// };
 const isEditorFocused = ref<boolean>(false);
 
 const onFocusEditorCon = (clickedCon: boolean) => {
@@ -71,12 +72,8 @@ const onSubmitComment = (parentId?: string, reCommentVal?: string) => {
 </script>
 <template>
   <div class="editor-con" @click="onFocusEditorCon(true)">
-    <RichEditor
-      :editorType="E_EditorType.comment"
-      v-model="commentVal"
-      :isEditorFocused="isEditorFocused"
-      @onBlurEditorCon="onBlurEditorCon"
-    />
+    <RichEditor :editorType="E_EditorType.comment" v-model="commentVal" :isEditorFocused="isEditorFocused"
+      @onBlurEditorCon="onBlurEditorCon" />
     <div class="comment-btn-con">
       <v-btn @click="onSubmitComment">댓글</v-btn>
     </div>
@@ -84,14 +81,9 @@ const onSubmitComment = (parentId?: string, reCommentVal?: string) => {
 
   <div class="comment-list-con">
     <v-list lines="three" class="p-20">
-      <CommentItem
-        v-for="comment in commentListModel"
-        :key="comment.commentId"
-        :comment="comment"
-        :hideAdmin="props.hideAdmin"
-        @onSubmitComment="onSubmitComment"
-        @onFetchCommentsBySwVersionId="onFetchCommentsBySwVersionId"
-      />
+      <CommentItem v-for="comment in commentListModel" :key="comment.commentId" :comment="comment"
+        :hideAdmin="props.hideAdmin" @onSubmitComment="onSubmitComment"
+        @onFetchCommentsBySwVersionId="onFetchCommentsBySwVersionId" />
     </v-list>
     <v-btn v-if="!props.computedLastPage" @click="onClickLoadNextPage">Load More</v-btn>
   </div>
@@ -103,6 +95,7 @@ const onSubmitComment = (parentId?: string, reCommentVal?: string) => {
   display: flex;
   flex-direction: column;
 }
+
 .comment-btn-con {
   margin-left: auto;
   margin-top: auto;

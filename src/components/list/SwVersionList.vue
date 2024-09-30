@@ -99,7 +99,7 @@ watch(
       eventSse.onMsg(curSwVersionId.value as string, sseTrigger);
       commentPage.value = 1;
     } else {
-      curModalTab.value = detailViewTabs[0]
+      curModalTab.value = detailViewTabs[0];
       eventSse.close();
     }
   },
@@ -119,7 +119,6 @@ watch(
   },
 );
 
-
 const computedIsLastPage = computed(() => {
   if (commnetLastPage.value === 0) {
     return true;
@@ -131,9 +130,6 @@ const computedIsLastPage = computed(() => {
 const curSwVersionInfo = computed(() => {
   return props.swVersionList?.find((sw) => sw.swVersionId === curSwVersionId.value);
 });
-
-
-
 
 const toggleModal = (type?: E_SwVersionModalType, testerId?: string) => {
   switch (type) {
