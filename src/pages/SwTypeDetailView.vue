@@ -24,6 +24,7 @@ import { userApi } from "@/services/domain/userService";
 import { maintainerApi } from "@/services/domain/maintainerService";
 import BoardClass from "@/entity/Board";
 import { boardApi } from "@/services/domain/boardService";
+import { checkEditorValueEmpty } from "@/utils/common/validator";
 
 const route = useRoute();
 
@@ -142,8 +143,11 @@ const onSubmitNewVersion = async (
   file?: File,
   unitTestList?: Partial<ITestUnit>[],
 ) => {
-  // console.log("onSubmitNewVersion", versionTitle, versionDesc, tag, file);
+
   try {
+    if (!!checkEditorValueEmpty(versionDesc)) return alert("버전 설명을 입력해주세요");
+
+
     const createSwVersion = await swVersionApi.POST_swVersion({
       swTypeId: Array.isArray(route.params.id) ? route.params.id[0] : route.params.id,
       versionTitle,
@@ -176,6 +180,8 @@ const onSubmitEditVersion = async (
   unitTestList?: Partial<ITestUnit>[],
 ) => {
   try {
+    if (!!checkEditorValueEmpty(versionDesc)) return alert("버전 설명을 입력해주세요");
+
     await swVersionApi.PATCH_swVersion({
       swVersionId,
       versionTitle,
@@ -254,25 +260,15 @@ const onSubmitNewBoard = (boardParam: BoardClass) => {
 </script>
 
 <template>
-  <ModalWrap
-    v-model="modalStatus.openModalNewVersion"
-    :title="editVersionFlag ? '버전 정보 수정' : '신규 버전'"
-    :type="E_ModalType.full"
-  >
-    <NewVersionForm
-      @onSubmitNewVersion="onSubmitNewVersion"
-      @onSubmitEditVersion="onSubmitEditVersion"
-      :editFlag="editVersionFlag"
-      :editVersionInfo="editVersionInfo"
-    />
+  <ModalWrap v-model="modalStatus.openModalNewVersion" :title="editVersionFlag ? '버전 정보 수정' : '신규 버전'"
+    :type="E_ModalType.full">
+    <NewVersionForm @onSubmitNewVersion="onSubmitNewVersion" @onSubmitEditVersion="onSubmitEditVersion"
+      :editFlag="editVersionFlag" :editVersionInfo="editVersionInfo" />
   </ModalWrap>
 
   <ModalWrap v-model="modalStatus.openModalAddMaintainer" title="관리자 관리">
-    <AddMaintainerForm
-      :userList="userList"
-      :curMaintainerList="maintainerList"
-      @onSubmitAddMaintainers="onSubmitAddMaintainers"
-    />
+    <AddMaintainerForm :userList="userList" :curMaintainerList="maintainerList"
+      @onSubmitAddMaintainers="onSubmitAddMaintainers" />
   </ModalWrap>
 
   <ModalWrap v-model="modalStatus.openModalNewBoard" title="새로운 게시글">
@@ -288,16 +284,11 @@ const onSubmitNewBoard = (boardParam: BoardClass) => {
           <v-icon icon="mdi-account-multiple-plus" start></v-icon>
           관리자 관리
         </v-btn>
-        <v-btn
-          variant="outlined"
-          color="primary"
-          @click="
-            () => {
-              modalStatus.openModalNewVersion = true;
-              editVersionFlag = false;
-            }
-          "
-        >
+        <v-btn variant="outlined" color="primary" @click="() => {
+          modalStatus.openModalNewVersion = true;
+          editVersionFlag = false;
+        }
+          ">
           새로운 버전 등록
           <v-icon icon="mdi-plus"></v-icon>
         </v-btn>
@@ -308,25 +299,16 @@ const onSubmitNewBoard = (boardParam: BoardClass) => {
         <h4>Maintainer</h4>
       </header>
       <div>
-        <v-chip
-          v-for="maintainer in maintainerList"
-          :class="maintainer.id === loggedInUser?.id ? ' on' : ''"
-          class="mr-2 mb-2"
-          :variant="maintainer.id === loggedInUser?.id ? 'tonal' : 'outlined'"
-          label
-        >
+        <v-chip v-for="maintainer in maintainerList" :class="maintainer.id === loggedInUser?.id ? ' on' : ''"
+          class="mr-2 mb-2" :variant="maintainer.id === loggedInUser?.id ? 'tonal' : 'outlined'" label>
           {{ maintainer.id === loggedInUser?.id ? "me" : maintainer.username }}
         </v-chip>
       </div>
     </section>
     <div class="content-con">
       <div class="list-con">
-        <SwVersionList
-          :swVersionList="swVersionList"
-          :onFetchSwVersionList="onFetchSwVersionList"
-          @onSubmitStatus="onSubmitStatus"
-          @onClickEditVersion="onClickEditVersion"
-        />
+        <SwVersionList :swVersionList="swVersionList" :onFetchSwVersionList="onFetchSwVersionList"
+          @onSubmitStatus="onSubmitStatus" @onClickEditVersion="onClickEditVersion" />
       </div>
       <section class="list-con">
         <div class="board-con-header">
@@ -335,14 +317,10 @@ const onSubmitNewBoard = (boardParam: BoardClass) => {
               {{ tab }}
             </v-tab>
           </v-tabs>
-          <v-btn
-            color="primary"
-            @click="
-              () => {
-                modalStatus.openModalNewBoard = true;
-              }
-            "
-          >
+          <v-btn color="primary" @click="() => {
+            modalStatus.openModalNewBoard = true;
+          }
+            ">
             새로운 게시글 등록
             <v-icon icon="mdi-plus"></v-icon>
           </v-btn>
@@ -367,28 +345,34 @@ const onSubmitNewBoard = (boardParam: BoardClass) => {
   padding: 20px 0;
   display: flex;
   justify-content: space-between;
+
   .header-btn-con {
     display: flex;
     gap: 10px;
   }
 }
+
 .maintainer-con {
   display: flex;
   flex-direction: column;
   gap: 10px;
   padding-bottom: 10px;
 }
+
 .content-con {
   display: flex;
   gap: 40px;
+
   .list-con {
     flex: 1;
   }
+
   .board-con-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 10px 20px;
+
     button {
       font-size: 16px;
       font-weight: 700;
