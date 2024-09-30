@@ -13,11 +13,12 @@ export const boardApi = {
       return data;
     });
   },
-  GET_boardList: (swTypeId: string, boardType: "req" | "update"): Promise<any> => {
+  GET_boardList: (swTypeId: string, boardType: "req" | "update", page: number = 1): Promise<any> => {
     return ExceptionWrapper(async () => {
       const apiResult = await http.get(`/board/${swTypeId}`, {
         params: {
           boardType,
+          page,
         },
       });
       const data = await apiResult.data;
