@@ -339,7 +339,7 @@ const onSubmitAddTesters = (testers: IUserInfo[]) => {
   }
 }
 
-.tab-window {
-  // min-height: 400px;
-}
+// .tab-window {
+//   // min-height: 400px;
+// }
 </style>

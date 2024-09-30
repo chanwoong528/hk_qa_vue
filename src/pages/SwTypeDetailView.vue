@@ -38,6 +38,7 @@ const maintainerList = ref<IUserInfo[]>([]);
 const userList = ref<IUserInfo[]>([]);
 const swVersionList = ref<ISwVersion[]>([]);
 const boardList = ref<BoardClass[]>([]);
+const boardPageInfo = reactive({ page: 1, totalPage: 1 });
 
 const editVersionFlag = ref<boolean>(false);
 const editVersionInfo = reactive<Partial<ISwVersion & { swTypeId: string }>>({});
@@ -92,20 +93,30 @@ watch(
   },
 );
 watch(
-  () => [curTab.value],
-  ([newTab]) => {
+  () => [curTab.value, boardPageInfo.page],
+  ([newTab, newPage], [oldTab, oldPage]) => {
+
+    console.log(newTab, oldTab);
+
+
     const boardType = newTab === "요청 사항" ? "req" : "update";
-    onFetchBoardList(route.params.id as string, boardType);
+    onFetchBoardList(route.params.id as string, boardType, newTab === oldTab ? Number(newPage) : 1)
   },
 );
+
+
+
 
 const onFetchSwVersionList = (swTypeId: string) => {
   return swVersionApi.GET_swVersionsBySwTypeId(swTypeId).then((res) => (swVersionList.value = res as ISwVersion[]));
 };
 
-const onFetchBoardList = (swTypeId: string, boardType: "req" | "update" = "req") => {
-  return boardApi.GET_boardList(swTypeId, boardType).then((res) => {
-    boardList.value = res as BoardClass[];
+const onFetchBoardList = (swTypeId: string, boardType: "req" | "update" = "req", page: number = 1) => {
+
+  return boardApi.GET_boardList(swTypeId, boardType, page).then((res) => {
+    boardList.value = res.boardList as BoardClass[];
+    boardPageInfo.totalPage = res.lastPage as number;
+    boardPageInfo.page = res.page as number;
   });
 };
 
@@ -114,7 +125,6 @@ const onSubmitStatus = (
   dbSavedTestSession: Partial<ITestSession>,
   openModalUpdateStatus: any,
 ) => {
-  //TODO: typescript better way than partial
   if (!!selectedTestSession.sessionId && !!selectedTestSession.status && !!selectedTestSession.reasonContent) {
     if (
       selectedTestSession.status === dbSavedTestSession.status &&
@@ -126,7 +136,7 @@ const onSubmitStatus = (
     return testSessionApi
       .PATCH_testSession(selectedTestSession.sessionId, selectedTestSession.status, selectedTestSession.reasonContent)
       .then((_) => {
-        //TODO: handle success instead of call api again
+
         submitErrorFlag.value = true;
         openModalUpdateStatus.value = false;
         onFetchSwVersionList(route.params.id as string);
@@ -327,12 +337,17 @@ const onSubmitNewBoard = (boardParam: BoardClass) => {
         </div>
         <v-card>
           <v-tabs-window v-model="curTab">
+
             <v-tabs-window-item :value="tabs[0]">
               <BoardRequestList :boardList="boardList" :curTab="curTab" />
+              <v-pagination v-model="boardPageInfo.page" :length="boardPageInfo.totalPage" class="my-4"></v-pagination>
             </v-tabs-window-item>
+
             <v-tabs-window-item :value="tabs[1]">
               <BoardRequestList :boardList="boardList" :curTab="curTab" />
+              <v-pagination v-model="boardPageInfo.page" :length="boardPageInfo.totalPage" class="my-4"></v-pagination>
             </v-tabs-window-item>
+
           </v-tabs-window>
         </v-card>
       </section>
