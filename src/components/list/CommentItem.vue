@@ -10,6 +10,7 @@ import { reactionApi } from "@/services/domain/reactionService";
 import { renderIconForReaction } from "@/utils/common/formatter";
 import { useUserStore } from "@/store/userStore";
 import { storeToRefs } from "pinia";
+import RichEditor from "../RichEditor.vue";
 const props = defineProps({
   comment: {
     type: Object as () => IComment,
@@ -24,6 +25,8 @@ const mouseOver = ref<boolean>(false);
 const isEditorFocused = ref<boolean>(false);
 const openChildComments = ref<boolean>(false);
 const openEditorForReply = ref<boolean>(false);
+const openEditorForEdit = ref<boolean>(false);
+
 const curCommentId = ref<string>("");
 const reCommentVal = ref<string>("");
 
@@ -49,9 +52,18 @@ const onSubmitReComment = () => {
 const onClickReply = () => {
   if (!!props.comment?.commentId) {
     curCommentId.value = props.comment.commentId;
+
     openEditorForReply.value = !openEditorForReply.value;
   }
 };
+const onClickEdit = () => {
+  if (!!props.comment?.commentId) {
+    curCommentId.value = props.comment.commentId;
+    reCommentVal.value = props.comment.content;
+    openEditorForEdit.value = !openEditorForEdit.value;
+  }
+}
+
 
 const onFetchCommentsBySwVersionId = () => {
   emit("onFetchCommentsBySwVersionId");
@@ -80,18 +92,16 @@ const onClickReactionBtn = (btnType: E_ReactionType, parentId?: string) => {
           <span class="date" v-if="props.comment?.createdAt">{{ formatDateTime(props.comment?.createdAt) }}</span>
         </p>
       </template>
-      <v-card-text v-html="props.comment?.content"></v-card-text>
+      <v-card-text v-if="!openEditorForEdit" v-html="props.comment?.content"></v-card-text>
+      <!--  :editorType="E_EditorType.comment" -->
+      <RichEditor v-else v-model="reCommentVal" :isEditorFocused="isEditorFocused" @onBlurEditorCon="onBlurEditorCon" />
+
       <ul v-if="props.comment?.reactions" class="reactions-con">
         <li v-for="reactionKey in Object.keys(props.comment.counts as object)">
-          <v-chip
-            link
-            v-if="props.comment?.counts && !!props.comment?.counts"
-            @click="onClickReactionBtn(reactionKey as E_ReactionType, props.comment.commentId as string)"
-          >
-            <v-icon
-              :icon="renderIconForReaction(reactionKey as E_ReactionType).icon"
-              :color="renderIconForReaction(reactionKey as E_ReactionType).color"
-            ></v-icon>
+          <v-chip link v-if="props.comment?.counts && !!props.comment?.counts"
+            @click="onClickReactionBtn(reactionKey as E_ReactionType, props.comment.commentId as string)">
+            <v-icon :icon="renderIconForReaction(reactionKey as E_ReactionType).icon"
+              :color="renderIconForReaction(reactionKey as E_ReactionType).color"></v-icon>
             {{ props.comment.counts[reactionKey as E_ReactionType] }}
 
             <v-tooltip activator="parent" location="end" max-width="300">
@@ -105,44 +115,33 @@ const onClickReactionBtn = (btnType: E_ReactionType, parentId?: string) => {
     </v-card>
 
     <div class="comment-btn-con">
-      <v-btn
-        v-if="!!props.comment?.childComments && props.comment?.childComments.length > 0"
-        @click="openChildComments = !openChildComments"
-        variant="plain"
-      >
+      <v-btn v-if="!!props.comment?.childComments && props.comment?.childComments.length > 0"
+        @click="openChildComments = !openChildComments" variant="plain">
         답글 {{ comment?.childComments.length }}개
       </v-btn>
-      <v-btn
-        class="reply-btn"
-        v-if="!child && !openEditorForReply"
-        variant="plain"
-        color="primary"
-        @click="onClickReply"
-      >
-        답글
-      </v-btn>
+      <div class="comment-btn-control">
+        <v-btn class="reply-btn" v-if="!child && !openEditorForReply" variant="plain" color="primary"
+          @click="onClickEdit">
+          수정
+        </v-btn>
+        <v-btn class="reply-btn" v-if="!child && !openEditorForReply" variant="plain" color="primary"
+          @click="onClickReply">
+          답글
+        </v-btn>
+      </div>
     </div>
 
     <div v-if="openEditorForReply" class="child-comment-con" @click="onFocusEditorCon(true)">
-      <RichEditor
-        :editorType="E_EditorType.comment"
-        v-model="reCommentVal"
-        :isEditorFocused="isEditorFocused"
-        @onBlurEditorCon="onBlurEditorCon"
-      />
+      <RichEditor :editorType="E_EditorType.comment" v-model="reCommentVal" :isEditorFocused="isEditorFocused"
+        @onBlurEditorCon="onBlurEditorCon" />
       <div class="reply-btn-con">
         <v-btn @click="openEditorForReply = false" variant="outlined" color="warning">취소</v-btn>
         <v-btn @click="onSubmitReComment">답글</v-btn>
       </div>
     </div>
     <v-list line="one" v-if="openChildComments">
-      <CommentItem
-        v-for="childComment in comment?.childComments"
-        :key="childComment.commentId"
-        :comment="childComment"
-        @onFetchCommentsBySwVersionId="onFetchCommentsBySwVersionId"
-        child
-      />
+      <CommentItem v-for="childComment in comment?.childComments" :key="childComment.commentId" :comment="childComment"
+        @onFetchCommentsBySwVersionId="onFetchCommentsBySwVersionId" child />
     </v-list>
   </v-list-item>
 </template>
@@ -153,6 +152,11 @@ const onClickReactionBtn = (btnType: E_ReactionType, parentId?: string) => {
   align-items: center;
   width: 100%;
   justify-content: space-between;
+
+  .comment-btn-control {
+    margin-left: auto;
+  }
+
   .reply-btn {
     margin-left: auto;
   }
@@ -160,9 +164,11 @@ const onClickReactionBtn = (btnType: E_ReactionType, parentId?: string) => {
 
 .comment-item {
   position: relative;
+
   .comment-card {
     padding-bottom: 30px;
   }
+
   .reactions-con {
     display: flex;
     position: absolute;
@@ -172,11 +178,13 @@ const onClickReactionBtn = (btnType: E_ReactionType, parentId?: string) => {
     bottom: 10px;
   }
 }
+
 .child-comment-con {
   display: flex;
   flex-direction: column;
   justify-content: end;
   padding: 10px 2px 10px 16px;
+
   .reply-btn-con {
     display: flex;
     justify-content: flex-end;
@@ -184,6 +192,7 @@ const onClickReactionBtn = (btnType: E_ReactionType, parentId?: string) => {
     gap: 10px;
   }
 }
+
 // .reaction-btn-con {
 // }
 
@@ -193,6 +202,7 @@ const onClickReactionBtn = (btnType: E_ReactionType, parentId?: string) => {
   justify-content: space-between;
   font-size: 16px;
   font-weight: bold;
+
   .date {
     font-size: 12px;
     color: grey;
