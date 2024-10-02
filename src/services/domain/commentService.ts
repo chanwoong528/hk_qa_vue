@@ -31,4 +31,18 @@ export const commentApi = {
       return data;
     });
   },
+
+  PATCH_comment: (comment: Partial<IComment>): Promise<IComment> => {
+    return ExceptionWrapper(async () => {
+      const apiResult = await http.patch(`/comment/edit/${comment.commentId}`, { content: comment.content });
+      const data = await apiResult.data;
+      return data;
+    });
+  },
+
+  DELETE_comment: (commentId: string): Promise<void> => {
+    return ExceptionWrapper(async () => {
+      await http.delete(`/comment/${commentId}`);
+    });
+  },
 };

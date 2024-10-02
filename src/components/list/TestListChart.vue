@@ -183,8 +183,8 @@ const renderPercentage = (statusCount: number, total: number) => {
         </div>
       </div>
       <div class="chart-info">
-        <p class="success-percentage"> {{ (computedData.infoData[E_TestStatus.passed] / computedData.infoData["total"]
-        ).toFixed(1) }} %
+        <p class="success-percentage">
+          {{ (computedData.infoData[E_TestStatus.passed] / computedData.infoData["total"] * 100).toFixed(1) }} %
         </p>
         <p>성공 </p>
 

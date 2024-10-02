@@ -95,10 +95,6 @@ watch(
 watch(
   () => [curTab.value, boardPageInfo.page],
   ([newTab, newPage], [oldTab, oldPage]) => {
-
-    console.log(newTab, oldTab);
-
-
     const boardType = newTab === "요청 사항" ? "req" : "update";
     onFetchBoardList(route.params.id as string, boardType, newTab === oldTab ? Number(newPage) : 1)
   },

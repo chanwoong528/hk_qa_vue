@@ -11,12 +11,12 @@ import {
   E_SwVersionModalType,
   E_TestStatus,
 } from "@/types/enum.d";
-import type { IReaction, ISwVersion, ITestSession, ITestUnit } from "@/types/types.d";
+import type { ISwVersion, ITestSession, ITestUnit } from "@/types/types.d";
 
 import { swVersionApi, testUnitApi } from "@/services/domain/swService";
 // import { reactionApi } from "@/services/domain/reactionService";
 
-import { formatDateTime, formatDate, formatDateForServer } from "@/utils/common/formatter";
+import { formatDateTime, formatDate, formatDateForServer, countReactions, renderIconForVersionStatus, renderTestStatus } from "@/utils/common/formatter";
 import UnitTestList from "./UnitTestList.vue";
 import TestListChips from "./TestListChips.vue";
 
@@ -37,22 +37,6 @@ const props = defineProps({
 const unitList = ref<ITestUnit[]>([]);
 const openCalender = ref<boolean>(false);
 const selectedDate = ref<string>();
-
-function countReactions(reactions: IReaction[]): Record<string, number> {
-  const reactionCounts: Record<string, number> = {};
-
-  reactions.forEach((reaction) => {
-    const type = reaction.reactionType;
-    if (!!type) {
-      if (reactionCounts[type]) {
-        reactionCounts[type]++;
-      } else {
-        reactionCounts[type] = 1;
-      }
-    }
-  });
-  return reactionCounts;
-}
 
 watch(
   () => [props.isCurOpen, props.swVersion?.swVersionId],
@@ -132,41 +116,7 @@ const onClickDetailView = () => {
   }
 };
 
-const renderIconForVersionStatus = (status: E_TestStatus) => {
-  switch (status) {
-    case E_TestStatus.failed:
-      return "mdi-close-circle";
-    case E_TestStatus.passed:
-      return "mdi-check";
-    default:
-      return "mdi-alert-circle";
-  }
-};
 
-// const onClickReactionBtn = (btnType: E_ReactionType, testUnitId: string) => {
-//   const testers = props.swVersion?.testSessions;
-//   const versionAuthor = props.swVersion?.user;
-
-//   if (
-//     !testers?.some((tester) => tester.user.id === loggedInUser.value?.id) &&
-//     versionAuthor?.id !== loggedInUser.value?.id
-//   ) {
-//     return alert("테스트 참여자 또는 버전 작성자만 가능합니다.");
-//   }
-//   return reactionApi.POST_reaction(E_ReactionParentType.testUnit, btnType, testUnitId).then(() => {
-//     fetchUnitList(props.swVersion?.swVersionId as string);
-//   });
-// };
-const renderColorIcon = (status: E_TestStatus) => {
-  switch (status) {
-    case E_TestStatus.failed:
-      return "error";
-    case E_TestStatus.passed:
-      return "teal";
-    default:
-      return "warning";
-  }
-};
 
 const onSubmitDueDate = () => {
   if (!selectedDate.value) return alert("마감일을 선택해주세요");
@@ -197,7 +147,7 @@ const onSubmitDueDate = () => {
       </div>
       <template v-slot:actions="{ expanded }">
         <v-icon :icon="!!expanded ? 'mdi-minus' : 'mdi-plus'"></v-icon>
-        <v-icon :color="renderColorIcon(testSessionsPassStatus)"
+        <v-icon :color="renderTestStatus(testSessionsPassStatus)"
           :icon="renderIconForVersionStatus(testSessionsPassStatus)"></v-icon>
       </template>
     </v-expansion-panel-title>
