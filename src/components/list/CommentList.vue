@@ -9,7 +9,9 @@ import { useUserStore } from "@/store/userStore";
 import CommentItem from "./CommentItem.vue";
 import { checkEditorValueEmpty } from "@/utils/common/validator";
 
+
 const commentListModel = defineModel<IComment[]>();
+
 
 const props = defineProps({
   page: {
@@ -25,7 +27,7 @@ const props = defineProps({
     required: false,
   },
 });
-const emit = defineEmits(["onFetchCommentsBySwVersionId", "onClickLoadNextPage", "onSubmitComment"]);
+const emit = defineEmits(["onFetchCommentsBySwVersionId", "onClickLoadNextPage", "onSubmitComment", "onSubmitEditComment", "onClickDeleteComment"]);
 
 const userStore = useUserStore();
 const { loggedInUser } = storeToRefs(userStore);
@@ -36,11 +38,11 @@ const isCommentEmpty = computed(() => {
   return checkEditorValueEmpty(commentVal.value);
 });
 
-// const checkEditorValueEmpty = (content: string) => {
-//   let regex = /(<([^>]+)>)/gi;
-//   return content.replace(regex, "").length === 0;
-// };
+
 const isEditorFocused = ref<boolean>(false);
+const openChildComments = ref<string[]>([]);
+
+
 
 const onFocusEditorCon = (clickedCon: boolean) => {
   isEditorFocused.value = clickedCon;
@@ -69,6 +71,27 @@ const onSubmitComment = (parentId?: string, reCommentVal?: string) => {
   emit("onSubmitComment", params);
   commentVal.value = "";
 };
+
+const onSubmitEditComment = (commentId: string, content: string) => {
+  if (checkEditorValueEmpty(content)) return alert("Please write a comment");
+  emit("onSubmitEditComment", commentId, content);
+};
+
+
+const onClickDeleteComment = (commentId: string) => {
+  emit("onClickDeleteComment", commentId);
+};
+
+const toggleChildComments = (commentId: string) => {
+  if (openChildComments.value.includes(commentId)) {
+    openChildComments.value = openChildComments.value.filter((id) => id !== commentId);
+  } else {
+    openChildComments.value = [...openChildComments.value, commentId];
+  }
+};
+
+
+
 </script>
 <template>
   <div class="editor-con" @click="onFocusEditorCon(true)">
@@ -81,9 +104,22 @@ const onSubmitComment = (parentId?: string, reCommentVal?: string) => {
 
   <div class="comment-list-con">
     <v-list lines="three" class="p-20">
-      <CommentItem v-for="comment in commentListModel" :key="comment.commentId" :comment="comment"
-        :hideAdmin="props.hideAdmin" @onSubmitComment="onSubmitComment"
-        @onFetchCommentsBySwVersionId="onFetchCommentsBySwVersionId" />
+
+      <template v-for="comment in commentListModel" :key="comment.commentId" :comment="comment">
+
+        <CommentItem :comment="comment" :hideAdmin="props.hideAdmin" @onSubmitComment="onSubmitComment"
+          @onSubmitEditComment="onSubmitEditComment" @onClickDeleteComment="onClickDeleteComment"
+          @onFetchCommentsBySwVersionId="onFetchCommentsBySwVersionId" @toggleChildComments="toggleChildComments" />
+
+        <v-list line="one" v-if="openChildComments.includes(comment.commentId)">
+          <CommentItem v-for="childComment in comment.childComments" :key="childComment.commentId" :comment="childComment"
+            :hideAdmin="props.hideAdmin" @onSubmitComment="onSubmitComment" @onSubmitEditComment="onSubmitEditComment"
+            @onClickDeleteComment="onClickDeleteComment" @onFetchCommentsBySwVersionId="onFetchCommentsBySwVersionId"
+            child />
+        </v-list>
+      </template>
+
+
     </v-list>
     <v-btn v-if="!props.computedLastPage" @click="onClickLoadNextPage">Load More</v-btn>
   </div>

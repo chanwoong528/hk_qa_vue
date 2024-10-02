@@ -208,6 +208,18 @@ const onSubmitComment = (params: any) => {
   });
 };
 
+const onSubmitEditComment = (commentId: string, content: string) => {
+  return commentApi.PATCH_comment({ commentId, content }).then((res) => {
+    return onFetchCommentsBySwVersionId();
+  });
+};
+const onClickDeleteComment = (commentId: string) => {
+  return commentApi.DELETE_comment(commentId).then((res) => {
+    return onFetchCommentsBySwVersionId();
+  });
+
+};
+
 const onClickAddTester = (swVerId: string) => {
   curSwVersionId.value = swVerId;
   const targetSwVersion = props.swVersionList?.find((sw) => sw.swVersionId === swVerId);
@@ -279,6 +291,7 @@ const onSubmitAddTesters = (testers: IUserInfo[]) => {
         <UnitTestList :swVersion="curSwVersionInfo" />
         <CommentList v-model="commentListForVersion" :page="commentPage" :computedLastPage="computedIsLastPage"
           @onFetchCommentsBySwVersionId="onFetchCommentsBySwVersionId" @onSubmitComment="onSubmitComment"
+          @onClickDeleteComment="onClickDeleteComment" @onSubmitEditComment="onSubmitEditComment"
           @onClickLoadNextPage="onClickLoadNextPage" />
       </v-tabs-window-item>
 
