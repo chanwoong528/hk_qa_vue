@@ -32,4 +32,15 @@ export const boardApi = {
       return data;
     });
   },
+  PATCH_board: (boardInfo: any & { boardId: string; userId: string }): Promise<any> => {
+    return ExceptionWrapper(async () => {
+      const apiResult = await http.patch(`/board/${boardInfo.boardId}`, {
+        title: boardInfo.title,
+        content: boardInfo.content,
+        userId: boardInfo.userId,
+      });
+      const data = await apiResult.data;
+      return data;
+    });
+  },
 };

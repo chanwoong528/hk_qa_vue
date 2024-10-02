@@ -165,18 +165,18 @@ const onClickReactionBtn = (btnType: E_ReactionType, parentId?: string) => {
           <v-icon icon="mdi-pencil" prepend></v-icon>
           수정
         </v-btn>
-        <v-btn class="reply-btn" v-if="openEditorForEdit" variant="plain" color="primary" @click="onSubmitEditComment">
-          <v-icon icon="mdi-pencil" prepend></v-icon>
+        <v-btn class="reply-btn" v-if="openEditorForEdit" variant="plain" color="success" @click="onSubmitEditComment">
+          <v-icon icon="mdi-content-save-outline" prepend></v-icon>
           저장
         </v-btn>
 
 
-        <v-btn class=" reply-btn" v-if="!openEditorForEdit" variant="plain" color="primary" @click="onClickDeleteComment">
+        <v-btn class=" reply-btn" v-if="!openEditorForEdit" variant="plain" color="error" @click="onClickDeleteComment">
           <v-icon icon="mdi-delete" prepend></v-icon>
           삭제
         </v-btn>
-        <v-btn class="reply-btn" v-if="openEditorForEdit" variant="plain" color="primary" @click="onClickEdit">
-          <v-icon icon="mdi-pencil" prepend></v-icon>
+        <v-btn class="reply-btn" v-if="openEditorForEdit" variant="tonal" color="error" @click="onClickEdit">
+          <v-icon icon="mdi-cancel" prepend></v-icon>
           취소
         </v-btn>
 
