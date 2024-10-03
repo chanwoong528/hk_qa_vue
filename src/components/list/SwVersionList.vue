@@ -346,7 +346,7 @@ const onSubmitAddTesters = (testers: IUserInfo[]) => {
   padding: 20px 0;
 
   &.finished {
-    z-index: -1;
+    z-index: 0;
   }
 
   header {
