@@ -319,7 +319,7 @@ const onSubmitAddTesters = (testers: IUserInfo[]) => {
         @onClickEditVersion="onClickEditVersion" />
     </v-expansion-panels>
   </section>
-  <section class="version-list-con" v-if="(props.swVersionList ?? []).filter((ver) => {
+  <section class="version-list-con finished" v-if="(props.swVersionList ?? []).filter((ver) => {
     if (ver.testSessions.every((tester) => tester.status === E_TestStatus.passed) && ver.testSessions.length > 0)
       return ver;
   }).length > 0
@@ -341,7 +341,13 @@ const onSubmitAddTesters = (testers: IUserInfo[]) => {
 
 <style scoped lang="scss">
 .version-list-con {
+  position: relative;
+  z-index: 1;
   padding: 20px 0;
+
+  &.finished {
+    z-index: -1;
+  }
 
   header {
     h4 {
