@@ -45,6 +45,8 @@ const userStore = useUserStore();
 const { loggedInUser } = storeToRefs(userStore);
 
 const panelOpened = ref(props.swVersionList?.[0]?.swVersionId ?? 0);
+
+
 const emit = defineEmits(["onSubmitStatus", "onClickEditVersion"]);
 
 const userList = ref<IUserInfo[]>([]);
@@ -327,7 +329,7 @@ const onSubmitAddTesters = (testers: IUserInfo[]) => {
     <header>
       <h4>종료된 버전</h4>
     </header>
-    <v-expansion-panels>
+    <v-expansion-panels v-model="panelOpened">
       <SwVersionItem v-for="(swVersion, idx) in props.swVersionList?.filter((ver) => {
         if (ver.testSessions.every((tester) => tester.status === E_TestStatus.passed) && ver.testSessions.length > 0)
           return ver;

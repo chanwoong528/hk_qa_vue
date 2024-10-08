@@ -36,13 +36,7 @@ const onClickReactionBtn = (btnType: E_ReactionType) => {
 
 <template>
   <div class="reaction-btn-con" :class="!!props.isActivated ? ' on' : ''">
-    <v-btn
-      v-for="btn in REACT_BTN_LIST"
-      :key="btn.icon"
-      icon
-      size="x-small"
-      @click="onClickReactionBtn(btn.type)"
-    >
+    <v-btn v-for="btn in REACT_BTN_LIST" :key="btn.icon" icon size="x-small" @click="onClickReactionBtn(btn.type)">
       <v-icon :icon="btn.icon" :color="btn.color"></v-icon>
     </v-btn>
   </div>
@@ -59,6 +53,7 @@ const onClickReactionBtn = (btnType: E_ReactionType) => {
   transition: transform 0.3s, opacity 0.3s;
   pointer-events: none;
   opacity: 0;
+
   &.on {
     transform: translateY(-50%);
     z-index: 1;
