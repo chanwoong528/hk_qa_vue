@@ -89,8 +89,29 @@ const onClickLoggedInUserStatus = (tester: ITestSession) => {
 
 const copyToClipboard = () => {
   const parsedUrl = new URL(window.location.href);
+  const targetUrl = `${parsedUrl.origin}${parsedUrl.pathname}?open=${props.swVersion?.swVersionId}`
 
-  navigator.clipboard.writeText(`${parsedUrl.origin}${parsedUrl.pathname}?open=${props.swVersion?.swVersionId}`);
+  // clipboard API 사용
+  if (navigator.clipboard !== undefined) {
+    navigator.clipboard
+      .writeText(targetUrl)
+
+  } else {
+    // execCommand 사용
+    const textArea = document.createElement('textarea');
+    textArea.value = `targetUrl`;
+    document.body.appendChild(textArea);
+    textArea.select();
+    textArea.setSelectionRange(0, 99999);
+    try {
+      document.execCommand('copy');
+    } catch (err) {
+      console.error('복사 실패', err);
+    }
+    textArea.setSelectionRange(0, 0);
+    document.body.removeChild(textArea);
+  }
+
 
 }
 
