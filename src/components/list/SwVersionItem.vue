@@ -99,7 +99,7 @@ const copyToClipboard = () => {
   } else {
     // execCommand 사용
     const textArea = document.createElement('textarea');
-    textArea.value = `targetUrl`;
+    textArea.value = targetUrl;
     document.body.appendChild(textArea);
     textArea.select();
     textArea.setSelectionRange(0, 99999);
