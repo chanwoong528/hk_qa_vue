@@ -86,6 +86,14 @@ const onClickLoggedInUserStatus = (tester: ITestSession) => {
     return emit("onClickTester", tester, loggedInUser.value?.id);
   }
 };
+
+const copyToClipboard = () => {
+  const parsedUrl = new URL(window.location.href);
+
+  navigator.clipboard.writeText(`${parsedUrl.origin}${parsedUrl.pathname}?open=${props.swVersion?.swVersionId}`);
+
+}
+
 const onClickEditVersion = () => {
   openCalender.value = false;
 
@@ -154,7 +162,11 @@ const onSubmitDueDate = () => {
 
     <v-expansion-panel-text @Click.stop="onClickDetailView">
       <div class="desc-wrap">
+
         <div class="edit-btn-con">
+
+
+
           <div>
             <v-btn class="edit-btn" variant="outlined" @click.stop="openCalender = true">
               <template v-if="!selectedDate">
@@ -174,6 +186,15 @@ const onSubmitDueDate = () => {
             <v-icon class="mdi mdi-application-edit" start></v-icon>
             수정
           </v-btn>
+
+          <v-snackbar :timeout="2000" color="blue-grey" rounded="pill">
+            <template v-slot:activator="{ props }">
+              <v-btn v-bind="props" variant="tonal" @click.stop="copyToClipboard" icon size="small">
+                <v-icon class="mdi mdi-link-variant"></v-icon>
+              </v-btn>
+            </template>
+            복사되었습니다.
+          </v-snackbar>
         </div>
         <div class="desc-inner-html" v-html="props.swVersion?.versionDesc" />
       </div>

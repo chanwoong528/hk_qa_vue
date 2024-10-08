@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "cross-env NODE_ENV=dev vite",
+    "dev:front": "cross-env NODE_ENV=prod vite",
     "build": "cross-env NODE_ENV=prod vue-tsc --noEmit && vite build",
     "preview": "cross-env NODE_ENV=prod vite preview",
     "lint": "eslint . --fix --ignore-path .gitignore",
