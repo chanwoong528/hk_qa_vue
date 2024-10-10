@@ -65,7 +65,7 @@ const emit = defineEmits(["onChangeSelectRole", "onChangeUserStatus"]);
 </script>
 
 <template>
-  <section v-if="tableType === E_UserListType.checkbox">
+  <section class="box-wrap" v-if="tableType === E_UserListType.checkbox">
     <v-text-field
       class="search-user"
       v-model="serachUserTerm"
@@ -92,7 +92,7 @@ const emit = defineEmits(["onChangeSelectRole", "onChangeUserStatus"]);
     </v-data-table>
   </section>
 
-  <section v-else>
+  <section class="box-wrap" v-else>
     <v-text-field
       class="serach-user"
       v-model="serachUserTerm"
@@ -149,5 +149,12 @@ const emit = defineEmits(["onChangeSelectRole", "onChangeUserStatus"]);
 <style scoped>
 .serach-user {
   max-width: 400px;
+}
+.box-wrap {
+  background: #fff;
+  border-radius: 6px;
+  padding-top: 20px;
+  border: 1px solid #e2e8f0;
+  box-shadow: rgba(15, 22, 36, 0.1) 0px 1px 3px 0px;
 }
 </style>

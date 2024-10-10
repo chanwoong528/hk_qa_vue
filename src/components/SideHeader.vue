@@ -80,7 +80,7 @@ const onSubmitNewService = (title: string, desc: string) => {
     <NewServiceForm @onSubmitNewService="onSubmitNewService" />
   </ModalWrap>
   <v-navigation-drawer permanent>
-    <v-list v-model:opened="openGroups">
+    <v-list v-model:opened="openGroups" active-class="ss">
       <v-list-item>
         <div class="title-wrap">
           <v-list-item-title>
@@ -97,16 +97,9 @@ const onSubmitNewService = (title: string, desc: string) => {
             color="primary"
             @click="openNewServiceModal = true"
           >
-            서비스 등록
+            서비스
             <v-icon icon="mdi-plus"></v-icon>
           </v-btn>
-        </div>
-        <v-list-item-subtitle>
-          {{ loggedInUser?.username }}
-        </v-list-item-subtitle>
-        <div class="side-ctrl-con">
-          <p>{{ loggedInUser?.role }}</p>
-          <v-btn variant="plain" icon="mdi-logout-variant" color="error" @click="onClickLogout"> </v-btn>
         </div>
       </v-list-item>
 
@@ -140,6 +133,18 @@ const onSubmitNewService = (title: string, desc: string) => {
       </template>
     </v-list>
   </v-navigation-drawer>
+  
+  <v-app-bar :elevation="1">
+
+  <v-app-bar-title><!-- 품질 향상과 방향성을 제시하는 가이드 --></v-app-bar-title>
+
+  <template v-slot:append>
+    {{ loggedInUser?.username }}
+    <p>({{ loggedInUser?.role }})</p>
+    <v-btn variant="plain" icon="mdi-logout-variant" color="error" @click="onClickLogout" />
+  </template>
+</v-app-bar>
+  
 </template>
 
 <style lang="scss" scoped>
@@ -147,16 +152,19 @@ const onSubmitNewService = (title: string, desc: string) => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 20px;
+  gap: 5px;
+  flex-direction: column;
+  padding: 20px 40px 20px 0;
+  .v-btn {
+    position: absolute;
+    right: 20px;
+    top: 10px;
+  }
   h1 {
+    width: 70px;
     img {
       width: 100%;
     }
   }
-}
-.side-ctrl-con {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 }
 </style>

@@ -9,7 +9,7 @@
 </template>
 <style lang="scss" scoped>
 .main-layout {
-  padding: 20px;
+  padding: 20px 24px;
   max-width: 1920px;
   margin: 0 auto;
 }

@@ -34,7 +34,7 @@ const headers = ref([
     <!-- <v-row cols="12" md="4"> -->
     <!-- <v-col  col="1"> -->
     <div class="card-wrap">
-      <v-card v-for="swItem in props.swList" :key="swItem.swTypeId" elevation="16" :to="`/sw-type/${swItem.swTypeId}`"
+      <v-card v-for="swItem in props.swList" :key="swItem.swTypeId" :to="`/sw-type/${swItem.swTypeId}`"
         link class="service-home-card">
 
         <header class="card-header">

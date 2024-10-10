@@ -80,5 +80,9 @@ const onSubmitAddUser = (
   padding: 20px 0;
   display: flex;
   justify-content: space-between;
+
+  h3 {
+    font-size: 24px;
+  }
 }
 </style>
