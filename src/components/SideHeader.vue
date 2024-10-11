@@ -80,8 +80,8 @@ const onSubmitNewService = (title: string, desc: string) => {
     <NewServiceForm @onSubmitNewService="onSubmitNewService" />
   </ModalWrap>
   <v-navigation-drawer permanent>
-    <v-list v-model:opened="openGroups" active-class="ss">
-      <v-list-item>
+    <v-list v-model:opened="openGroups" class="navigation-list">
+      <v-list-item style="background: #303b87;">
         <div class="title-wrap">
           <v-list-item-title>
             <h1>
@@ -96,10 +96,16 @@ const onSubmitNewService = (title: string, desc: string) => {
             variant="outlined"
             color="primary"
             @click="openNewServiceModal = true"
+            class="service-create"
           >
             서비스
             <v-icon icon="mdi-plus"></v-icon>
           </v-btn>
+        </div>
+        
+        <div class="user-wrap">
+          {{ loggedInUser?.username }} ({{ loggedInUser?.role }})
+          <v-btn variant="plain" icon="mdi-logout-variant" color="error" @click="onClickLogout" />
         </div>
       </v-list-item>
 
@@ -133,32 +139,23 @@ const onSubmitNewService = (title: string, desc: string) => {
       </template>
     </v-list>
   </v-navigation-drawer>
-  
-  <v-app-bar :elevation="1">
-
-  <v-app-bar-title><!-- 품질 향상과 방향성을 제시하는 가이드 --></v-app-bar-title>
-
-  <template v-slot:append>
-    {{ loggedInUser?.username }}
-    <p>({{ loggedInUser?.role }})</p>
-    <v-btn variant="plain" icon="mdi-logout-variant" color="error" @click="onClickLogout" />
-  </template>
-</v-app-bar>
-  
 </template>
 
 <style lang="scss" scoped>
+.navigation-list {
+  padding: 0;
+}
 .title-wrap {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 5px;
   flex-direction: column;
-  padding: 20px 40px 20px 0;
-  .v-btn {
+  padding: 30px 40px 10px 0;
+  .service-create {
     position: absolute;
     right: 20px;
-    top: 10px;
+    top: 20px;
   }
   h1 {
     width: 70px;
@@ -166,5 +163,12 @@ const onSubmitNewService = (title: string, desc: string) => {
       width: 100%;
     }
   }
+}
+
+.user-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.6);
 }
 </style>

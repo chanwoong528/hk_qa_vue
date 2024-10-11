@@ -20,13 +20,22 @@ export default createVuetify({
       myCustomTheme: {
         dark: false,
         variables: {
-          'border-color': '#e2e8f0',
+          'border-color': '#d9e3ef',
           'border-opacity' : '1',
+          'high-emphasis-opacity': '1',
+          'input-control-height': '26px',
+          'field-input-padding-top': '8px',
+          'field-input-padding-bottom': '8px',
+          'field-border-opacity': '0.2',
+          'table-row-height': '68px'
+          
         },
         colors: {
           primary: '#6d7fff',
           background: '#eef1f9',
-          'on-surface': '#475569',
+          'on-surface': '#1e293b',
+          
+          
           
         }
       }

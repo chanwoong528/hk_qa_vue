@@ -117,11 +117,13 @@ const emit = defineEmits(["onChangeSelectRole", "onChangeUserStatus"]);
       :sort-by="[{ key: 'createdAt', order: 'asc' }]"
     >
       <template v-slot:item.actions="{ item }">
+        <div class="action-wrap">
         <v-select
           v-model="item.role"
           :items="Object.values(E_Role)"
           @update:modelValue="emit('onChangeSelectRole', item.id, item.role)"
           hide-details
+          variant="outlined"
         >
         </v-select>
         <v-select
@@ -129,7 +131,9 @@ const emit = defineEmits(["onChangeSelectRole", "onChangeUserStatus"]);
           :items="Object.values(E_UserStatus)"
           @update:modelValue="emit('onChangeUserStatus', item.id, item.userStatus)"
           hide-details
+          variant="outlined"
         ></v-select>
+        </div>
       </template>
       <template v-slot:item.verification="{ item }">
         <v-btn v-if="item.userStatus !== E_UserStatus.ok" @click="onClickSendVerificationEmail(item.email)"
@@ -156,5 +160,12 @@ const emit = defineEmits(["onChangeSelectRole", "onChangeUserStatus"]);
   padding-top: 20px;
   border: 1px solid #e2e8f0;
   box-shadow: rgba(15, 22, 36, 0.1) 0px 1px 3px 0px;
+}
+.action-wrap {
+  display: flex;
+  gap: 6px;
+  .v-select {
+    width: 100%;
+  }
 }
 </style>
