@@ -12,4 +12,9 @@
 @use 'vuetify/settings' with (
     $body-font-family: 'Noto Sans KR',
     $field-outline-opacity: .18,
+    $table-header-font-weight: 600,
 );
+
+.v-table thead tr th {
+    background: rgb(226 232 240 / 20%);
+ }

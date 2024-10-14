@@ -27,12 +27,13 @@ export default createVuetify({
           'field-input-padding-top': '8px',
           'field-input-padding-bottom': '8px',
           'field-border-opacity': '0.2',
-          'table-row-height': '68px'
+          'table-row-height': '68px',
+          'activated-opacity': '0.2'
           
         },
         colors: {
-          primary: '#6d7fff',
-          background: '#eef1f9',
+          primary: '#296ae5',
+          background: '#f6f9ff',
           'on-surface': '#1e293b',
           
           

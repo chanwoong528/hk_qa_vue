@@ -65,7 +65,7 @@ const emit = defineEmits(["onChangeSelectRole", "onChangeUserStatus"]);
 </script>
 
 <template>
-  <section class="box-wrap" v-if="tableType === E_UserListType.checkbox">
+  <section v-if="tableType === E_UserListType.checkbox">
     <v-text-field
       class="search-user"
       v-model="serachUserTerm"
@@ -92,7 +92,7 @@ const emit = defineEmits(["onChangeSelectRole", "onChangeUserStatus"]);
     </v-data-table>
   </section>
 
-  <section class="box-wrap" v-else>
+  <section v-else>
     <v-text-field
       class="serach-user"
       v-model="serachUserTerm"
@@ -100,7 +100,7 @@ const emit = defineEmits(["onChangeSelectRole", "onChangeUserStatus"]);
       clear-icon="mdi-close-circle"
       label="유저 검색"
       type="text"
-      variant="filled"
+      variant="outlined"
       clearable
       @click:clear="serachUserTerm = ''"
     >
@@ -151,15 +151,13 @@ const emit = defineEmits(["onChangeSelectRole", "onChangeUserStatus"]);
 </template>
 
 <style scoped>
+
+
+
 .serach-user {
   max-width: 400px;
-}
-.box-wrap {
-  background: #fff;
-  border-radius: 6px;
-  padding-top: 20px;
-  border: 1px solid #e2e8f0;
-  box-shadow: rgba(15, 22, 36, 0.1) 0px 1px 3px 0px;
+  float: right;
+  min-width: 400px;
 }
 .action-wrap {
   display: flex;
@@ -168,4 +166,5 @@ const emit = defineEmits(["onChangeSelectRole", "onChangeUserStatus"]);
     width: 100%;
   }
 }
+
 </style>
