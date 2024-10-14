@@ -92,12 +92,4 @@ const onSubmitAddUser = (
   }
 }
 
-.box-wrap {
-  background: #fff;
-  border-radius: 6px;
-  border: 1px solid #e2e8f0;
-  box-shadow: rgba(15, 22, 36, 0.1) 0px 1px 3px 0px;
-  padding: 0px 24px;
-}
-
 </style>

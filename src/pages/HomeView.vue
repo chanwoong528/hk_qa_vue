@@ -12,11 +12,11 @@ const { swTypes } = storeToRefs(swStore);
 <template>
   <DefaultLayout>
     <header class="home-header">
-      <h3><strong> 품질 향상</strong>과 <strong>방향성</strong>을 <strong>제시</strong>하는 가이드</h3>
       <p>
         <span class="acronym">Q</span>uality <span class="acronym"> I</span>mprovement &
         <span class="acronym">N</span>avigation <span class="acronym">G</span>uide
       </p>
+      <h3><strong> 품질 향상</strong>과 <strong>방향성</strong>을 <strong>제시</strong>하는 가이드</h3>
     </header>
     <SwList :type="E_SwTypeListType.section" :swList="swTypes" />
   </DefaultLayout>
@@ -24,27 +24,31 @@ const { swTypes } = storeToRefs(swStore);
 
 <style scoped lang="scss">
 .home-header {
-  padding: 20px 0;
+  padding: 20px 0 24px;
   display: flex;
   /* justify-content: space-between; */
   flex-direction: column;
-  gap: 4px;
+  gap: 8px;
 
   h3 {
     font-family: "Noto Sans KR";
-    font-size: 20px;
+    font-size: 28px;
     font-style: normal;
-    font-weight: 700;
+    font-weight: 500;
     line-height: normal;
     letter-spacing: -0.7px;
+    strong {
+      font-weight: 500;
+    }
   }
   p {
     font-family: "Noto Sans KR";
-    font-size: 16px;
+    font-size: 14px;
     font-style: normal;
     font-weight: 300;
     line-height: normal;
     letter-spacing: -0.6px;
+    line-height: 1;
   }
 }
 </style>

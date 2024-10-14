@@ -28,7 +28,7 @@ export default createVuetify({
           'field-input-padding-bottom': '8px',
           'field-border-opacity': '0.2',
           'table-row-height': '68px',
-          'activated-opacity': '0.2'
+          'activated-opacity': '0.1',
           
         },
         colors: {
