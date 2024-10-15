@@ -23,22 +23,22 @@ const unitTestList = ref<Partial<ITestUnit>[]>(
       ? props.editVersionInfo?.testUnits
       : []
     : // : [{ unitDesc: "" }],
-      [],
+    [],
 );
 
 const initialState = !!props.editFlag
   ? {
-      versionTitle: props.editVersionInfo?.versionTitle,
-      versionDesc: props.editVersionInfo?.versionDesc,
-      tag: props.editVersionInfo?.tag,
-      fileSrc: props.editVersionInfo?.fileSrc,
-    }
+    versionTitle: props.editVersionInfo?.versionTitle,
+    versionDesc: props.editVersionInfo?.versionDesc,
+    tag: props.editVersionInfo?.tag,
+    fileSrc: props.editVersionInfo?.fileSrc,
+  }
   : {
-      versionTitle: "",
-      versionDesc: "버전 설명",
-      tag: "",
-      file: "",
-    };
+    versionTitle: "",
+    versionDesc: "버전 설명",
+    tag: "",
+    file: "",
+  };
 const state = reactive({
   ...initialState,
 });
@@ -86,25 +86,13 @@ const onSubmitNewVersion = () => {
 </script>
 <template>
   <form @submit.prevent="">
-    <v-text-field
-      :error-messages="v$.versionTitle.$errors.map((e) => e.$message).join(', ')"
-      density="compact"
-      placeholder="버전 제목"
-      prepend-inner-icon="mdi-xml"
-      variant="outlined"
-      @blur="v$.versionTitle.$touch"
-      @input="v$.versionTitle.$touch"
-      v-model="state.versionTitle"
-      :disabled="!!props.editFlag"
-    />
+    <v-text-field :error-messages="v$.versionTitle.$errors.map((e) => e.$message).join(', ')" density="compact"
+      placeholder="버전 제목" prepend-inner-icon="mdi-xml" variant="outlined" @blur="v$.versionTitle.$touch"
+      @input="v$.versionTitle.$touch" v-model="state.versionTitle" />
+    <!-- :disabled="!!props.editFlag" -->
 
-    <div
-      :class="{ focus: isEditorFocused }"
-      class="editor-con"
-      :tabindex="0"
-      @focus="onFocusEditorCon(true)"
-      @click="onFocusEditorCon(true)"
-    >
+    <div :class="{ focus: isEditorFocused }" class="editor-con" :tabindex="0" @focus="onFocusEditorCon(true)"
+      @click="onFocusEditorCon(true)">
       <p>
         <v-icon icon="mdi-text-box-multiple-outline"></v-icon>
         버전 설명
@@ -112,38 +100,19 @@ const onSubmitNewVersion = () => {
       <RichEditor v-model="state.versionDesc" :isEditorFocused="isEditorFocused" @onBlurEditorCon="onBlurEditorCon" />
     </div>
 
-    <v-text-field
-      :error-messages="v$.tag.$errors.map((e) => e.$message).join(', ')"
-      density="compact"
-      placeholder="Gitlab Url"
-      prepend-inner-icon="mdi-gitlab"
-      variant="outlined"
-      @blur="v$.tag.$touch"
-      @input="v$.tag.$touch"
-      v-model="state.tag"
-    />
+    <v-text-field :error-messages="v$.tag.$errors.map((e) => e.$message).join(', ')" density="compact"
+      placeholder="Gitlab Url" prepend-inner-icon="mdi-gitlab" variant="outlined" @blur="v$.tag.$touch"
+      @input="v$.tag.$touch" v-model="state.tag" />
     <a v-if="initialState.fileSrc" class="cur-file-btn" :href="initialState.fileSrc" target="_blank">현재 파일</a>
-    <v-file-input
-      label="파일 첨부(필요시)"
-      chips
-      density="compact"
-      variant="outlined"
-      @change="state.file = $event.target.files[0]"
-    ></v-file-input>
+    <v-file-input label="파일 첨부(필요시)" chips density="compact" variant="outlined"
+      @change="state.file = $event.target.files[0]"></v-file-input>
     <AddTestUnitForm v-model="unitTestList" />
-    <v-btn
-      color="blue"
-      size="large"
-      variant="tonal"
-      block
-      type="submit"
-      @click="
-        {
-          v$.$validate();
-          onSubmitNewVersion();
-        }
-      "
-    >
+    <v-btn color="blue" size="large" variant="tonal" block type="submit" @click="
+                        {
+      v$.$validate();
+      onSubmitNewVersion();
+    }
+      ">
       {{ props.editFlag ? "버전 수정" : "신규 버전 생성" }}
     </v-btn>
   </form>
@@ -155,6 +124,7 @@ form {
   flex-direction: column;
   gap: 10px;
   padding: 20px 0;
+
   // .cur-file-btn {}
   .editor-con {
     border: 1px solid #9d9d9d;
