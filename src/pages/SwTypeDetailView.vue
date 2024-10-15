@@ -173,7 +173,11 @@ const onSubmitNewVersion = async (
     modalStatus.openModalNewVersion = false;
     return onFetchSwVersionList(createSwVersion.swType.swTypeId);
   } catch (error) {
-    return alert("Error:Something wrong with creating new version");
+    if ((error as { statusCode: number; message: string; }).statusCode === 409) {
+      return alert("버전 제목이 중복됩니다.");
+    }
+
+    return alert("Error: 문제가 발생하였습니다. 다시 시도해주세요.");
   }
 };
 
@@ -210,8 +214,11 @@ const onSubmitEditVersion = async (
     modalStatus.openModalNewVersion = false;
     onFetchSwVersionList(route.params.id as string);
   } catch (error) {
-    console.log(error);
-    return alert("Error:Something wrong with editing version");
+    if ((error as { statusCode: number; message: string; }).statusCode === 409) {
+      return alert("버전 제목이 중복됩니다.");
+    }
+
+    return alert("Error: 문제가 발생하였습니다. 다시 시도해주세요.");
   }
 };
 
