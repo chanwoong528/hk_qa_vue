@@ -92,7 +92,8 @@ header {
 .service-home-card {
   display: flex;
   flex-direction: column;
-  box-shadow: none;
+  border: 1px solid rgb(41 106 230 / 30%);
+  box-shadow: 0px 0px 1px 2px rgba(0, 0, 0, 0.04), inset 0px 1px 2px 1px rgba(255, 255, 255, 1);
 
   .card-header {
     display: flex;

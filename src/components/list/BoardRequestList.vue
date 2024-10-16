@@ -18,7 +18,9 @@ const computedBoardList = computed(() => {
 });
 </script>
 <template>
-  <v-list lines="two">
+  <v-list 
+      lines="two" 
+      rounded-md>
     <v-list-item v-if="computedBoardList.length < 1">게시글이 없습니다.</v-list-item>
 
     <v-list-item
@@ -26,6 +28,7 @@ const computedBoardList = computed(() => {
       :key="board.boardId"
       :title="board.title"
       link
+      rounded-md
       :to="`/board/${board.boardId}`"
     >
       <v-list-item-subtitle class="subtitle">
@@ -45,5 +48,8 @@ const computedBoardList = computed(() => {
   display: flex;
   justify-content: space-between;
   margin-top: 4px;
+}
+.v-list-item {
+  border-bottom:1px solid #ddd;
 }
 </style>

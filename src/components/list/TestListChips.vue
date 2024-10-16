@@ -39,7 +39,7 @@ const sortedTestSessions = computed(() => {
     <div class="tester-con">
       <p>현재 테스터</p>
       <v-chip v-for="tester in sortedTestSessions " :class="tester.user.id === loggedInUser?.id ? ' on' : ''"
-        class="mr-2 mb-2" :variant="tester.user.id === loggedInUser?.id ? 'tonal' : 'outlined'" label
+        class="mr-2 mb-2" :variant="tester.user.id === loggedInUser?.id ? 'tonal' : 'tonal'"
         :color="renderTestStatus(tester.status as E_TestStatus)" @click.stop="onClickLoggedInUserStatus(tester)">
         <v-icon icon="mdi-account-circle-outline" start></v-icon>
         {{ tester.user.id === loggedInUser?.id ? "me" : tester.user.username }}
@@ -77,7 +77,15 @@ const sortedTestSessions = computed(() => {
   }
 
 }
-
+.tester-con {
+  padding-top: 20px;
+  padding-bottom: 6px;
+  border-bottom:1px dashed #ddd;
+  p {
+    padding-bottom:10px;
+    font-weight: 500;
+  }
+}
 
 .chart-con {
   display: flex;

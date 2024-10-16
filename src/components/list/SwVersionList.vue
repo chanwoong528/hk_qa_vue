@@ -304,11 +304,11 @@ const onSubmitAddTesters = (testers: IUserInfo[]) => {
   </ModalWrap>
   <!-- Detail Modal for Specific Version -->
 
-  <section class="version-list-con">
+  <section class="version-list-con box-wrap">
     <header>
       <h4>진행중인 버전</h4>
     </header>
-    <v-expansion-panels v-model="panelOpened">
+    <v-expansion-panels v-model="panelOpened" flat variant="accordion">
       <SwVersionItem v-for="(swVersion, idx) in props.swVersionList?.filter((ver) => {
         if (
           !ver.testSessions.every((tester) => tester.status === E_TestStatus.passed) ||
@@ -321,7 +321,7 @@ const onSubmitAddTesters = (testers: IUserInfo[]) => {
         @onClickEditVersion="onClickEditVersion" />
     </v-expansion-panels>
   </section>
-  <section class="version-list-con finished" v-if="(props.swVersionList ?? []).filter((ver) => {
+  <section class="version-list-con finished box-wrap" v-if="(props.swVersionList ?? []).filter((ver) => {
     if (ver.testSessions.every((tester) => tester.status === E_TestStatus.passed) && ver.testSessions.length > 0)
       return ver;
   }).length > 0
@@ -329,7 +329,7 @@ const onSubmitAddTesters = (testers: IUserInfo[]) => {
     <header>
       <h4>종료된 버전</h4>
     </header>
-    <v-expansion-panels v-model="panelOpened">
+    <v-expansion-panels v-model="panelOpened" flat variant="accordion">
       <SwVersionItem v-for="(swVersion, idx) in props.swVersionList?.filter((ver) => {
         if (ver.testSessions.every((tester) => tester.status === E_TestStatus.passed) && ver.testSessions.length > 0)
           return ver;
@@ -345,20 +345,29 @@ const onSubmitAddTesters = (testers: IUserInfo[]) => {
 .version-list-con {
   position: relative;
   z-index: 1;
-  padding: 20px 0;
+  padding: 0px 0;
+  border-top: 2px solid #296ae5;
 
   &.finished {
     z-index: 0;
+    margin-top: 30px;
+    border-top-color: #4b5a61;
   }
 
   header {
+    position: relative;
+    z-index: 2;
+    padding: 12px 22px;
+    border-bottom: 1px solid #dbdbdb;
+    box-shadow: 0px 1px 1px 1px rgba(0, 0, 0, 0.04);
     h4 {
       font-size: 20px;
-      font-weight: 700;
-      padding-bottom: 10px;
+      font-weight: 500;
     }
   }
 }
+    
+
 
 // .tab-window {
 //   // min-height: 400px;

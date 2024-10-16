@@ -11,5 +11,6 @@
 .main-layout {
   padding: 20px 32px 60px;
   max-width: 1920px;
+  min-width: 1400px;
 }
 </style>
