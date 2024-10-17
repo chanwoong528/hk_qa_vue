@@ -35,7 +35,7 @@ const initialState = !!props.editFlag
   }
   : {
     versionTitle: "",
-    versionDesc: "버전 설명",
+    versionDesc: "<br/>",
     tag: "",
     file: "",
   };
@@ -108,7 +108,7 @@ const onSubmitNewVersion = () => {
       @change="state.file = $event.target.files[0]"></v-file-input>
     <AddTestUnitForm v-model="unitTestList" />
     <v-btn color="blue" size="large" variant="tonal" block type="submit" @click="
-                        {
+                                {
       v$.$validate();
       onSubmitNewVersion();
     }
