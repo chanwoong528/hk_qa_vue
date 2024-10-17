@@ -307,16 +307,16 @@ const onSubmitNewBoard = (boardParam: BoardClass) => {
         </v-btn>
       </div>
     </header>
-    <section v-if="loggedInUser?.role !== E_Role.tester" class="maintainer-con">
-      <header>
-        <h4>Maintainer</h4>
-      </header>
-      <div>
-        <v-chip v-for="maintainer in maintainerList" :class="maintainer.id === loggedInUser?.id ? ' on' : ''"
+    <section v-if="loggedInUser?.role !== E_Role.tester" class="maintainer-con box-wrap">
+        <header>
+          <h4>Maintainer</h4>
+        </header>
+        <div class="maintainer-chips">
+        <v-chip variant="tonal" color="blue-grey-darken-3" v-for="maintainer in maintainerList" :class="maintainer.id === loggedInUser?.id ? ' on' : ''"
           class="mr-2 mb-2" :variant="maintainer.id === loggedInUser?.id ? 'tonal' : 'outlined'" label>
           {{ maintainer.id === loggedInUser?.id ? "me" : maintainer.username }}
         </v-chip>
-      </div>
+        </div>
     </section>
     <div class="content-con">
       <div class="list-con">
@@ -324,35 +324,37 @@ const onSubmitNewBoard = (boardParam: BoardClass) => {
           @onSubmitStatus="onSubmitStatus" @onClickEditVersion="onClickEditVersion" />
       </div>
       <section class="list-con">
-        <div class="board-con-header">
-          <v-tabs v-model="curTab" color="primary">
-            <v-tab v-for="tab in tabs" :key="tab" :value="tab">
-              {{ tab }}
-            </v-tab>
-          </v-tabs>
-          <v-btn color="primary" @click="() => {
-            modalStatus.openModalNewBoard = true;
-          }
-            ">
-            새로운 게시글 등록
-            <v-icon icon="mdi-plus"></v-icon>
-          </v-btn>
+        <div class="board-con box-wrap">
+          <div class="board-con-header">
+            <v-tabs v-model="curTab" color="primary">
+              <v-tab v-for="tab in tabs" :key="tab" :value="tab">
+                {{ tab }}
+              </v-tab>
+            </v-tabs>
+            <v-btn color="primary" variant="tonal" flat @click="() => {
+              modalStatus.openModalNewBoard = true;
+            }
+              ">
+              새로운 게시글 등록
+              <v-icon icon="mdi-plus"></v-icon>
+            </v-btn>
+          </div>
+          <v-card flat>
+            <v-tabs-window v-model="curTab">
+
+              <v-tabs-window-item :value="tabs[0]">
+                <BoardRequestList :boardList="boardList" :curTab="curTab" />
+                <v-pagination v-model="boardPageInfo.page" :length="boardPageInfo.totalPage" class="my-4" size="small"></v-pagination>
+              </v-tabs-window-item>
+
+              <v-tabs-window-item :value="tabs[1]">
+                <BoardRequestList :boardList="boardList" :curTab="curTab" />
+                <v-pagination v-model="boardPageInfo.page" :length="boardPageInfo.totalPage" class="my-4" size="small"></v-pagination>
+              </v-tabs-window-item>
+
+            </v-tabs-window>
+          </v-card>
         </div>
-        <v-card>
-          <v-tabs-window v-model="curTab">
-
-            <v-tabs-window-item :value="tabs[0]">
-              <BoardRequestList :boardList="boardList" :curTab="curTab" />
-              <v-pagination v-model="boardPageInfo.page" :length="boardPageInfo.totalPage" class="my-4"></v-pagination>
-            </v-tabs-window-item>
-
-            <v-tabs-window-item :value="tabs[1]">
-              <BoardRequestList :boardList="boardList" :curTab="curTab" />
-              <v-pagination v-model="boardPageInfo.page" :length="boardPageInfo.totalPage" class="my-4"></v-pagination>
-            </v-tabs-window-item>
-
-          </v-tabs-window>
-        </v-card>
       </section>
     </div>
   </DefaultLayout>
@@ -368,33 +370,57 @@ const onSubmitNewBoard = (boardParam: BoardClass) => {
     display: flex;
     gap: 10px;
   }
+  h3 {
+    font-size: 24px;
+    font-weight: 500;
+  }
 }
 
 .maintainer-con {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding-bottom: 10px;
+  flex-direction: row;
+  align-items: center;
+  gap: 14px;
+  padding:14px 0 6px 24px;
+  h4 {
+    padding-bottom:10px;
+  }
+  .maintainer-chips {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
 }
 
 .content-con {
   display: flex;
   gap: 40px;
+  margin-top:40px;
 
   .list-con {
-    flex: 1;
+    width: calc(40% - 40px);
+    &:first-child {
+      width: 60%;
+      flex-shrink: 0;
+    }
   }
-
+  .board-con {
+    padding:0;
+  }
   .board-con-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 20px;
-
-    button {
-      font-size: 16px;
-      font-weight: 700;
+    padding-right:20px;
+    border-bottom:1px solid #ddd;
+    .v-tabs {
+      button {
+        font-size: 16px;
+        font-weight: 500;
+        letter-spacing: -0.006em;
+      }
     }
+    
   }
 }
 </style>

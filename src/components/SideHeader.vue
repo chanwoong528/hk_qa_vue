@@ -15,7 +15,7 @@ import NewServiceForm from "@/components/form/NewServiceForm.vue";
 import { watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
-import HIQ_LOGO from "@/assets/hiq_logo_text_black.svg";
+import HIQ_LOGO from "@/assets/logo_q_3.png";
 
 const route = useRoute();
 const router = useRouter();
@@ -80,8 +80,8 @@ const onSubmitNewService = (title: string, desc: string) => {
     <NewServiceForm @onSubmitNewService="onSubmitNewService" />
   </ModalWrap>
   <v-navigation-drawer permanent>
-    <v-list v-model:opened="openGroups">
-      <v-list-item>
+    <v-list v-model:opened="openGroups" class="navigation-list">
+      <v-list-item class="logo-wrap">
         <div class="title-wrap">
           <v-list-item-title>
             <h1>
@@ -96,22 +96,19 @@ const onSubmitNewService = (title: string, desc: string) => {
             variant="outlined"
             color="primary"
             @click="openNewServiceModal = true"
+            class="service-create"
           >
-            서비스 등록
+            서비스
             <v-icon icon="mdi-plus"></v-icon>
           </v-btn>
         </div>
-        <v-list-item-subtitle>
-          {{ loggedInUser?.username }}
-        </v-list-item-subtitle>
-        <div class="side-ctrl-con">
-          <p>{{ loggedInUser?.role }}</p>
-          <v-btn variant="plain" icon="mdi-logout-variant" color="error" @click="onClickLogout"> </v-btn>
-        </div>
       </v-list-item>
 
-      <v-divider />
-
+      <div class="user-wrap">
+        <div class="user-state">{{ loggedInUser?.role.substr(0,1) }}</div> {{ loggedInUser?.username }} 
+        <v-btn variant="plain" icon="mdi-logout-variant" color="error" @click="onClickLogout" />
+      </div>
+      <div class="navItem-wrap">
       <template v-for="navItem in computedNavList">
         <v-list-item
           :key="navItem.label"
@@ -121,7 +118,6 @@ const onSubmitNewService = (title: string, desc: string) => {
         >
           {{ navItem.label }}
         </v-list-item>
-
         <v-list-group v-else-if="!!(navItem.code === 'SW Type Detail')" v-model="openGroups" :value="navItem.label">
           <template v-slot:activator="{ props }">
             <v-list-item v-bind="props" :title="navItem.label"></v-list-item>
@@ -138,25 +134,79 @@ const onSubmitNewService = (title: string, desc: string) => {
           </v-list-item>
         </v-list-group>
       </template>
+      </div>
     </v-list>
   </v-navigation-drawer>
 </template>
 
 <style lang="scss" scoped>
+.logo-wrap { 
+  background: #296ae5;
+}
+.navItem-wrap {
+  padding: 0 12px 0 11px;
+  .v-list-item {
+    margin: 8px 0;
+  }
+}
+.navigation-list {
+  padding: 0px;
+}
+.v-list-item--active {
+  color: rgba(41, 106 ,229);
+  border-radius: 8px !important;
+}
+.v-list-item--active .v-list-item__overlay, 
+.v-list-item[aria-haspopup=menu][aria-expanded=true] .v-list-item__overlay {
+  color: #fff;
+  text-shadow: 1px 1px 1px rgba(0, 0 ,0, 0.2);
+}
 .title-wrap {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 20px;
+  gap: 5px;
+  flex-direction: column;
+  padding: 30px 30px 10px 0;
+  .service-create {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    background: #fff;
+  }
   h1 {
+    width: 160px;
     img {
       width: 100%;
     }
   }
 }
-.side-ctrl-con {
+
+.user-wrap {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: center;
+  background: #fff;
+  padding: 14px 10px 10px 10px;
+
+  .user-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    background: rgb(201 206 215 / 40%);
+    border-radius: 100%;
+    padding: 10px;
+    overflow: hidden;
+    text-transform: capitalize;
+    font-weight: 600;
+    font-size: 14px;
+    margin-right: 8px;
+    color: #475569
+  }
+}
+.v-navigation-drawer {
+  box-shadow: 1px 1px 2px 1px rgba(0, 0, 0, 0.06);
 }
 </style>

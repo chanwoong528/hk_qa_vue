@@ -85,21 +85,21 @@ export function countReactions(reactions: IReaction[]): Record<string, number> {
 export const renderIconForVersionStatus = (status: E_TestStatus) => {
   switch (status) {
     case E_TestStatus.failed:
-      return "mdi-close-circle";
+      return "Failed";
     case E_TestStatus.passed:
-      return "mdi-check";
+      return "Completed";
     default:
-      return "mdi-alert-circle";
+      return "in progress";
   }
 };
 
 export const renderTestStatus = (type: E_TestStatus) => {
   switch (type) {
     case E_TestStatus.failed:
-      return "error";
+      return "red";
     case E_TestStatus.passed:
-      return "teal";
+      return "green";
     default:
-      return "warning";
+      return "deep-orange";
   }
 };

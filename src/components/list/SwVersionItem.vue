@@ -160,24 +160,15 @@ const onSubmitDueDate = () => {
 
 <template>
   <v-expansion-panel v-if="itemType === 'panel'" :value="props.swVersion?.swVersionId">
-    <v-expansion-panel-title>
+    <v-expansion-panel-title variant = "tonal">
       <div class="title-header">
         <h3>
           {{ props.swVersion?.versionTitle }}
         </h3>
-        <div class="title-header--left">
-          <p v-if="!!props.swVersion?.createdAt" class="date">
-            {{ formatDateTime(props.swVersion?.createdAt) }}
-          </p>
-          <p class="author">
-            {{ props.swVersion?.user.username }}
-          </p>
-        </div>
       </div>
       <template v-slot:actions="{ expanded }">
-        <v-icon :icon="!!expanded ? 'mdi-minus' : 'mdi-plus'"></v-icon>
-        <v-icon :color="renderTestStatus(testSessionsPassStatus)"
-          :icon="renderIconForVersionStatus(testSessionsPassStatus)"></v-icon>
+        <v-chip  size="small" :color="renderTestStatus(testSessionsPassStatus)">{{renderIconForVersionStatus(testSessionsPassStatus)}}</v-chip>
+        <v-icon  size="x-large" :icon="!!expanded ? 'mdi-chevron-up' : 'mdi-chevron-down'"></v-icon>
       </template>
     </v-expansion-panel-title>
 
@@ -185,37 +176,38 @@ const onSubmitDueDate = () => {
       <div class="desc-wrap">
 
         <div class="edit-btn-con">
-
-
-
-          <div>
-            <v-btn class="edit-btn" variant="outlined" @click.stop="openCalender = true">
-              <template v-if="!selectedDate">
-                <v-icon class="mdi mdi-calendar-check" start></v-icon>
-                마감일
-              </template>
-              <template v-else> Due: {{ formatDate(selectedDate) }} </template>
-            </v-btn>
-            <div class="date-picker" v-if="!!openCalender" @click.stop>
-              <v-btn class="close-btn" icon="mdi-close" @click="openCalender = false" variant="plain"></v-btn>
-              <v-date-picker v-model="selectedDate" show-adjacent-months> </v-date-picker>
-              <v-btn variant="plain" @click="onSubmitDueDate">ok</v-btn>
-            </div>
+          <div class="title-header--left">
+            <p v-if="!!props.swVersion?.createdAt" class="date">
+              <strong>생성 :</strong> {{ formatDateTime(props.swVersion?.createdAt) }}
+            </p>
+            <p class="author">
+             <strong>만든이 :</strong> {{ props.swVersion?.user.username }}
+            </p>
           </div>
-
-          <v-btn class="edit-btn" variant="outlined" @click.stop="onClickEditVersion">
-            <v-icon class="mdi mdi-application-edit" start></v-icon>
-            수정
-          </v-btn>
-
-          <v-snackbar :timeout="2000" color="blue-grey" rounded="pill">
+          <v-snackbar :timeout="2000" rounded="pill">
             <template v-slot:activator="{ props }">
-              <v-btn v-bind="props" variant="tonal" @click.stop="copyToClipboard" icon size="small">
-                <v-icon class="mdi mdi-link-variant"></v-icon>
+              <v-btn v-bind="props" variant="tonal" @click.stop="copyToClipboard" size="small" color="blue-grey" >
+                <v-icon class="mdi mdi-link-variant" size="large"></v-icon>
               </v-btn>
             </template>
             복사되었습니다.
           </v-snackbar>
+          <v-btn class="edit-btn" variant="tonal" color="primary" size="small" @click.stop="openCalender = true">
+            <template v-if="!selectedDate">
+              <v-icon class="mdi mdi-calendar-check" start></v-icon>
+              마감일
+            </template>
+            <template v-else> Due: {{ formatDate(selectedDate) }} </template>
+          </v-btn>
+          <div class="date-picker" v-if="!!openCalender" @click.stop>
+            <v-btn class="close-btn" icon="mdi-close" @click="openCalender = false" variant="plain"></v-btn>
+            <v-date-picker v-model="selectedDate" show-adjacent-months> </v-date-picker>
+            <v-btn variant="plain" @click="onSubmitDueDate">ok</v-btn>
+          </div>
+          <v-btn class="edit-btn" variant="tonal" color="primary" size="small" @click.stop="onClickEditVersion">
+            <v-icon class="mdi mdi-application-edit" start></v-icon>
+            수정
+          </v-btn>
         </div>
         <div class="desc-inner-html" v-html="props.swVersion?.versionDesc" />
       </div>
@@ -224,16 +216,15 @@ const onSubmitDueDate = () => {
       <UnitTestList :swVersion="props.swVersion" />
 
       <div class="version-ctrl-con">
-        <v-divider :thickness="2"></v-divider>
         <TestListChips :swVersion="props.swVersion" @onClickLoggedInUserStatus="onClickLoggedInUserStatus" />
 
         <div class="modify-tester-btn-con">
           <v-btn v-if="loggedInUser?.role !== E_Role.tester" @click.stop="onClickAddTester"
-            class="text-none text-subtitle-1" variant="outlined">
+            class="text-none text-subtitle-1" variant="tonal" color="primary" >
             <v-icon icon="mdi-account-multiple-plus" start></v-icon>
             테스터 관리
           </v-btn>
-          <v-btn @click.stop="onClickDetailView" class="text-none text-subtitle-1" variant="outlined">
+          <v-btn @click.stop="onClickDetailView" class="text-none text-subtitle-1" variant="flat" color="grey-lighten-3">
             상세보기
             <v-icon icon="mdi-dots-horizontal-circle-outline" end></v-icon>
           </v-btn>
@@ -272,7 +263,17 @@ const onSubmitDueDate = () => {
     bottom: 0;
   }
 }
-
+.title-header--left {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  font-size: 14px;
+  padding-right: 6px;
+  strong {
+    font-weight: 500;
+    color: #000;
+  }
+}
 .modify-tester-btn-con {
   display: flex;
   justify-content: space-between;
@@ -288,15 +289,40 @@ const onSubmitDueDate = () => {
 
   margin-top: 20px;
 }
+.v-expansion-panel--active > .v-expansion-panel-title:not(.v-expansion-panel-title--static) {
+  min-height: 54px;
+  background: #f4f8ff;
+  border-bottom-style: solid;
+  h3 {
+    opacity: 1;
+  }
+}
 
+.v-expansion-panel {
+  &:last-child:not(.v-expansion-panel--active) {
+    .v-expansion-panel-title {
+      border-bottom-width: 0;
+    }
+  }
+}
 .v-expansion-panel-title {
-  background-color: #ececec;
-
+  border-bottom:1px dashed rgb(221 221 221 / 80%) ;
+  padding-right:24px;
+  min-height: 54px;
+  
+  .v-chip {
+    margin-right: 8px;
+  }
   .title-header {
     width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: center;
+  
+    h3 {
+      font-weight: 500;
+      opacity: 0.8;
+    }
 
     &--left {
       padding: 0 8px;
@@ -319,7 +345,11 @@ const onSubmitDueDate = () => {
     // }
   }
 }
-
+.v-expansion-panel-text {
+    padding: 10px 2px;
+    border-bottom:1px solid #ddd;
+  
+}
 .desc-wrap {
   position: relative;
   padding-top: 40px;
@@ -355,8 +385,9 @@ const onSubmitDueDate = () => {
   .desc-inner-html {
     overflow: hidden;
     max-height: 300px;
-    margin: 20px 0;
-
+    padding: 20px;
+    background: #f9f9f9;
+    min-height: 200px;
     &.expand {
       max-height: none;
 

@@ -100,7 +100,7 @@ const emit = defineEmits(["onChangeSelectRole", "onChangeUserStatus"]);
       clear-icon="mdi-close-circle"
       label="유저 검색"
       type="text"
-      variant="filled"
+      variant="outlined"
       clearable
       @click:clear="serachUserTerm = ''"
     >
@@ -117,11 +117,13 @@ const emit = defineEmits(["onChangeSelectRole", "onChangeUserStatus"]);
       :sort-by="[{ key: 'createdAt', order: 'asc' }]"
     >
       <template v-slot:item.actions="{ item }">
+        <div class="action-wrap">
         <v-select
           v-model="item.role"
           :items="Object.values(E_Role)"
           @update:modelValue="emit('onChangeSelectRole', item.id, item.role)"
           hide-details
+          variant="outlined"
         >
         </v-select>
         <v-select
@@ -129,7 +131,9 @@ const emit = defineEmits(["onChangeSelectRole", "onChangeUserStatus"]);
           :items="Object.values(E_UserStatus)"
           @update:modelValue="emit('onChangeUserStatus', item.id, item.userStatus)"
           hide-details
+          variant="outlined"
         ></v-select>
+        </div>
       </template>
       <template v-slot:item.verification="{ item }">
         <v-btn v-if="item.userStatus !== E_UserStatus.ok" @click="onClickSendVerificationEmail(item.email)"
@@ -147,7 +151,20 @@ const emit = defineEmits(["onChangeSelectRole", "onChangeUserStatus"]);
 </template>
 
 <style scoped>
+
+
+
 .serach-user {
   max-width: 400px;
+  float: right;
+  min-width: 400px;
 }
+.action-wrap {
+  display: flex;
+  gap: 6px;
+  .v-select {
+    width: 100%;
+  }
+}
+
 </style>

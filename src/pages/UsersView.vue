@@ -55,8 +55,9 @@ const onSubmitAddUser = (
     <AddUserForm @submitUser="onSubmitAddUser" />
   </ModalWrap>
   <DefaultLayout>
+    <div class="box-wrap">
     <header class="user-header">
-      <h3>User Management</h3>
+      <h3>유저 관리</h3>
       <v-btn
         v-if="loggedInUser?.role !== E_Role.tester"
         variant="elevated"
@@ -72,13 +73,23 @@ const onSubmitAddUser = (
       @onChangeSelectRole="onChangeSelectRole"
       @onChangeUserStatus="onChangeUserStatus"
     />
+    </div>
   </DefaultLayout>
 </template>
 
 <style scoped>
 .user-header {
-  padding: 20px 0;
+  padding: 14px 24px 16px;
   display: flex;
   justify-content: space-between;
+  border-bottom: 1px solid #ddd ;
+  margin: 0 -24px;
+  margin-bottom: 14px;
+
+  h3 {
+    font-size: 24px;
+    font-weight: 600;
+  }
 }
+
 </style>

@@ -27,7 +27,7 @@ export default defineConfig({
       google: {
         families: [
           {
-            name: "Roboto",
+            name: "Noto Sans KR",
             styles: "wght@100;300;400;500;700;900",
           },
         ],
