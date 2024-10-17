@@ -308,15 +308,16 @@ const onSubmitNewBoard = (boardParam: BoardClass) => {
       </div>
     </header>
     <section v-if="loggedInUser?.role !== E_Role.tester" class="maintainer-con box-wrap">
-        <header>
-          <h4>Maintainer</h4>
-        </header>
-        <div class="maintainer-chips">
-        <v-chip variant="tonal" color="blue-grey-darken-3" v-for="maintainer in maintainerList" :class="maintainer.id === loggedInUser?.id ? ' on' : ''"
-          class="mr-2 mb-2" :variant="maintainer.id === loggedInUser?.id ? 'tonal' : 'outlined'" label>
+      <header>
+        <h4>Maintainer</h4>
+      </header>
+      <div class="maintainer-chips">
+        <v-chip color="blue-grey-darken-3" v-for="maintainer in maintainerList"
+          :class="maintainer.id === loggedInUser?.id ? ' on' : ''" class="mr-2 mb-2"
+          :variant="maintainer.id === loggedInUser?.id ? 'tonal' : 'outlined'" label>
           {{ maintainer.id === loggedInUser?.id ? "me" : maintainer.username }}
         </v-chip>
-        </div>
+      </div>
     </section>
     <div class="content-con">
       <div class="list-con">
@@ -344,12 +345,14 @@ const onSubmitNewBoard = (boardParam: BoardClass) => {
 
               <v-tabs-window-item :value="tabs[0]">
                 <BoardRequestList :boardList="boardList" :curTab="curTab" />
-                <v-pagination v-model="boardPageInfo.page" :length="boardPageInfo.totalPage" class="my-4" size="small"></v-pagination>
+                <v-pagination v-model="boardPageInfo.page" :length="boardPageInfo.totalPage" class="my-4"
+                  size="small"></v-pagination>
               </v-tabs-window-item>
 
               <v-tabs-window-item :value="tabs[1]">
                 <BoardRequestList :boardList="boardList" :curTab="curTab" />
-                <v-pagination v-model="boardPageInfo.page" :length="boardPageInfo.totalPage" class="my-4" size="small"></v-pagination>
+                <v-pagination v-model="boardPageInfo.page" :length="boardPageInfo.totalPage" class="my-4"
+                  size="small"></v-pagination>
               </v-tabs-window-item>
 
             </v-tabs-window>
@@ -370,6 +373,7 @@ const onSubmitNewBoard = (boardParam: BoardClass) => {
     display: flex;
     gap: 10px;
   }
+
   h3 {
     font-size: 24px;
     font-weight: 500;
@@ -381,10 +385,12 @@ const onSubmitNewBoard = (boardParam: BoardClass) => {
   flex-direction: row;
   align-items: center;
   gap: 14px;
-  padding:14px 0 6px 24px;
+  padding: 14px 0 6px 24px;
+
   h4 {
-    padding-bottom:10px;
+    padding-bottom: 10px;
   }
+
   .maintainer-chips {
     display: flex;
     flex-direction: row;
@@ -395,24 +401,28 @@ const onSubmitNewBoard = (boardParam: BoardClass) => {
 .content-con {
   display: flex;
   gap: 40px;
-  margin-top:40px;
+  margin-top: 40px;
 
   .list-con {
     width: calc(40% - 40px);
+
     &:first-child {
       width: 60%;
       flex-shrink: 0;
     }
   }
+
   .board-con {
-    padding:0;
+    padding: 0;
   }
+
   .board-con-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-right:20px;
-    border-bottom:1px solid #ddd;
+    padding-right: 20px;
+    border-bottom: 1px solid #ddd;
+
     .v-tabs {
       button {
         font-size: 16px;
@@ -420,7 +430,7 @@ const onSubmitNewBoard = (boardParam: BoardClass) => {
         letter-spacing: -0.006em;
       }
     }
-    
+
   }
 }
 </style>
