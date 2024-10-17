@@ -24,7 +24,7 @@ const { swTypes } = storeToRefs(swStore);
 
 <style scoped lang="scss">
 .home-header {
-  padding: 20px 0 24px;
+  padding: 30px 0 30px;
   display: flex;
   /* justify-content: space-between; */
   flex-direction: column;

@@ -37,3 +37,13 @@
     display: flex;
     
   }
+  html, body {
+    letter-spacing: -0.006em;
+  }
+  .v-btn {
+    letter-spacing: -0.006em;
+  }
+
+  .v-pagination__item--is-active .v-btn__overlay {
+    opacity: 0.1
+  }

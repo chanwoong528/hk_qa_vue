@@ -21,7 +21,7 @@ export default createVuetify({
         dark: false,
         variables: {
           'border-color': '#d9e3ef',
-          'border-opacity' : '1',
+          'border-opacity' : '0.8',
           'high-emphasis-opacity': '1',
           'input-control-height': '26px',
           'field-input-padding-top': '8px',
@@ -35,9 +35,6 @@ export default createVuetify({
           primary: '#296ae5',
           background: '#f6f9ff',
           'on-surface': '#1e293b',
-          
-          
-          
         }
       }
     }

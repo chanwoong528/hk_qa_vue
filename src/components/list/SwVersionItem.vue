@@ -387,6 +387,7 @@ const onSubmitDueDate = () => {
     max-height: 300px;
     padding: 20px;
     background: #f9f9f9;
+    min-height: 200px;
     &.expand {
       max-height: none;
 

@@ -48,8 +48,20 @@ const computedBoardList = computed(() => {
   display: flex;
   justify-content: space-between;
   margin-top: 4px;
+  line-height: 1.4;
+  font-size: 13px;
+  opacity: 0.8;
+  margin-top: 5px;
+}
+.v-list-item-title {
+  opacity: 1;
+  font-weight: 600;
 }
 .v-list-item {
-  border-bottom:1px solid #ddd;
+  border-bottom:1px dashed #ddd;
+  
+}
+.v-list-item--density-default:not(.v-list-item--nav).v-list-item--two-line {
+  padding-inline-start:20px;
 }
 </style>

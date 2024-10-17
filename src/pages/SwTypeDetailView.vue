@@ -317,14 +317,14 @@ const onSubmitNewBoard = (boardParam: BoardClass) => {
           @onSubmitStatus="onSubmitStatus" @onClickEditVersion="onClickEditVersion" />
       </div>
       <section class="list-con">
-        <div class="box-wrap">
+        <div class="board-con box-wrap">
           <div class="board-con-header">
             <v-tabs v-model="curTab" color="primary">
               <v-tab v-for="tab in tabs" :key="tab" :value="tab">
                 {{ tab }}
               </v-tab>
             </v-tabs>
-            <v-btn color="primary" flat @click="() => {
+            <v-btn color="primary" variant="tonal" flat @click="() => {
               modalStatus.openModalNewBoard = true;
             }
               ">
@@ -337,12 +337,12 @@ const onSubmitNewBoard = (boardParam: BoardClass) => {
 
               <v-tabs-window-item :value="tabs[0]">
                 <BoardRequestList :boardList="boardList" :curTab="curTab" />
-                <v-pagination v-model="boardPageInfo.page" :length="boardPageInfo.totalPage" class="my-4"></v-pagination>
+                <v-pagination v-model="boardPageInfo.page" :length="boardPageInfo.totalPage" class="my-4" size="small"></v-pagination>
               </v-tabs-window-item>
 
               <v-tabs-window-item :value="tabs[1]">
                 <BoardRequestList :boardList="boardList" :curTab="curTab" />
-                <v-pagination v-model="boardPageInfo.page" :length="boardPageInfo.totalPage" class="my-4"></v-pagination>
+                <v-pagination v-model="boardPageInfo.page" :length="boardPageInfo.totalPage" class="my-4" size="small"></v-pagination>
               </v-tabs-window-item>
 
             </v-tabs-window>
@@ -397,19 +397,23 @@ const onSubmitNewBoard = (boardParam: BoardClass) => {
       flex-shrink: 0;
     }
   }
-
+  .board-con {
+    padding:0;
+  }
   .board-con-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin: 0 -24px;
     padding-right:20px;
     border-bottom:1px solid #ddd;
-
-    button {
-      font-size: 16px;
-      font-weight: 500;
+    .v-tabs {
+      button {
+        font-size: 16px;
+        font-weight: 500;
+        letter-spacing: -0.006em;
+      }
     }
+    
   }
 }
 </style>
