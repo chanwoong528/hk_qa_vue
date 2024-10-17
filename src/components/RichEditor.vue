@@ -10,8 +10,6 @@ import MagicUrl from "quill-magic-url";
 
 import { E_EditorType } from "@/types/enum.d";
 
-import "@vueup/vue-quill/dist/vue-quill.snow.css";
-import "@vueup/vue-quill/dist/vue-quill.bubble.css";
 
 
 Quill.register('modules/magicUrl', MagicUrl);
@@ -126,7 +124,6 @@ import 'quill/dist/quill.snow.css';
 </script>
 
 <template>
-  {{ isEditorFocused }}
   <div class="editor-wrap" @blur="onBlur">
     <div ref="quillEditor" class="quill-editor" :class="props.editorType === E_EditorType.comment
       ? !!props.isEditorFocused
