@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { PropType, ref, watch, onMounted, onBeforeUnmount } from "vue";
 import Quill from 'quill';
-// import { QuillEditor } from "@vueup/vue-quill";
 
 import ImageCompress from "quill-image-compress";
 import QuillResizeImage from "quill-resize-image";
+import QuillImageDropAndPaste from 'quill-image-drop-and-paste'
 
 import MagicUrl from "quill-magic-url";
 
@@ -14,6 +14,7 @@ import { E_EditorType } from "@/types/enum.d";
 
 Quill.register('modules/magicUrl', MagicUrl);
 Quill.register('modules/imageCompress', ImageCompress);
+Quill.register('modules/imageDropAndPaste', QuillImageDropAndPaste)
 Quill.register('modules/resizeImage', QuillResizeImage);
 
 
@@ -53,14 +54,21 @@ onMounted(() => {
         }
 
       },
+      imageDropAndPaste: {
+        // add an custom image handler
+        handler: () => {
+          //do nothing
+          return;
+        },
+      },
       magicUrl: true,
       imageCompress: {
-        quality: 0.7, // default
-        maxWidth: 800, // default
-        maxHeight: 800, // default
+        quality: 0.9, // default
+        maxWidth: 1200, // default
+        maxHeight: 1200, // default
         imageType: 'image/jpeg', // default
-        debug: true, // default
-        handleOnPaste: false, //default 
+        debug: process.env.NODE_ENV === 'dev',
+        handleOnPaste: true, //default 
 
       },
       resizeImage: {
@@ -76,6 +84,7 @@ onMounted(() => {
     // console.log('Content:', (quillInstance as Quill).root.innerHTML);
     modelValue.value = (quillInstance as Quill).root.innerHTML;
   });
+
 
   // blur handler
   quillInstance.on('selection-change', (range) => {
@@ -103,15 +112,15 @@ watch(
     }
   },
 );
-watch(
-  () => props.isEditorFocused,
-  (newVal) => {
-    if (!!newVal && !!quillInstance) {
-      // (editorRef.value as any).focus();
-      // quillInstance?.focus();
-    }
-  },
-);
+// watch(
+//   () => props.isEditorFocused,
+//   (newVal) => {
+//     if (!!newVal && !!quillInstance) {
+//       // (editorRef.value as any).focus();
+//       // quillInstance?.focus();
+//     }
+//   },
+// );
 const emit = defineEmits(["onBlurEditorCon"]);
 
 const onBlur = () => {
