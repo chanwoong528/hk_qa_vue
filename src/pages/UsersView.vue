@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
-import { storeToRefs } from "pinia";
+import { ref, onMounted } from 'vue';
+import { storeToRefs } from 'pinia';
 
-import { useUserStore } from "@/store/userStore";
-import { userApi } from "@/services/domain/userService";
+import { useUserStore } from '@/store/userStore';
+import { userApi } from '@/services/domain/userService';
 
-import type { IUserInfo } from "@/types/types";
-import { E_Role, E_UserStatus } from "@/types/enum.d";
+import type { IUserInfo } from '@/types/types';
+import { E_Role, E_UserStatus } from '@/types/enum.d';
 
-import DefaultLayout from "@/layout/DefaultLayout.vue";
-import UserList from "@/components/list/UserList.vue";
-import ModalWrap from "@/components/ModalWrap.vue";
-import AddUserForm from "@/components/form/AddUserForm.vue";
+import DefaultLayout from '@/layout/DefaultLayout.vue';
+import UserList from '@/components/list/UserList.vue';
+import ModalWrap from '@/components/ModalWrap.vue';
+import AddUserForm from '@/components/form/AddUserForm.vue';
 
 const userList = ref<IUserInfo[]>([]);
 const userStore = useUserStore();
@@ -22,17 +22,23 @@ const openModalNewUser = ref<boolean>(false);
 onMounted(() => fetchUsers());
 
 const fetchUsers = () => {
-  return userApi.GET_users("all").then((usersData) => {
+  return userApi.GET_users('all').then(usersData => {
     userList.value = usersData as IUserInfo[];
   });
 };
 
 const onChangeSelectRole = (id: string, role: E_Role) => {
-  userApi.PATCH_user({ id: id, role: role });
+  userApi.PATCH_user({
+    id: id,
+    role: role,
+  });
 };
 
 const onChangeUserStatus = (id: string, userStatus: E_UserStatus) => {
-  userApi.PATCH_user({ id: id, userStatus: userStatus });
+  userApi.PATCH_user({
+    id: id,
+    userStatus: userStatus,
+  });
 };
 
 const onToggleNewUser = () => {
@@ -40,11 +46,14 @@ const onToggleNewUser = () => {
 };
 
 const onSubmitAddUser = (
-  newUser: Partial<IUserInfo> & { username: string; email: string }
+  newUser: Partial<IUserInfo> & {
+    username: string;
+    email: string;
+  }
 ) => {
-  return userApi.POST_user(newUser).then((res) => {
+  return userApi.POST_user(newUser).then(res => {
     fetchUsers();
-    alert("New user added successfully!");
+    alert('New user added successfully!');
     openModalNewUser.value = false;
   });
 };
@@ -56,23 +65,23 @@ const onSubmitAddUser = (
   </ModalWrap>
   <DefaultLayout>
     <div class="box-wrap">
-    <header class="user-header">
-      <h3>유저 관리</h3>
-      <v-btn
-        v-if="loggedInUser?.role !== E_Role.tester"
-        variant="elevated"
-        color="primary"
-        @click="onToggleNewUser"
-      >
-        신규 유저 등록
-        <v-icon icon="mdi-plus"></v-icon>
-      </v-btn>
-    </header>
-    <UserList
-      :userList="userList"
-      @onChangeSelectRole="onChangeSelectRole"
-      @onChangeUserStatus="onChangeUserStatus"
-    />
+      <header class="user-header">
+        <h3>유저 관리</h3>
+        <v-btn
+          v-if="loggedInUser?.role !== E_Role.tester"
+          variant="elevated"
+          color="primary"
+          @click="onToggleNewUser"
+        >
+          신규 유저 등록
+          <v-icon icon="mdi-plus"></v-icon>
+        </v-btn>
+      </header>
+      <UserList
+        :userList="userList"
+        @onChangeSelectRole="onChangeSelectRole"
+        @onChangeUserStatus="onChangeUserStatus"
+      />
     </div>
   </DefaultLayout>
 </template>
@@ -82,7 +91,7 @@ const onSubmitAddUser = (
   padding: 14px 24px 16px;
   display: flex;
   justify-content: space-between;
-  border-bottom: 1px solid #ddd ;
+  border-bottom: 1px solid #ddd;
   margin: 0 -24px;
   margin-bottom: 14px;
 
@@ -91,5 +100,4 @@ const onSubmitAddUser = (
     font-weight: 600;
   }
 }
-
 </style>
