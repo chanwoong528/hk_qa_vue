@@ -10,11 +10,16 @@ module.exports = {
     node: true,
   },
   extends: [
-    'plugin:vue/vue3-essential',
-    'eslint:recommended',
-    '@vue/eslint-config-typescript',
+    "plugin:vue/vue3-essential",
+    "eslint:recommended",
+    "@vue/eslint-config-typescript",
+    "eslint-config-prettier",
   ],
+
+  plugins: ["@typescript-eslint", "import", "prettier"],
+
   rules: {
-    'vue/multi-word-component-names': 'off',
+    "vue/multi-word-component-names": "off",
+    "prettier/prettier": "error",
   },
-}
+};
