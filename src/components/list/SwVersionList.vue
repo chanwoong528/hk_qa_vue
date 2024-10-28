@@ -366,7 +366,6 @@ const onSubmitAddTesters = (testers: IUserInfo[]) => {
     }
   }
 }
-    
 
 
 // .tab-window {

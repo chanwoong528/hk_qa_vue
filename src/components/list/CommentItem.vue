@@ -141,8 +141,41 @@ const onClickReactionBtn = (btnType: E_ReactionType, parentId?: string) => {
           </v-chip>
 
         </li>
-        <li v-if="!props.child">
-          <v-chip color="primary" @click="onClickReply" variant="outlined">
+        <li v-if="!props.child" class="comment-btn-bottom">
+          <div class="comment-btn-con">
+            <v-btn v-if="!!props.comment?.childComments && props.comment?.childComments.length > 0"
+              @click="() => emit('toggleChildComments', comment?.commentId)" variant="plain">
+              <v-icon :icon="openChildComments ? 'mdi-menu-up-outline' : 'mdi-menu-down-outline'" prepend></v-icon>
+              답글 {{ comment?.childComments.length }}개
+
+            </v-btn>
+
+            <div class="comment-btn-control" v-if="loggedInUser?.id === props.comment?.user.id">
+
+              <v-btn class="reply-btn" v-if="!openEditorForEdit" variant="plain" color="primary" @click="onClickEdit">
+                <v-icon icon="mdi-pencil" prepend></v-icon>
+                수정
+              </v-btn>
+              <v-btn class="reply-btn" v-if="openEditorForEdit" variant="plain" color="success" @click="onSubmitEditComment">
+                <v-icon icon="mdi-content-save-outline" prepend></v-icon>
+                저장
+              </v-btn>
+
+
+              <v-btn class=" reply-btn" v-if="!openEditorForEdit" variant="plain" color="error" @click="onClickDeleteComment">
+                <v-icon icon="mdi-delete" prepend></v-icon>
+                삭제
+              </v-btn>
+              <v-btn class="reply-btn" v-if="openEditorForEdit" variant="tonal" color="error" @click="onClickEdit">
+                <v-icon icon="mdi-cancel" prepend></v-icon>
+                취소
+              </v-btn>
+
+
+            </div>
+          </div>
+
+          <v-chip @click="onClickReply" variant="tonal">
             <v-icon icon="mdi-arrow-right-bottom"></v-icon>
             답글
           </v-chip>
@@ -151,38 +184,7 @@ const onClickReactionBtn = (btnType: E_ReactionType, parentId?: string) => {
 
     </v-card>
 
-    <div class="comment-btn-con">
-      <v-btn v-if="!!props.comment?.childComments && props.comment?.childComments.length > 0"
-        @click="() => emit('toggleChildComments', comment?.commentId)" variant="plain">
-        <v-icon :icon="openChildComments ? 'mdi-menu-up-outline' : 'mdi-menu-down-outline'" prepend></v-icon>
-        답글 {{ comment?.childComments.length }}개
-
-      </v-btn>
-
-      <div class="comment-btn-control" v-if="loggedInUser?.id === props.comment?.user.id">
-
-        <v-btn class="reply-btn" v-if="!openEditorForEdit" variant="plain" color="primary" @click="onClickEdit">
-          <v-icon icon="mdi-pencil" prepend></v-icon>
-          수정
-        </v-btn>
-        <v-btn class="reply-btn" v-if="openEditorForEdit" variant="plain" color="success" @click="onSubmitEditComment">
-          <v-icon icon="mdi-content-save-outline" prepend></v-icon>
-          저장
-        </v-btn>
-
-
-        <v-btn class=" reply-btn" v-if="!openEditorForEdit" variant="plain" color="error" @click="onClickDeleteComment">
-          <v-icon icon="mdi-delete" prepend></v-icon>
-          삭제
-        </v-btn>
-        <v-btn class="reply-btn" v-if="openEditorForEdit" variant="tonal" color="error" @click="onClickEdit">
-          <v-icon icon="mdi-cancel" prepend></v-icon>
-          취소
-        </v-btn>
-
-
-      </div>
-    </div>
+    
 
     <div v-if="openEditorForReply" class="child-comment-con" @click="onFocusEditorCon(true)">
       <RichEditor :editorType="E_EditorType.comment" v-model="reCommentVal" :isEditorFocused="isEditorFocused"
@@ -197,6 +199,11 @@ const onClickReactionBtn = (btnType: E_ReactionType, parentId?: string) => {
 </template>
 
 <style scoped lang="scss">
+.comment-btn-bottom {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+}
 .comment-btn-con {
   display: flex;
   align-items: center;
@@ -214,18 +221,20 @@ const onClickReactionBtn = (btnType: E_ReactionType, parentId?: string) => {
 
 .comment-item {
   position: relative;
+  padding-left: 0 !important;
+  padding-top:0;
 
   .comment-card {
-    padding-bottom: 30px;
+    padding-bottom: 10px;
   }
 
   .reactions-con {
     display: flex;
-    position: absolute;
+    width: 100%;
     list-style: none;
     gap: 4px;
-    left: 10px;
-    bottom: 10px;
+    bottom: 6px;
+    padding: 0px 10px;
   }
 }
 
@@ -233,7 +242,8 @@ const onClickReactionBtn = (btnType: E_ReactionType, parentId?: string) => {
   display: flex;
   flex-direction: column;
   justify-content: end;
-  padding: 10px 2px 10px 16px;
+  border: 1px solid #ccc;
+  margin: 20px 14px;
 
   .reply-btn-con {
     display: flex;
@@ -250,13 +260,19 @@ const onClickReactionBtn = (btnType: E_ReactionType, parentId?: string) => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 16px;
-  font-weight: bold;
+  font-size: 14px;
+  font-weight: 500;
 
   .date {
-    font-size: 12px;
+
+    font-size: 13px;
     color: grey;
     margin-left: 10px;
+    font-weight: 400;
   }
+}
+.v-btn--variant-plain {
+  padding: 0;
+  height: auto;
 }
 </style>
