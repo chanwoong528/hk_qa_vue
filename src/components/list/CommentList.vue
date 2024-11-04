@@ -98,7 +98,7 @@ const toggleChildComments = (commentId: string) => {
     <RichEditor :editorType="E_EditorType.comment" v-model="commentVal" :isEditorFocused="isEditorFocused"
       @onBlurEditorCon="onBlurEditorCon" />
     <div class="comment-btn-con">
-      <v-btn @click="onSubmitComment">댓글</v-btn>
+      <v-btn @click="onSubmitComment" variant="tonal" color="primary">댓글</v-btn>
     </div>
   </div>
 
@@ -121,13 +121,12 @@ const toggleChildComments = (commentId: string) => {
 
 
     </v-list>
-    <v-btn v-if="!props.computedLastPage" @click="onClickLoadNextPage">Load More</v-btn>
+    <v-btn v-if="!props.computedLastPage" @click="onClickLoadNextPage" variant="tonal" color="primary">Load More</v-btn>
   </div>
 </template>
 
 <style scoped>
 .editor-con {
-  padding: 10px 0;
   display: flex;
   flex-direction: column;
 }

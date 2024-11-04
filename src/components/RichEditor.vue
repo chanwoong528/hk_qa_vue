@@ -144,13 +144,19 @@ import "quill/dist/quill.snow.css";
   display: flex;
   flex-direction: column;
 }
-
+.editor-con {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #666;
+}
 .editor-wrap {
   // position: relative;
 
   .ql-toolbar.ql-snow {
     border: none;
     z-index: 2;
+    padding: 3px;
+    box-shadow: 1px 1px 2px 1px rgba(0,0,0,0.14);
   }
 
   .ql-container.ql-snow {
@@ -160,6 +166,7 @@ import "quill/dist/quill.snow.css";
       height: 100%;
     }
   }
+
 
   &.comment-editor {
     border-bottom: 1px solid #999;
@@ -173,6 +180,65 @@ import "quill/dist/quill.snow.css";
 
     // .ql-toolbar.ql-snow {
     // }
+  }
+}
+.comment-btn-con {
+
+}
+
+.comment-list-con {
+  margin-top:20px;
+  border-top:1px solid #ddd;
+  .v-list {
+    padding-top: 0;
+  }
+  .v-card {
+    border: none;
+    border-bottom:1px solid #ddd;
+    border-radius: 0;
+    
+  }
+  .v-card--variant-tonal {
+    
+    background: #f7f7f7;
+    .v-card-item {
+      position: relative;
+      &:after {
+        content: "";
+        position: absolute;
+        width: calc(100% - 20px);
+        height: 1px;
+        left: 10px;
+        //border-bottom:1px dashed #ddd;
+        bottom:0;
+      }
+    }
+    .v-card-text {
+      padding-top:10px;
+    }
+    
+    .v-card__underlay {
+      opacity: 0;
+    }
+    
+  }
+  .v-card--variant-outlined {
+    .v-card-item {
+      position: relative;
+      padding: 8px 12px;
+      &:after {
+        content: "";
+        position: absolute;
+        width: calc(100% - 20px);
+        height: 1px;
+        left: 10px;
+        //border-bottom:1px dashed #ddd;
+        bottom:0;
+      }
+    }
+    .v-card-text {
+      padding-top:10px;
+    }
   }
 }
 </style>

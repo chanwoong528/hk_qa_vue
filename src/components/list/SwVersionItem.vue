@@ -285,9 +285,13 @@ const onSubmitDueDate = () => {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: flex-start;
   gap: 20px;
-
-  margin-top: 20px;
+  margin-top: 5px;
+  background: #f9f9f9;
+  padding: 14px;
+  min-height: 140px;
+  margin-bottom: 14px;
 }
 .v-expansion-panel--active > .v-expansion-panel-title:not(.v-expansion-panel-title--static) {
   min-height: 54px;
