@@ -5,7 +5,7 @@ import HomeView from "@/pages/HomeView.vue";
 import LoginView from "@/pages/LoginView.vue";
 import UsersView from "@/pages/UsersView.vue";
 import BoardDetailView from "@/pages/BoardDetailView.vue";
-// import SwTypeView from "@/pages/SwTypeView.vue";
+import SwTypeView from "@/pages/SwTypeView.vue";
 import SwTypeDetailView from "@/pages/SwTypeDetailView.vue";
 import VerifyView from "@/pages/VerifyView.vue";
 import ResetPwView from "@/pages/ResetPwView.vue";
@@ -55,16 +55,16 @@ export const NAV_LIST: NavItem[] = [
       hidden: true,
     },
   },
-  // {
-  //   path: "/sw-type",
-  //   component: SwTypeView,
-  //   label: "Services",
-  //   code:
-  //   meta: {
-  //     requiresAuth: true,
-  //     requiresMaster: true,
-  //   },
-  // },
+  {
+    path: "/sw-type",
+    component: SwTypeView,
+    label: "HK SW 목록",
+    code: "SW list",
+    meta: {
+      requiresAuth: true,
+      requiresMaster: true,
+    },
+  },
   {
     path: "/sw-type/:id",
     directTo: "/sw-type/",

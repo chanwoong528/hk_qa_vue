@@ -1,3 +1,4 @@
+import { JenkinsDeploymentClass } from "@/entity/JenkinsDeployment";
 import { E_ReactionParentType, E_ReactionType, E_TestStatus } from "./enum";
 
 export interface ILoginInfo {
@@ -24,8 +25,7 @@ export interface IUserInfo {
   refresh_token?: string;
 }
 
-export interface IUserUpdateInfo
-  extends Partial<Omit<IUserInfo, "access_token" | "refresh_token">> {
+export interface IUserUpdateInfo extends Partial<Omit<IUserInfo, "access_token" | "refresh_token">> {
   id: string;
   pw?: string;
 }
@@ -38,7 +38,8 @@ export interface ISwType {
   createdAt: string;
   updatedAt: string;
   user: IUserInfo;
-  swVersions: ISwVersion[]
+  swVersions: ISwVersion[];
+  jenkinsDeployments: JenkinsDeploymentClass[];
 }
 
 export interface ISwVersion {
