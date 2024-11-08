@@ -55,6 +55,8 @@ const curTab = ref<string>(tabs[0]);
 const submitErrorFlag = ref<boolean>(true);
 const swTypeInfo = ref<ISwType>();
 
+const jenkinsDeploymentLoading = ref<boolean>(false);
+
 onMounted(() => {
   Promise.all([
     onFetchMaintainerList(route.params.id as string),
@@ -263,6 +265,11 @@ const onSubmitNewBoard = (boardParam: BoardClass) => {
     onFetchBoardList(route.params.id as string, curTab.value === "요청 사항" ? "req" : "update");
   });
 };
+
+const onClickJenkinsDeployment = (jenkinsDeploymentId: string) => {
+  console.log("@@@@@@ ", jenkinsDeploymentId);
+  jenkinsDeploymentLoading.value = true;
+};
 </script>
 
 <template>
@@ -332,6 +339,32 @@ const onSubmitNewBoard = (boardParam: BoardClass) => {
         </v-chip>
       </div>
     </section>
+    <section
+      v-if="
+        loggedInUser?.role !== E_Role.tester &&
+        !!swTypeInfo?.jenkinsDeployments &&
+        swTypeInfo?.jenkinsDeployments.length > 0
+      "
+      class="maintainer-con box-wrap"
+    >
+      <header>
+        <h4>Jenkins</h4>
+      </header>
+      <div class="maintainer-chips">
+        <v-chip
+          color="blue-grey-darken-3"
+          v-for="deployment in swTypeInfo?.jenkinsDeployments"
+          class="mr-2 mb-2"
+          :disabled="jenkinsDeploymentLoading"
+          label
+          link
+          @click="onClickJenkinsDeployment(deployment.jenkinsDeploymentId)"
+        >
+          {{ deployment.title }}
+        </v-chip>
+      </div>
+    </section>
+
     <div class="content-con">
       <div class="list-con">
         <SwVersionList

@@ -1,12 +1,20 @@
 <script setup lang="ts">
-import type { ISwType } from "@/types/types";
-import { E_SwTypeListType } from "@/types/enum.d";
+import { storeToRefs } from "pinia";
+
 import { PropType, reactive, ref } from "vue";
 import ModalWrap from "../ModalWrap.vue";
 
 import AddJenkinsForm from "../form/AddJenkinsForm.vue";
 import { JenkinsDeploymentClass } from "@/entity/JenkinsDeployment";
 import { jenkinsDeploymentApi } from "@/services/domain/jenkinsDeploymentService";
+import { swApi } from "@/services/domain/swService";
+import { useSwStore } from "@/store/swStore";
+
+import type { ISwType } from "@/types/types";
+import { E_ModalType, E_SwTypeListType } from "@/types/enum.d";
+
+const swStore = useSwStore();
+// const { swTypes } = storeToRefs(swStore);
 
 const curSwTypeId = ref<string>("");
 const curJenkinsDeployment = ref<JenkinsDeploymentClass | null>(null);
@@ -62,24 +70,43 @@ const onEditJenkinsDeployment = (jenkinsDeployment: JenkinsDeploymentClass, swTy
   modalStatus.openAddJenkinsDeployment = true;
 };
 
+const onFetchSwTypes = () => {
+  return swApi.GET_sw().then(swListRes => {
+    return swStore.setSwTypes(swListRes as ISwType[]);
+  });
+};
+
+const onClickDeleteJenkinsDeployment = (jenkinsDeploymentId: string) => {
+  console.log("jenkinsDeploymentId", jenkinsDeploymentId);
+  jenkinsDeploymentApi.DELETE_jenkinsDeployment(jenkinsDeploymentId).then(res => {
+    onFetchSwTypes();
+    modalStatus.openAddJenkinsDeployment = false;
+  });
+};
+
 const onSubmitEditJenkinsDeployment = (jenkinsDeploymentParams: Partial<JenkinsDeploymentClass>) => {
-  console.log("jenkinsDeploymentParams", jenkinsDeploymentParams);
+  jenkinsDeploymentApi.PATCH_jenkinsDeployment(jenkinsDeploymentParams).then(res => {
+    onFetchSwTypes();
+    modalStatus.openAddJenkinsDeployment = false;
+  });
 };
 
 const onSubmitNewJenkinsDeployment = (jenkinsDeploymentParams: Partial<JenkinsDeploymentClass>) => {
-  console.log("jenkinsDeploymentParams", jenkinsDeploymentParams);
-
-  jenkinsDeploymentApi.POST_jenkinsDeployment(jenkinsDeploymentParams).then(res => {});
+  jenkinsDeploymentApi.POST_jenkinsDeployment(jenkinsDeploymentParams).then(res => {
+    onFetchSwTypes();
+    modalStatus.openAddJenkinsDeployment = false;
+  });
 };
 </script>
 
 <template>
-  <ModalWrap v-model="modalStatus.openAddJenkinsDeployment">
+  <ModalWrap v-model="modalStatus.openAddJenkinsDeployment" title="Jenkins Deployment" :type="E_ModalType.full">
     <AddJenkinsForm
       :swTypeId="curSwTypeId"
       :editJenkinsDeployment="curJenkinsDeployment || undefined"
       @onSubmitNewJenkinsDeployment="onSubmitNewJenkinsDeployment"
       @onSubmitEditJenkinsDeployment="onSubmitEditJenkinsDeployment"
+      @onClickDeleteJenkinsDeployment="onClickDeleteJenkinsDeployment"
     />
   </ModalWrap>
 
@@ -153,9 +180,14 @@ const onSubmitNewJenkinsDeployment = (jenkinsDeploymentParams: Partial<JenkinsDe
 
                 <v-tooltip activator="parent" location="end" max-width="300">
                   <div>
-                    <p>[{{ jenkinsDeployment.title }}]</p>
-                    <p>[{{ jenkinsDeployment.description }}]</p>
-                    <p>[{{ jenkinsDeployment.jenkinsUrl }}]</p>
+                    <p>
+                      <strong> 설명 :</strong><br />
+                      [{{ jenkinsDeployment.description }}]
+                    </p>
+                    <p>
+                      <strong> JenkinsUrl :</strong><br />
+                      [{{ jenkinsDeployment.jenkinsUrl }}]
+                    </p>
                   </div>
                 </v-tooltip>
               </v-list-item-title>

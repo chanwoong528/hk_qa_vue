@@ -16,7 +16,7 @@ const { swTypes } = storeToRefs(swStore);
       <h3>Service Management</h3>
     </header>
 
-    <SwList v-if="swTypes.length > 0" :sw-list="swTypes" />
+    <SwList v-if="swTypes.length > 0" :swList="swTypes" />
   </DefaultLayout>
 </template>
 

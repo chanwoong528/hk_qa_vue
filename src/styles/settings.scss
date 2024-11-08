@@ -9,74 +9,76 @@
 //   $color-pack: false
 // );
 
-@use 'vuetify/settings' with (
-    $body-font-family: 'Noto Sans KR',
-    $field-outline-opacity: .18,
-    $table-header-font-weight: 600,
-    $tabs-height : 58,
-    $list-border-color: '#ddd',
-    $list-border-style: 'solid',
-    $list-border-width: '1px',
-    $list-border-thin-width: '1px',
+@use "vuetify/settings" with (
+  $body-font-family: "Noto Sans KR",
+  $field-outline-opacity: 0.18,
+  $table-header-font-weight: 600,
+  $tabs-height: 58,
+  $list-border-color: "#ddd",
+  $list-border-style: "solid",
+  $list-border-width: "1px",
+  $list-border-thin-width: "1px"
 );
 
 .v-table thead tr th {
-    background: rgb(226 232 240 / 20%);
- }
+  background: rgb(226 232 240 / 20%);
+}
 
+.box-wrap {
+  background: #fff;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  box-shadow: rgba(15, 22, 36, 0.1) 0px 1px 3px 0px;
+  padding: 0px 24px;
+}
 
- .box-wrap {
-    background: #fff;
-    border-radius: 6px;
-    border: 1px solid #e2e8f0;
-    box-shadow: rgba(15, 22, 36, 0.1) 0px 1px 3px 0px;
-    padding: 0px 24px;
-  }
+.v-row > div {
+  display: flex;
+}
+html,
+body {
+  letter-spacing: -0.006em;
+}
+form {
+  padding: 20px 0;
+}
 
-  .v-row > div {
-    display: flex;
-    
-  }
-  html, body {
-    letter-spacing: -0.006em;
-  }
-  .v-btn {
-    letter-spacing: -0.006em;
-  }
+.v-btn {
+  letter-spacing: -0.006em;
+}
 
-  .v-pagination__item--is-active .v-btn__overlay {
-    opacity: 0.1
-  }
+.v-pagination__item--is-active .v-btn__overlay {
+  opacity: 0.1;
+}
 
-  .v-toolbar {
-    background-color: transparent;
-    box-shadow: 1px 1px 2px 2px rgba(0,0,0,0.1);
-    &-title__placeholder {
-      font-size: 22px;
-      font-weight: 500;
-      color: #296ae5;
-    }
+.v-toolbar {
+  background-color: transparent;
+  box-shadow: 1px 1px 2px 2px rgba(0, 0, 0, 0.1);
+  &-title__placeholder {
+    font-size: 22px;
+    font-weight: 500;
+    color: #296ae5;
   }
+}
 
-  
 .v-dialog {
   .v-slide-group {
-    margin-top:30px;
+    margin-top: 30px;
   }
   .v-slide-group__content {
     height: 46px;
-    border-bottom:1px solid #ccc;
+    border-bottom: 1px solid #ccc;
 
     .v-btn__content {
       font-size: 16px;
     }
     .v-tab {
-      border:1px solid #ccc;
+      border: 1px solid #ccc;
       border-bottom-width: 0;
       border-radius: 4px 4px 0 0;
       height: 46px;
       & + .v-tab {
-        margin-left:4px;
+        margin-left: 4px;
       }
     }
   }

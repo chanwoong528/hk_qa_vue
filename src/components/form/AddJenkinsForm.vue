@@ -23,7 +23,11 @@ const initialState = !props.editJenkinsDeployment?.jenkinsDeploymentId
       description: props.editJenkinsDeployment.description,
     };
 
-const emit = defineEmits(["onSubmitNewJenkinsDeployment", "onSubmitEditJenkinsDeployment"]);
+const emit = defineEmits([
+  "onSubmitNewJenkinsDeployment",
+  "onSubmitEditJenkinsDeployment",
+  "onClickDeleteJenkinsDeployment",
+]);
 
 const state = reactive({
   ...initialState,
@@ -47,6 +51,10 @@ const onSubmitNewJenkinsDeployment = () => {
   return emit("onSubmitNewJenkinsDeployment", { ...state, swTypeId: props.swTypeId });
 };
 
+const onClickDeleteJenkinsDeployment = () => {
+  return emit("onClickDeleteJenkinsDeployment", props.editJenkinsDeployment?.jenkinsDeploymentId);
+};
+
 const onSubmitEditJenkinsDeployment = () => {
   if (!!v$.value.$errors.map(e => e.$message).join(", ")) return;
 
@@ -63,7 +71,7 @@ const onSubmitEditJenkinsDeployment = () => {
       :error-messages="v$.title.$errors.map(e => e.$message).join(', ')"
       density="compact"
       placeholder="Jenkins Title"
-      prepend-inner-icon="mdi-xml"
+      prepend-inner-icon="mdi-format-title"
       variant="outlined"
       @blur="v$.title.$touch"
       @input="v$.title.$touch"
@@ -79,32 +87,42 @@ const onSubmitEditJenkinsDeployment = () => {
       @input="v$.description.$touch"
       v-model="state.description"
     />
+
     <v-text-field
       :error-messages="v$.jenkinsUrl.$errors.map(e => e.$message).join(', ')"
       density="compact"
       placeholder="Jenkins jenkinsUrl"
-      prepend-inner-icon="mdi-text-box-multiple-outline"
+      prepend-inner-icon="mdi-cloud-upload"
       variant="outlined"
       @blur="v$.jenkinsUrl.$touch"
       @input="v$.jenkinsUrl.$touch"
       v-model="state.jenkinsUrl"
     />
-    <v-btn
-      color="blue"
-      size="large"
-      variant="tonal"
-      block
-      type="submit"
-      @click="
-        {
-          v$.$validate();
-          props.editJenkinsDeployment ? onSubmitEditJenkinsDeployment() : onSubmitNewJenkinsDeployment();
-        }
-      "
-    >
-      {{ props.editJenkinsDeployment ? "Edit" : "Add" }} Jenkins Deployment
-    </v-btn>
+    <div class="btn-con">
+      <v-btn class="delete-btn" color="red" variant="tonal" @click="onClickDeleteJenkinsDeployment">delete</v-btn>
+
+      <v-btn
+        color="blue"
+        size="large"
+        variant="tonal"
+        type="submit"
+        @click="
+          {
+            v$.$validate();
+            props.editJenkinsDeployment ? onSubmitEditJenkinsDeployment() : onSubmitNewJenkinsDeployment();
+          }
+        "
+      >
+        {{ props.editJenkinsDeployment ? "Edit" : "Add" }} Jenkins Deployment
+      </v-btn>
+    </div>
   </form>
 </template>
 
-<style scoped></style>
+<style scoped>
+.btn-con {
+  display: flex;
+
+  gap: 10px;
+}
+</style>
