@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, onMounted, reactive } from "vue";
+import { ref, watch, onMounted, reactive, onUnmounted } from "vue";
 import { useRoute } from "vue-router";
 import { storeToRefs } from "pinia";
 
@@ -25,6 +25,9 @@ import { maintainerApi } from "@/services/domain/maintainerService";
 import BoardClass from "@/entity/Board";
 import { boardApi } from "@/services/domain/boardService";
 import { checkEditorValueEmpty } from "@/utils/common/validator";
+import { buildLogApi, jenkinsDeploymentApi } from "@/services/domain/jenkinsDeploymentService";
+import { JenkinsDeploymentClass } from "@/entity/JenkinsDeployment";
+import { sseApiForJenkinsDeployment } from "@/services/domain/sseService";
 
 const route = useRoute();
 
@@ -39,6 +42,8 @@ const userList = ref<IUserInfo[]>([]);
 const swVersionList = ref<ISwVersion[]>([]);
 const boardList = ref<BoardClass[]>([]);
 const boardPageInfo = reactive({ page: 1, totalPage: 1 });
+
+const jenkinsDeploymentList = ref<JenkinsDeploymentClass[]>([]);
 
 const editVersionFlag = ref<boolean>(false);
 const editVersionInfo = reactive<Partial<ISwVersion & { swTypeId: string }>>({});
@@ -57,14 +62,29 @@ const swTypeInfo = ref<ISwType>();
 
 const jenkinsDeploymentLoading = ref<boolean>(false);
 
+const sseTrigger = reactive({ type: "", date: "" });
+const sseForJenkinsDeployment = sseApiForJenkinsDeployment();
+
 onMounted(() => {
   Promise.all([
     onFetchMaintainerList(route.params.id as string),
     onFetchSwVersionList(route.params.id as string),
     onFetchBoardList(route.params.id as string),
+    onFetchJenkinsDeployment(route.params.id as string),
   ]);
+  sseForJenkinsDeployment.onMsg(route.params.id as string, sseTrigger);
 });
 
+onUnmounted(() => {
+  sseForJenkinsDeployment.close();
+});
+
+watch(
+  () => sseTrigger.date,
+  newDate => {
+    onFetchJenkinsDeployment(route.params.id as string);
+  }
+);
 watch(
   () => [route.params.id, swTypes.value],
   ([newId, newSwTypes]) => {
@@ -77,6 +97,7 @@ watch(
       onFetchMaintainerList(newId as string),
       onFetchSwVersionList(newId as string),
       onFetchBoardList(newId as string),
+      onFetchJenkinsDeployment(newId as string),
     ]);
   }
 );
@@ -104,6 +125,12 @@ watch(
 
 const onFetchSwVersionList = (swTypeId: string) => {
   return swVersionApi.GET_swVersionsBySwTypeId(swTypeId).then(res => (swVersionList.value = res as ISwVersion[]));
+};
+
+const onFetchJenkinsDeployment = (swTypeId: string) => {
+  return jenkinsDeploymentApi.GET_jenkinsDeploymentBySwType(swTypeId).then(res => {
+    jenkinsDeploymentList.value = res.map(dep => new JenkinsDeploymentClass(dep));
+  });
 };
 
 const onFetchBoardList = (swTypeId: string, boardType: "req" | "update" = "req", page: number = 1) => {
@@ -267,8 +294,9 @@ const onSubmitNewBoard = (boardParam: BoardClass) => {
 };
 
 const onClickJenkinsDeployment = (jenkinsDeploymentId: string) => {
-  console.log("@@@@@@ ", jenkinsDeploymentId);
-  jenkinsDeploymentLoading.value = true;
+  buildLogApi.POST_buildLog({ jenkinsDeploymentId }).then(res => {
+    onFetchJenkinsDeployment(route.params.id as string);
+  });
 };
 </script>
 
@@ -340,11 +368,7 @@ const onClickJenkinsDeployment = (jenkinsDeploymentId: string) => {
       </div>
     </section>
     <section
-      v-if="
-        loggedInUser?.role !== E_Role.tester &&
-        !!swTypeInfo?.jenkinsDeployments &&
-        swTypeInfo?.jenkinsDeployments.length > 0
-      "
+      v-if="loggedInUser?.role !== E_Role.tester && !!jenkinsDeploymentList && jenkinsDeploymentList.length > 0"
       class="maintainer-con box-wrap"
     >
       <header>
@@ -353,9 +377,9 @@ const onClickJenkinsDeployment = (jenkinsDeploymentId: string) => {
       <div class="maintainer-chips">
         <v-chip
           color="blue-grey-darken-3"
-          v-for="deployment in swTypeInfo?.jenkinsDeployments"
+          v-for="deployment in jenkinsDeploymentList"
           class="mr-2 mb-2"
-          :disabled="jenkinsDeploymentLoading"
+          :disabled="!deployment.isReadyForAnotherDeploy()"
           label
           link
           @click="onClickJenkinsDeployment(deployment.jenkinsDeploymentId)"

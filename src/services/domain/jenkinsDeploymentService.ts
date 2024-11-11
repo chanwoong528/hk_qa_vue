@@ -33,4 +33,21 @@ export const jenkinsDeploymentApi = {
       return await http.delete(`/jenkins-deployment/${jenkinsDeploymentId}`);
     });
   },
+  GET_jenkinsDeploymentBySwType: (swTypeId: string): Promise<JenkinsDeploymentClass[]> => {
+    return ExceptionWrapper(async () => {
+      const apiResult = await http.get(`/jenkins-deployment/${swTypeId}`);
+      const data = await apiResult.data;
+      return data;
+    });
+  },
+};
+
+export const buildLogApi = {
+  POST_buildLog: (buildLogParams: Partial<any>): Promise<any> => {
+    return ExceptionWrapper(async () => {
+      const apiResult = await http.post("/deploy-log", buildLogParams);
+      const data = await apiResult.data;
+      return data;
+    });
+  },
 };
