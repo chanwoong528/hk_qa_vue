@@ -16,10 +16,17 @@ import type { ISwVersion, ITestSession, ITestUnit } from "@/types/types.d";
 import { swVersionApi, testUnitApi } from "@/services/domain/swService";
 // import { reactionApi } from "@/services/domain/reactionService";
 
-import { formatDateTime, formatDate, formatDateForServer, countReactions, renderIconForVersionStatus, renderTestStatus } from "@/utils/common/formatter";
+import {
+  formatDateTime,
+  formatDate,
+  formatDateForServer,
+  countReactions,
+  renderIconForVersionStatus,
+  renderTestStatus,
+} from "@/utils/common/formatter";
 import UnitTestList from "./UnitTestList.vue";
 import TestListChips from "./TestListChips.vue";
-
+import { JenkinsDeploymentClass } from "@/entity/JenkinsDeployment";
 
 const store = useUserStore();
 const { loggedInUser } = storeToRefs(store);
@@ -33,6 +40,9 @@ const props = defineProps({
   isCurOpen: Boolean,
   itemType: String,
   toggleModal: Function,
+  jenkinsDeploymentList: {
+    type: Array as () => JenkinsDeploymentClass[],
+  },
 });
 const unitList = ref<ITestUnit[]>([]);
 const openCalender = ref<boolean>(false);
@@ -48,12 +58,12 @@ watch(
         selectedDate.value = dateAdapter.parseISO(props.swVersion.dueDate) as string;
       }
     }
-  },
+  }
 );
 
 const fetchUnitList = (swVersionId: string) => {
-  testUnitApi.GET_testUnitsBySwVersionId(swVersionId).then((res) => {
-    const unitListWithReactionCount = res.map((unit) => {
+  testUnitApi.GET_testUnitsBySwVersionId(swVersionId).then(res => {
+    const unitListWithReactionCount = res.map(unit => {
       return {
         ...unit,
         counts: countReactions(unit.reactions),
@@ -63,13 +73,18 @@ const fetchUnitList = (swVersionId: string) => {
   });
 };
 
-const emit = defineEmits(["onClickTester", "onClickAddTester", "onClickDetailView", "onClickEditVersion"]);
+const emit = defineEmits([
+  "onClickTester",
+  "onClickAddTester",
+  "onClickDetailView",
+  "onClickEditVersion",
+  "onClickJenkinsDeployment",
+]);
 
 const testSessionsPassStatus = computed(() => {
   if (props.swVersion?.testSessions && props.swVersion?.testSessions.length > 0) {
-    if (props.swVersion?.testSessions.some((tester) => tester.status === E_TestStatus.failed))
-      return E_TestStatus.failed;
-    if (props.swVersion?.testSessions.every((tester) => tester.status === E_TestStatus.passed))
+    if (props.swVersion?.testSessions.some(tester => tester.status === E_TestStatus.failed)) return E_TestStatus.failed;
+    if (props.swVersion?.testSessions.every(tester => tester.status === E_TestStatus.passed))
       return E_TestStatus.passed;
 
     return E_TestStatus.pending;
@@ -89,31 +104,27 @@ const onClickLoggedInUserStatus = (tester: ITestSession) => {
 
 const copyToClipboard = () => {
   const parsedUrl = new URL(window.location.href);
-  const targetUrl = `${parsedUrl.origin}${parsedUrl.pathname}?open=${props.swVersion?.swVersionId}`
+  const targetUrl = `${parsedUrl.origin}${parsedUrl.pathname}?open=${props.swVersion?.swVersionId}`;
 
   // clipboard API 사용
   if (navigator.clipboard !== undefined) {
-    navigator.clipboard
-      .writeText(targetUrl)
-
+    navigator.clipboard.writeText(targetUrl);
   } else {
     // execCommand 사용
-    const textArea = document.createElement('textarea');
+    const textArea = document.createElement("textarea");
     textArea.value = targetUrl;
     document.body.appendChild(textArea);
     textArea.select();
     textArea.setSelectionRange(0, 99999);
     try {
-      document.execCommand('copy');
+      document.execCommand("copy");
     } catch (err) {
-      console.error('복사 실패', err);
+      console.error("복사 실패", err);
     }
     textArea.setSelectionRange(0, 0);
     document.body.removeChild(textArea);
   }
-
-
-}
+};
 
 const onClickEditVersion = () => {
   openCalender.value = false;
@@ -121,7 +132,7 @@ const onClickEditVersion = () => {
   const testers = props.swVersion?.testSessions;
   const versionAuthor = props.swVersion?.user;
   if (
-    testers?.some((tester) => tester.user.id === loggedInUser.value?.id) ||
+    testers?.some(tester => tester.user.id === loggedInUser.value?.id) ||
     versionAuthor?.id === loggedInUser.value?.id
   ) {
     emit("onClickEditVersion", props.swVersion?.swVersionId);
@@ -145,48 +156,50 @@ const onClickDetailView = () => {
   }
 };
 
-
-
 const onSubmitDueDate = () => {
   if (!selectedDate.value) return alert("마감일을 선택해주세요");
 
   swVersionApi
     .PATCH_swVersionDueDate(props.swVersion?.swVersionId as string, formatDateForServer(selectedDate.value))
-    .then((res) => {
+    .then(res => {
       openCalender.value = false;
     });
+};
+
+const onClickJenkinsDeployment = (jenkinsDeploymentId: string, tag: string) => {
+  // alert(jenkinsDeploymentId);
+  emit("onClickJenkinsDeployment", jenkinsDeploymentId, tag);
 };
 </script>
 
 <template>
   <v-expansion-panel v-if="itemType === 'panel'" :value="props.swVersion?.swVersionId">
-    <v-expansion-panel-title variant = "tonal">
+    <v-expansion-panel-title variant="tonal">
       <div class="title-header">
         <h3>
           {{ props.swVersion?.versionTitle }}
         </h3>
       </div>
       <template v-slot:actions="{ expanded }">
-        <v-chip  size="small" :color="renderTestStatus(testSessionsPassStatus)">{{renderIconForVersionStatus(testSessionsPassStatus)}}</v-chip>
-        <v-icon  size="x-large" :icon="!!expanded ? 'mdi-chevron-up' : 'mdi-chevron-down'"></v-icon>
+        <v-chip size="small" :color="renderTestStatus(testSessionsPassStatus)">{{
+          renderIconForVersionStatus(testSessionsPassStatus)
+        }}</v-chip>
+        <v-icon size="x-large" :icon="!!expanded ? 'mdi-chevron-up' : 'mdi-chevron-down'"></v-icon>
       </template>
     </v-expansion-panel-title>
 
     <v-expansion-panel-text @Click.stop="onClickDetailView">
       <div class="desc-wrap">
-
         <div class="edit-btn-con">
           <div class="title-header--left">
             <p v-if="!!props.swVersion?.createdAt" class="date">
               <strong>생성 :</strong> {{ formatDateTime(props.swVersion?.createdAt) }}
             </p>
-            <p class="author">
-             <strong>만든이 :</strong> {{ props.swVersion?.user.username }}
-            </p>
+            <p class="author"><strong>만든이 :</strong> {{ props.swVersion?.user.username }}</p>
           </div>
           <v-snackbar :timeout="2000" rounded="pill">
             <template v-slot:activator="{ props }">
-              <v-btn v-bind="props" variant="tonal" @click.stop="copyToClipboard" size="small" color="blue-grey" >
+              <v-btn v-bind="props" variant="tonal" @click.stop="copyToClipboard" size="small" color="blue-grey">
                 <v-icon class="mdi mdi-link-variant" size="large"></v-icon>
               </v-btn>
             </template>
@@ -219,16 +232,50 @@ const onSubmitDueDate = () => {
         <TestListChips :swVersion="props.swVersion" @onClickLoggedInUserStatus="onClickLoggedInUserStatus" />
 
         <div class="modify-tester-btn-con">
-          <v-btn v-if="loggedInUser?.role !== E_Role.tester" @click.stop="onClickAddTester"
-            class="text-none text-subtitle-1" variant="tonal" color="primary" >
+          <v-btn
+            v-if="loggedInUser?.role !== E_Role.tester"
+            @click.stop="onClickAddTester"
+            class="text-none text-subtitle-1"
+            variant="tonal"
+            color="primary"
+          >
             <v-icon icon="mdi-account-multiple-plus" start></v-icon>
             테스터 관리
           </v-btn>
-          <v-btn @click.stop="onClickDetailView" class="text-none text-subtitle-1" variant="flat" color="grey-lighten-3">
+          <v-btn
+            @click.stop="onClickDetailView"
+            class="text-none text-subtitle-1"
+            variant="flat"
+            color="grey-lighten-3"
+          >
             상세보기
             <v-icon icon="mdi-dots-horizontal-circle-outline" end></v-icon>
           </v-btn>
         </div>
+        <section
+          v-if="loggedInUser?.role !== E_Role.tester && !!jenkinsDeploymentList && jenkinsDeploymentList.length > 0"
+          class="maintainer-con box-wrap"
+        >
+          <header>
+            <h4>Jenkins</h4>
+          </header>
+          <div class="maintainer-chips">
+            <v-chip
+              color="blue-grey-darken-3"
+              v-for="deployment in jenkinsDeploymentList"
+              class="mr-2 mb-2"
+              :disabled="!deployment.isReadyForAnotherDeploy()"
+              label
+              link
+              @click.stop="
+                props.swVersion?.versionTitle &&
+                  onClickJenkinsDeployment(deployment.jenkinsDeploymentId, props.swVersion.versionTitle)
+              "
+            >
+              {{ deployment.title }}
+            </v-chip>
+          </div>
+        </section>
       </div>
     </v-expansion-panel-text>
   </v-expansion-panel>
@@ -250,7 +297,7 @@ const onSubmitDueDate = () => {
   flex-direction: column;
   padding: 8px 24px 16px;
 
-  >li {
+  > li {
     position: relative;
     padding-bottom: 30px;
   }
@@ -310,10 +357,10 @@ const onSubmitDueDate = () => {
   }
 }
 .v-expansion-panel-title {
-  border-bottom:1px dashed rgb(221 221 221 / 80%) ;
-  padding-right:24px;
+  border-bottom: 1px dashed rgb(221 221 221 / 80%);
+  padding-right: 24px;
   min-height: 54px;
-  
+
   .v-chip {
     margin-right: 8px;
   }
@@ -322,7 +369,7 @@ const onSubmitDueDate = () => {
     display: flex;
     justify-content: space-between;
     align-items: center;
-  
+
     h3 {
       font-weight: 500;
       opacity: 0.8;
@@ -350,9 +397,8 @@ const onSubmitDueDate = () => {
   }
 }
 .v-expansion-panel-text {
-    padding: 10px 2px;
-    border-bottom:1px solid #ddd;
-  
+  padding: 10px 2px;
+  border-bottom: 1px solid #ddd;
 }
 .desc-wrap {
   position: relative;

@@ -16,8 +16,6 @@ export const jenkinsDeploymentApi = {
     jenkinsDeploymentParams: Partial<JenkinsDeploymentClass>
   ): Promise<JenkinsDeploymentClass> => {
     return ExceptionWrapper(async () => {
-      console.log(jenkinsDeploymentParams);
-
       const apiResult = await http.patch(
         `/jenkins-deployment/${jenkinsDeploymentParams.jenkinsDeploymentId}`,
         jenkinsDeploymentParams

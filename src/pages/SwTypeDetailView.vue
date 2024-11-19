@@ -60,8 +60,6 @@ const curTab = ref<string>(tabs[0]);
 const submitErrorFlag = ref<boolean>(true);
 const swTypeInfo = ref<ISwType>();
 
-const jenkinsDeploymentLoading = ref<boolean>(false);
-
 const sseTrigger = reactive({ type: "", date: "" });
 const sseForJenkinsDeployment = sseApiForJenkinsDeployment();
 
@@ -293,8 +291,10 @@ const onSubmitNewBoard = (boardParam: BoardClass) => {
   });
 };
 
-const onClickJenkinsDeployment = (jenkinsDeploymentId: string) => {
-  buildLogApi.POST_buildLog({ jenkinsDeploymentId }).then(res => {
+const onClickJenkinsDeployment = (jenkinsDeploymentId: string, tag: string) => {
+  console.log("@@@@@@@@@@@@@@@@", jenkinsDeploymentId, tag);
+
+  buildLogApi.POST_buildLog({ jenkinsDeploymentId, tag }).then(res => {
     onFetchJenkinsDeployment(route.params.id as string);
   });
 };
@@ -367,33 +367,14 @@ const onClickJenkinsDeployment = (jenkinsDeploymentId: string) => {
         </v-chip>
       </div>
     </section>
-    <section
-      v-if="loggedInUser?.role !== E_Role.tester && !!jenkinsDeploymentList && jenkinsDeploymentList.length > 0"
-      class="maintainer-con box-wrap"
-    >
-      <header>
-        <h4>Jenkins</h4>
-      </header>
-      <div class="maintainer-chips">
-        <v-chip
-          color="blue-grey-darken-3"
-          v-for="deployment in jenkinsDeploymentList"
-          class="mr-2 mb-2"
-          :disabled="!deployment.isReadyForAnotherDeploy()"
-          label
-          link
-          @click="onClickJenkinsDeployment(deployment.jenkinsDeploymentId)"
-        >
-          {{ deployment.title }}
-        </v-chip>
-      </div>
-    </section>
 
     <div class="content-con">
       <div class="list-con">
         <SwVersionList
           :swVersionList="swVersionList"
+          :jenkinsDeploymentList="jenkinsDeploymentList"
           :onFetchSwVersionList="onFetchSwVersionList"
+          @onClickJenkinsDeployment="onClickJenkinsDeployment"
           @onSubmitStatus="onSubmitStatus"
           @onClickEditVersion="onClickEditVersion"
         />

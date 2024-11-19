@@ -57,7 +57,6 @@ const colors = [
 ];
 
 const onAddJenkinsDeployment = (swTypeId: string) => {
-  console.log("swTypeId", swTypeId);
   curJenkinsDeployment.value = null;
   curSwTypeId.value = swTypeId;
   modalStatus.openAddJenkinsDeployment = true;
@@ -65,7 +64,7 @@ const onAddJenkinsDeployment = (swTypeId: string) => {
 
 const onEditJenkinsDeployment = (jenkinsDeployment: JenkinsDeploymentClass, swTypeId: string) => {
   curSwTypeId.value = swTypeId;
-  console.log("jenkinsDeployment", jenkinsDeployment);
+
   curJenkinsDeployment.value = jenkinsDeployment;
   modalStatus.openAddJenkinsDeployment = true;
 };
@@ -77,7 +76,6 @@ const onFetchSwTypes = () => {
 };
 
 const onClickDeleteJenkinsDeployment = (jenkinsDeploymentId: string) => {
-  console.log("jenkinsDeploymentId", jenkinsDeploymentId);
   jenkinsDeploymentApi.DELETE_jenkinsDeployment(jenkinsDeploymentId).then(res => {
     onFetchSwTypes();
     modalStatus.openAddJenkinsDeployment = false;

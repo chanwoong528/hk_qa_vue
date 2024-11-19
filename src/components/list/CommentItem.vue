@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { E_EditorType, E_ReactionParentType, E_ReactionType, E_Role } from "@/types/enum.d";
 import type { IComment } from "@/types/types";
-import { ref, defineProps } from "vue";
+import { ref } from "vue";
 
 import CommentReactionList from "./CommentReactionList.vue";
 
