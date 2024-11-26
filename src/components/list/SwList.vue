@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { storeToRefs } from "pinia";
-
 import { PropType, reactive, ref } from "vue";
 import ModalWrap from "../ModalWrap.vue";
 
