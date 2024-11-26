@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 import { computed } from "vue";
 
 import { storeToRefs } from "pinia";
@@ -8,10 +7,6 @@ import { useUserStore } from "@/store/userStore";
 import { E_TestStatus } from "@/types/enum.d";
 import type { ISwVersion, ITestSession } from "@/types/types.d";
 import { formatDateTime, renderIconForVersionStatus, renderTestStatus } from "@/utils/common/formatter";
-
-
-
-
 
 const store = useUserStore();
 const { loggedInUser } = storeToRefs(store);
@@ -22,7 +17,6 @@ const props = defineProps({
   },
 });
 
-
 const emit = defineEmits(["onClickLoggedInUserStatus"]);
 const onClickLoggedInUserStatus = (tester: ITestSession) => {
   emit("onClickLoggedInUserStatus", tester);
@@ -31,21 +25,29 @@ const onClickLoggedInUserStatus = (tester: ITestSession) => {
 const sortedTestSessions = computed(() => {
   return props.swVersion?.testSessions?.sort((a, b) => (a.createdAt > b.createdAt ? 1 : -1));
 });
-
 </script>
 
 <template>
   <div v-if="!!props.swVersion?.testSessions && props.swVersion?.testSessions.length > 0">
     <div class="tester-con">
       <p>현재 테스터</p>
-      <v-chip v-for="tester in sortedTestSessions " :class="tester.user.id === loggedInUser?.id ? ' on' : ''"
-        class="mr-2 mb-2" :variant="tester.user.id === loggedInUser?.id ? 'tonal' : 'tonal'"
-        :color="renderTestStatus(tester.status as E_TestStatus)" @click.stop="onClickLoggedInUserStatus(tester)">
+      <v-chip
+        v-for="tester in sortedTestSessions"
+        :class="tester.user.id === loggedInUser?.id ? ' on' : ''"
+        class="mr-2 mb-2"
+        :variant="tester.user.id === loggedInUser?.id ? 'tonal' : 'tonal'"
+        :color="renderTestStatus(tester.status as E_TestStatus)"
+        @click.stop="onClickLoggedInUserStatus(tester)"
+      >
         <v-icon icon="mdi-account-circle-outline" start></v-icon>
         {{ tester.user.id === loggedInUser?.id ? "me" : tester.user.username }}
         <v-icon :icon="renderIconForVersionStatus(tester.status)" end></v-icon>
-        <v-tooltip activator="parent" location="end" :color="renderTestStatus(tester.status as E_TestStatus)"
-          max-width="300">
+        <v-tooltip
+          activator="parent"
+          location="end"
+          :color="renderTestStatus(tester.status as E_TestStatus)"
+          max-width="300"
+        >
           <div v-if="tester.status === E_TestStatus.pending">
             <p>[{{ tester.user.username }}] <br />아직 QA를 진행하지 않았습니다.</p>
           </div>
@@ -75,14 +77,13 @@ const sortedTestSessions = computed(() => {
   &.detail {
     min-height: 300px;
   }
-
 }
 .tester-con {
   padding-top: 20px;
   padding-bottom: 6px;
-  border-bottom:1px dashed #ddd;
+  border-bottom: 1px dashed #ddd;
   p {
-    padding-bottom:10px;
+    padding-bottom: 10px;
     font-weight: 500;
   }
 }
@@ -97,14 +98,11 @@ const sortedTestSessions = computed(() => {
   border: 10px solid #f5f5f5;
 
   .chart-left-con {
-
     flex: 1;
     display: flex;
 
     .chart-wrap {
       max-width: 500px;
-
-
     }
   }
 

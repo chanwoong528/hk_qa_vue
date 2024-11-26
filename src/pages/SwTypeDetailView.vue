@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, onMounted, reactive } from "vue";
+import { ref, watch, onMounted, reactive, onUnmounted } from "vue";
 import { useRoute } from "vue-router";
 import { storeToRefs } from "pinia";
 
@@ -25,6 +25,9 @@ import { maintainerApi } from "@/services/domain/maintainerService";
 import BoardClass from "@/entity/Board";
 import { boardApi } from "@/services/domain/boardService";
 import { checkEditorValueEmpty } from "@/utils/common/validator";
+import { buildLogApi, jenkinsDeploymentApi } from "@/services/domain/jenkinsDeploymentService";
+import { DeployLogClass, JenkinsDeploymentClass } from "@/entity/JenkinsDeployment";
+import { sseApiForJenkinsDeployment } from "@/services/domain/sseService";
 
 const route = useRoute();
 
@@ -39,6 +42,8 @@ const userList = ref<IUserInfo[]>([]);
 const swVersionList = ref<ISwVersion[]>([]);
 const boardList = ref<BoardClass[]>([]);
 const boardPageInfo = reactive({ page: 1, totalPage: 1 });
+
+const jenkinsDeploymentList = ref<JenkinsDeploymentClass[]>([]);
 
 const editVersionFlag = ref<boolean>(false);
 const editVersionInfo = reactive<Partial<ISwVersion & { swTypeId: string }>>({});
@@ -55,14 +60,30 @@ const curTab = ref<string>(tabs[0]);
 const submitErrorFlag = ref<boolean>(true);
 const swTypeInfo = ref<ISwType>();
 
+const sseTrigger = reactive({ type: "", date: "" });
+const sseForJenkinsDeployment = sseApiForJenkinsDeployment();
+
 onMounted(() => {
   Promise.all([
     onFetchMaintainerList(route.params.id as string),
     onFetchSwVersionList(route.params.id as string),
     onFetchBoardList(route.params.id as string),
+    onFetchJenkinsDeployment(route.params.id as string),
   ]);
+  sseForJenkinsDeployment.onMsg(route.params.id as string, sseTrigger);
 });
 
+onUnmounted(() => {
+  sseForJenkinsDeployment.close();
+});
+
+watch(
+  () => sseTrigger.date,
+  newDate => {
+    console.log("newDate", newDate);
+    onFetchJenkinsDeployment(route.params.id as string);
+  }
+);
 watch(
   () => [route.params.id, swTypes.value],
   ([newId, newSwTypes]) => {
@@ -75,6 +96,7 @@ watch(
       onFetchMaintainerList(newId as string),
       onFetchSwVersionList(newId as string),
       onFetchBoardList(newId as string),
+      onFetchJenkinsDeployment(newId as string),
     ]);
   }
 );
@@ -102,6 +124,14 @@ watch(
 
 const onFetchSwVersionList = (swTypeId: string) => {
   return swVersionApi.GET_swVersionsBySwTypeId(swTypeId).then(res => (swVersionList.value = res as ISwVersion[]));
+};
+
+const onFetchJenkinsDeployment = (swTypeId: string) => {
+  return jenkinsDeploymentApi.GET_jenkinsDeploymentBySwType(swTypeId).then(res => {
+    jenkinsDeploymentList.value = res.map(
+      dep => new JenkinsDeploymentClass({ ...dep, deployLogs: dep.deployLogs.map(log => new DeployLogClass(log)) })
+    );
+  });
 };
 
 const onFetchBoardList = (swTypeId: string, boardType: "req" | "update" = "req", page: number = 1) => {
@@ -263,6 +293,12 @@ const onSubmitNewBoard = (boardParam: BoardClass) => {
     onFetchBoardList(route.params.id as string, curTab.value === "요청 사항" ? "req" : "update");
   });
 };
+
+const onClickJenkinsDeployment = (jenkinsDeploymentId: string, tag: string, reason: string) => {
+  buildLogApi.POST_buildLog({ jenkinsDeploymentId, tag, reason }).then(res => {
+    onFetchJenkinsDeployment(route.params.id as string);
+  });
+};
 </script>
 
 <template>
@@ -332,11 +368,14 @@ const onSubmitNewBoard = (boardParam: BoardClass) => {
         </v-chip>
       </div>
     </section>
+
     <div class="content-con">
       <div class="list-con">
         <SwVersionList
           :swVersionList="swVersionList"
+          :jenkinsDeploymentList="jenkinsDeploymentList"
           :onFetchSwVersionList="onFetchSwVersionList"
+          @onClickJenkinsDeployment="onClickJenkinsDeployment"
           @onSubmitStatus="onSubmitStatus"
           @onClickEditVersion="onClickEditVersion"
         />

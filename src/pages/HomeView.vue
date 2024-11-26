@@ -18,7 +18,7 @@ const { swTypes } = storeToRefs(swStore);
       </p>
       <h3><strong> 품질 향상</strong>과 <strong>방향성</strong>을 <strong>제시</strong>하는 가이드</h3>
     </header>
-    <SwList :type="E_SwTypeListType.section" :swList="swTypes" />
+    <SwList v-if="swTypes.length > 0" :type="E_SwTypeListType.section" :swList="swTypes" />
   </DefaultLayout>
 </template>
 

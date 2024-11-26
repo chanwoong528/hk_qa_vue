@@ -24,6 +24,7 @@ import { countReactions } from "@/utils/common/formatter";
 import { useRoute } from "vue-router";
 import TestListChart from "./TestListChart.vue";
 import UnitTestList from "./UnitTestList.vue";
+import { JenkinsDeploymentClass } from "@/entity/JenkinsDeployment";
 // import UnitTestList from "./UnitTestList.vue";
 // import TestListChips from "./TestListChips.vue";
 
@@ -36,6 +37,9 @@ const props = defineProps({
   onFetchSwVersionList: {
     type: Function,
   },
+  jenkinsDeploymentList: {
+    type: Array as () => JenkinsDeploymentClass[],
+  },
 });
 
 const detailViewTabs = ["버전 개요", "테스터"];
@@ -46,8 +50,7 @@ const { loggedInUser } = storeToRefs(userStore);
 
 const panelOpened = ref(props.swVersionList?.[0]?.swVersionId ?? 0);
 
-
-const emit = defineEmits(["onSubmitStatus", "onClickEditVersion"]);
+const emit = defineEmits(["onSubmitStatus", "onClickEditVersion", "onClickJenkinsDeployment"]);
 
 const userList = ref<IUserInfo[]>([]);
 
@@ -87,11 +90,11 @@ onMounted(() => {
 });
 watch(
   () => route.params.id as string,
-  (newId) => {
+  newId => {
     if (!!newId) {
       return (panelOpened.value = 0);
     }
-  },
+  }
 );
 
 watch(
@@ -104,21 +107,21 @@ watch(
       curModalTab.value = detailViewTabs[0];
       eventSse.close();
     }
-  },
+  }
 );
 
 watch(
   () => sseTrigger.date,
-  (newDate) => {
+  newDate => {
     onFetchCommentsBySwVersionId();
-  },
+  }
 );
 
 watch(
   () => commentPage.value,
-  (newPage) => {
+  newPage => {
     onFetchCommentsBySwVersionId(newPage as number);
-  },
+  }
 );
 
 const computedIsLastPage = computed(() => {
@@ -130,7 +133,7 @@ const computedIsLastPage = computed(() => {
 });
 
 const curSwVersionInfo = computed(() => {
-  return props.swVersionList?.find((sw) => sw.swVersionId === curSwVersionId.value);
+  return props.swVersionList?.find(sw => sw.swVersionId === curSwVersionId.value);
 });
 
 const toggleModal = (type?: E_SwVersionModalType, testerId?: string) => {
@@ -169,7 +172,7 @@ const onClickLoadNextPage = () => {
 };
 
 const onFetchCommentsBySwVersionId = (page?: number) => {
-  return commentApi.GET_commentsBySwVersionId(curSwVersionId.value, page).then((res) => {
+  return commentApi.GET_commentsBySwVersionId(curSwVersionId.value, page).then(res => {
     const { commentList, page, lastPage } = res as unknown as {
       commentList: IComment[];
       page: number;
@@ -179,11 +182,11 @@ const onFetchCommentsBySwVersionId = (page?: number) => {
 
     commnetLastPage.value = lastPage;
 
-    const commentListWithReactionCount = commentList.map((comment) => {
+    const commentListWithReactionCount = commentList.map(comment => {
       return {
         ...comment,
         counts: countReactions(comment.reactions),
-        childComments: comment.childComments.map((child) => {
+        childComments: comment.childComments.map(child => {
           return {
             ...child,
             counts: countReactions(child.reactions),
@@ -205,30 +208,29 @@ const onSubmitComment = (params: any) => {
   if (!curSwVersionId.value) return alert("버전이 선택되지 않았습니다.");
 
   params.swVersionId = curSwVersionId.value;
-  return commentApi.POST_comment(params).then((res) => {
+  return commentApi.POST_comment(params).then(res => {
     return onFetchCommentsBySwVersionId();
   });
 };
 
 const onSubmitEditComment = (commentId: string, content: string) => {
-  return commentApi.PATCH_comment({ commentId, content }).then((res) => {
+  return commentApi.PATCH_comment({ commentId, content }).then(res => {
     return onFetchCommentsBySwVersionId();
   });
 };
 const onClickDeleteComment = (commentId: string) => {
-  return commentApi.DELETE_comment(commentId).then((res) => {
+  return commentApi.DELETE_comment(commentId).then(res => {
     return onFetchCommentsBySwVersionId();
   });
-
 };
 
 const onClickAddTester = (swVerId: string) => {
   curSwVersionId.value = swVerId;
-  const targetSwVersion = props.swVersionList?.find((sw) => sw.swVersionId === swVerId);
+  const targetSwVersion = props.swVersionList?.find(sw => sw.swVersionId === swVerId);
 
-  return userApi.GET_users().then((usersData) => {
-    const curTesters = targetSwVersion?.testSessions.map((tester) => {
-      const targetUsers = usersData.find((user) => user.id === tester.user.id);
+  return userApi.GET_users().then(usersData => {
+    const curTesters = targetSwVersion?.testSessions.map(tester => {
+      const targetUsers = usersData.find(user => user.id === tester.user.id);
       if (targetUsers) return targetUsers;
     });
     testSessionUserList.value = curTesters as IUserInfo[];
@@ -239,7 +241,7 @@ const onClickAddTester = (swVerId: string) => {
 const onClickDetailView = (swVerId: string) => {
   curSwVersionId.value = swVerId;
 
-  return commentApi.GET_commentsBySwVersionId(swVerId).then((res) => onFetchCommentsBySwVersionId());
+  return commentApi.GET_commentsBySwVersionId(swVerId).then(res => onFetchCommentsBySwVersionId());
 };
 
 const onClickEditVersion = (swVerId: string) => {
@@ -249,28 +251,35 @@ const onClickEditVersion = (swVerId: string) => {
 
 const onSubmitAddTesters = (testers: IUserInfo[]) => {
   const tobeDeleted = testSessionUserList.value
-    .filter((tester) => !testers.some((newTester) => newTester.id === tester.id))
-    .map((tester) => tester.id);
+    .filter(tester => !testers.some(newTester => newTester.id === tester.id))
+    .map(tester => tester.id);
 
   const tobeAdded = testers
-    .filter((tester) => !testSessionUserList.value.some((oldTester) => oldTester.id === tester.id))
-    .map((tester) => tester.id);
+    .filter(tester => !testSessionUserList.value.some(oldTester => oldTester.id === tester.id))
+    .map(tester => tester.id);
 
   return testSessionApi
     .PUT_deleteOrAddTestSession(curSwVersionId.value, tobeDeleted, tobeAdded)
-    .then((res) => {
+    .then(res => {
       props.onFetchSwVersionList && props.onFetchSwVersionList(props.swVersionList?.[0]?.swType?.swTypeId);
       toggleModal(E_SwVersionModalType.addTester);
     })
-    .catch((error) => alert(error));
+    .catch(error => alert(error));
+};
+
+const onClickJenkinsDeployment = (jenkinsDeploymentId: string, tag: string, reason: string) => {
+  emit("onClickJenkinsDeployment", jenkinsDeploymentId, tag, reason);
 };
 </script>
 
 <template>
   <!-- //'QA 항목 상태 변경' -->
-  <ModalWrap v-model="openModalUpdateStatus"
-    :title="selectedTestSession.user?.id === loggedInUser?.id ? '내 상태 변경' : 'QA 항목 상태'" haveBtnCtl
-    @onSubmit="onSubmitStatus">
+  <ModalWrap
+    v-model="openModalUpdateStatus"
+    :title="selectedTestSession.user?.id === loggedInUser?.id ? '내 상태 변경' : 'QA 항목 상태'"
+    haveBtnCtl
+    @onSubmit="onSubmitStatus"
+  >
     <TestStatusForm v-model="selectedTestSession" />
   </ModalWrap>
 
@@ -288,13 +297,26 @@ const onSubmitAddTesters = (testers: IUserInfo[]) => {
     </div>
     <v-tabs-window v-model="curModalTab" class="tab-window">
       <v-tabs-window-item :value="detailViewTabs[0]">
-        <SwVersionItem :swVersion="curSwVersionInfo" :toggleModal="toggleModal" @onClickTester="onClickTester"
-          @onClickAddTester="onClickAddTester" @onClickDetailView="onClickDetailView" />
+        <SwVersionItem
+          :swVersion="curSwVersionInfo"
+          :toggleModal="toggleModal"
+          @onClickTester="onClickTester"
+          @onClickAddTester="onClickAddTester"
+          @onClickDetailView="onClickDetailView"
+          :jenkinsDeploymentList="jenkinsDeploymentList"
+          @onClickJenkinsDeployment="onClickJenkinsDeployment"
+        />
         <UnitTestList :swVersion="curSwVersionInfo" />
-        <CommentList v-model="commentListForVersion" :page="commentPage" :computedLastPage="computedIsLastPage"
-          @onFetchCommentsBySwVersionId="onFetchCommentsBySwVersionId" @onSubmitComment="onSubmitComment"
-          @onClickDeleteComment="onClickDeleteComment" @onSubmitEditComment="onSubmitEditComment"
-          @onClickLoadNextPage="onClickLoadNextPage" />
+        <CommentList
+          v-model="commentListForVersion"
+          :page="commentPage"
+          :computedLastPage="computedIsLastPage"
+          @onFetchCommentsBySwVersionId="onFetchCommentsBySwVersionId"
+          @onSubmitComment="onSubmitComment"
+          @onClickDeleteComment="onClickDeleteComment"
+          @onSubmitEditComment="onSubmitEditComment"
+          @onClickLoadNextPage="onClickLoadNextPage"
+        />
       </v-tabs-window-item>
 
       <v-tabs-window-item :value="detailViewTabs[1]">
@@ -309,34 +331,55 @@ const onSubmitAddTesters = (testers: IUserInfo[]) => {
       <h4>진행중인 버전</h4>
     </header>
     <v-expansion-panels v-model="panelOpened" flat variant="accordion">
-      <SwVersionItem v-for="(swVersion, idx) in props.swVersionList?.filter((ver) => {
-        if (
-          !ver.testSessions.every((tester) => tester.status === E_TestStatus.passed) ||
-          ver.testSessions.length === 0
-        )
-          return ver;
-      })" :key="swVersion.swVersionId" :swVersion="swVersion" :toggleModal="toggleModal"
-        :isCurOpen="swVersion.swVersionId === panelOpened || idx === 0" itemType="panel" @onClickTester="onClickTester"
-        @onClickAddTester="onClickAddTester" @onClickDetailView="onClickDetailView"
-        @onClickEditVersion="onClickEditVersion" />
+      <SwVersionItem
+        v-for="(swVersion, idx) in props.swVersionList?.filter(ver => {
+          if (!ver.testSessions.every(tester => tester.status === E_TestStatus.passed) || ver.testSessions.length === 0)
+            return ver;
+        })"
+        :key="swVersion.swVersionId"
+        :swVersion="swVersion"
+        :toggleModal="toggleModal"
+        :isCurOpen="swVersion.swVersionId === panelOpened || idx === 0"
+        itemType="panel"
+        @onClickTester="onClickTester"
+        @onClickAddTester="onClickAddTester"
+        @onClickDetailView="onClickDetailView"
+        @onClickEditVersion="onClickEditVersion"
+        :jenkinsDeploymentList="jenkinsDeploymentList"
+        @onClickJenkinsDeployment="onClickJenkinsDeployment"
+      />
     </v-expansion-panels>
   </section>
-  <section class="version-list-con finished box-wrap" v-if="(props.swVersionList ?? []).filter((ver) => {
-    if (ver.testSessions.every((tester) => tester.status === E_TestStatus.passed) && ver.testSessions.length > 0)
-      return ver;
-  }).length > 0
-    ">
+  <section
+    class="version-list-con finished box-wrap"
+    v-if="
+      (props.swVersionList ?? []).filter(ver => {
+        if (ver.testSessions.every(tester => tester.status === E_TestStatus.passed) && ver.testSessions.length > 0)
+          return ver;
+      }).length > 0
+    "
+  >
     <header>
       <h4>종료된 버전</h4>
     </header>
     <v-expansion-panels v-model="panelOpened" flat variant="accordion">
-      <SwVersionItem v-for="(swVersion, idx) in props.swVersionList?.filter((ver) => {
-        if (ver.testSessions.every((tester) => tester.status === E_TestStatus.passed) && ver.testSessions.length > 0)
-          return ver;
-      })" :key="swVersion.swVersionId" :swVersion="swVersion" :toggleModal="toggleModal"
-        :isCurOpen="swVersion.swVersionId === panelOpened || idx === 0" itemType="panel" @onClickTester="onClickTester"
-        @onClickAddTester="onClickAddTester" @onClickDetailView="onClickDetailView"
-        @onClickEditVersion="onClickEditVersion" />
+      <SwVersionItem
+        v-for="(swVersion, idx) in props.swVersionList?.filter(ver => {
+          if (ver.testSessions.every(tester => tester.status === E_TestStatus.passed) && ver.testSessions.length > 0)
+            return ver;
+        })"
+        :key="swVersion.swVersionId"
+        :swVersion="swVersion"
+        :toggleModal="toggleModal"
+        :isCurOpen="swVersion.swVersionId === panelOpened || idx === 0"
+        itemType="panel"
+        @onClickTester="onClickTester"
+        @onClickAddTester="onClickAddTester"
+        @onClickDetailView="onClickDetailView"
+        @onClickEditVersion="onClickEditVersion"
+        :jenkinsDeploymentList="jenkinsDeploymentList"
+        @onClickJenkinsDeployment="onClickJenkinsDeployment"
+      />
     </v-expansion-panels>
   </section>
 </template>
@@ -366,7 +409,6 @@ const onSubmitAddTesters = (testers: IUserInfo[]) => {
     }
   }
 }
-
 
 // .tab-window {
 //   // min-height: 400px;
