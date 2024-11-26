@@ -7,6 +7,7 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
+    AddDeployForm: typeof import('./src/components/form/AddDeployForm.vue')['default']
     AddJenkinsForm: typeof import('./src/components/form/AddJenkinsForm.vue')['default']
     AddMaintainerForm: typeof import('./src/components/form/AddMaintainerForm.vue')['default']
     AddTesterForm: typeof import('./src/components/form/AddTesterForm.vue')['default']
@@ -20,6 +21,7 @@ declare module 'vue' {
     DeployList: typeof import('./src/components/list/DeployList.vue')['default']
     ForgotPwForm: typeof import('./src/components/form/ForgotPwForm.vue')['default']
     HistoryList: typeof import('./src/components/list/HistoryList.vue')['default']
+    JenkinsList: typeof import('./src/components/list/JenkinsList.vue')['default']
     LoginForm: typeof import('./src/components/form/LoginForm.vue')['default']
     ModalWrap: typeof import('./src/components/ModalWrap.vue')['default']
     NewBoardForm: typeof import('./src/components/form/NewBoardForm.vue')['default']

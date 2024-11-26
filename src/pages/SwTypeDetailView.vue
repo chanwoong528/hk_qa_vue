@@ -26,7 +26,7 @@ import BoardClass from "@/entity/Board";
 import { boardApi } from "@/services/domain/boardService";
 import { checkEditorValueEmpty } from "@/utils/common/validator";
 import { buildLogApi, jenkinsDeploymentApi } from "@/services/domain/jenkinsDeploymentService";
-import { JenkinsDeploymentClass } from "@/entity/JenkinsDeployment";
+import { DeployLogClass, JenkinsDeploymentClass } from "@/entity/JenkinsDeployment";
 import { sseApiForJenkinsDeployment } from "@/services/domain/sseService";
 
 const route = useRoute();
@@ -80,6 +80,7 @@ onUnmounted(() => {
 watch(
   () => sseTrigger.date,
   newDate => {
+    console.log("newDate", newDate);
     onFetchJenkinsDeployment(route.params.id as string);
   }
 );
@@ -127,7 +128,9 @@ const onFetchSwVersionList = (swTypeId: string) => {
 
 const onFetchJenkinsDeployment = (swTypeId: string) => {
   return jenkinsDeploymentApi.GET_jenkinsDeploymentBySwType(swTypeId).then(res => {
-    jenkinsDeploymentList.value = res.map(dep => new JenkinsDeploymentClass(dep));
+    jenkinsDeploymentList.value = res.map(
+      dep => new JenkinsDeploymentClass({ ...dep, deployLogs: dep.deployLogs.map(log => new DeployLogClass(log)) })
+    );
   });
 };
 
@@ -291,10 +294,8 @@ const onSubmitNewBoard = (boardParam: BoardClass) => {
   });
 };
 
-const onClickJenkinsDeployment = (jenkinsDeploymentId: string, tag: string) => {
-  console.log("@@@@@@@@@@@@@@@@", jenkinsDeploymentId, tag);
-
-  buildLogApi.POST_buildLog({ jenkinsDeploymentId, tag }).then(res => {
+const onClickJenkinsDeployment = (jenkinsDeploymentId: string, tag: string, reason: string) => {
+  buildLogApi.POST_buildLog({ jenkinsDeploymentId, tag, reason }).then(res => {
     onFetchJenkinsDeployment(route.params.id as string);
   });
 };

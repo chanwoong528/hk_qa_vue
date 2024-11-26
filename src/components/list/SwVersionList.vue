@@ -267,8 +267,8 @@ const onSubmitAddTesters = (testers: IUserInfo[]) => {
     .catch(error => alert(error));
 };
 
-const onClickJenkinsDeployment = (jenkinsDeploymentId: string, tag: string) => {
-  emit("onClickJenkinsDeployment", jenkinsDeploymentId, tag);
+const onClickJenkinsDeployment = (jenkinsDeploymentId: string, tag: string, reason: string) => {
+  emit("onClickJenkinsDeployment", jenkinsDeploymentId, tag, reason);
 };
 </script>
 

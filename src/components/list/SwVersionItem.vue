@@ -5,16 +5,10 @@ import { useDate } from "vuetify";
 import { storeToRefs } from "pinia";
 import { useUserStore } from "@/store/userStore";
 
-import {
-  //  E_ReactionParentType, E_ReactionType,
-  E_Role,
-  E_SwVersionModalType,
-  E_TestStatus,
-} from "@/types/enum.d";
+import { E_Role, E_SwVersionModalType, E_TestStatus } from "@/types/enum.d";
 import type { ISwVersion, ITestSession, ITestUnit } from "@/types/types.d";
 
 import { swVersionApi, testUnitApi } from "@/services/domain/swService";
-// import { reactionApi } from "@/services/domain/reactionService";
 
 import {
   formatDateTime,
@@ -24,9 +18,17 @@ import {
   renderIconForVersionStatus,
   renderTestStatus,
 } from "@/utils/common/formatter";
+
+import { JenkinsDeploymentClass } from "@/entity/JenkinsDeployment";
+
 import UnitTestList from "./UnitTestList.vue";
 import TestListChips from "./TestListChips.vue";
-import { JenkinsDeploymentClass } from "@/entity/JenkinsDeployment";
+import ModalWrap from "../ModalWrap.vue";
+import AddDeployForm from "../form/AddDeployForm.vue";
+
+import JenkinsList from "./JenkinsList.vue";
+
+import { E_ModalType } from "@/types/enum.d";
 
 const store = useUserStore();
 const { loggedInUser } = storeToRefs(store);
@@ -47,6 +49,8 @@ const props = defineProps({
 const unitList = ref<ITestUnit[]>([]);
 const openCalender = ref<boolean>(false);
 const selectedDate = ref<string>();
+const openDeployModal = ref<boolean>(false);
+const selectedJenkinsDeployment = ref();
 
 watch(
   () => [props.isCurOpen, props.swVersion?.swVersionId],
@@ -166,13 +170,28 @@ const onSubmitDueDate = () => {
     });
 };
 
-const onClickJenkinsDeployment = (jenkinsDeploymentId: string, tag: string) => {
-  // alert(jenkinsDeploymentId);
-  emit("onClickJenkinsDeployment", jenkinsDeploymentId, tag);
+const onClickJenkinsDeployment = (jenkinsDeploymentId: string, tag?: string) => {
+  const target = props.jenkinsDeploymentList?.find(
+    deployment => deployment.jenkinsDeploymentId === jenkinsDeploymentId
+  ) as JenkinsDeploymentClass;
+
+  selectedJenkinsDeployment.value = { ...target, tag: !!tag ? tag : props.swVersion?.versionTitle };
+  openDeployModal.value = true;
+};
+
+const onSubmitJenkinsDeployment = (jenkinsDeploymentId: string, tag: string, reason: string) => {
+  emit("onClickJenkinsDeployment", jenkinsDeploymentId, tag, reason);
 };
 </script>
 
 <template>
+  <ModalWrap v-model="openDeployModal" :title="`배포  ${selectedJenkinsDeployment?.title}`" :type="E_ModalType.full">
+    <AddDeployForm
+      :selectedJenkinsDeployment="selectedJenkinsDeployment || new JenkinsDeploymentClass()"
+      @onSubmitJenkinsDeployment="onSubmitJenkinsDeployment"
+    />
+  </ModalWrap>
+
   <v-expansion-panel v-if="itemType === 'panel'" :value="props.swVersion?.swVersionId">
     <v-expansion-panel-title variant="tonal">
       <div class="title-header">
@@ -252,30 +271,20 @@ const onClickJenkinsDeployment = (jenkinsDeploymentId: string, tag: string) => {
             <v-icon icon="mdi-dots-horizontal-circle-outline" end></v-icon>
           </v-btn>
         </div>
-        <section
-          v-if="loggedInUser?.role !== E_Role.tester && !!jenkinsDeploymentList && jenkinsDeploymentList.length > 0"
-          class="maintainer-con box-wrap"
-        >
-          <header>
-            <h4>Jenkins</h4>
-          </header>
-          <div class="maintainer-chips">
-            <v-chip
-              color="blue-grey-darken-3"
-              v-for="deployment in jenkinsDeploymentList"
-              class="mr-2 mb-2"
-              :disabled="!deployment.isReadyForAnotherDeploy()"
-              label
-              link
-              @click.stop="
-                props.swVersion?.versionTitle &&
-                  onClickJenkinsDeployment(deployment.jenkinsDeploymentId, props.swVersion.versionTitle)
-              "
-            >
-              {{ deployment.title }}
-            </v-chip>
-          </div>
-        </section>
+        <!-- 젠킨스 버전 리스트 -->
+
+        <JenkinsList
+          v-if="
+            loggedInUser?.role !== E_Role.tester &&
+            !!props.jenkinsDeploymentList &&
+            props.jenkinsDeploymentList?.length > 0
+          "
+          :tag="props.swVersion?.versionTitle || ''"
+          :jenkinsDeploymentList="props.jenkinsDeploymentList"
+          @onClickdeploy="onClickJenkinsDeployment"
+        />
+
+        <!-- 젠킨스 버전 리스트 -->
       </div>
     </v-expansion-panel-text>
   </v-expansion-panel>
