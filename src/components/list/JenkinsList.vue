@@ -10,6 +10,7 @@ const props = defineProps<{
 
 const curModalTab = ref<string>(props.jenkinsDeploymentList[0].title);
 
+console.log(props.jenkinsDeploymentList);
 // watch(curModalTab, newVal => {
 //   curWindowInfo.value = props.jenkinsDeploymentList.find(jenkins => jenkins.title === newVal) || null;
 // });
@@ -33,13 +34,18 @@ const onClickRevert = (jenkinsDeploymentId: string, tag: string) => {
       </v-tabs>
     </div>
     <v-tabs-window v-model="curModalTab" class="tab-window">
-      <v-tabs-window-item v-for="curWind in props.jenkinsDeploymentList" :value="curWind.title" class="ma-2">
+      <v-tabs-window-item
+        v-for="curWind in props.jenkinsDeploymentList"
+        :value="curWind.title"
+        :key="curWind.jenkinsDeploymentId"
+        class="ma-2"
+      >
         <v-chip
           @click="onClickDeploy(curWind.jenkinsDeploymentId as string)"
           color="blue-grey-darken-3"
           class="ma-2"
           :disabled="!curWind.isReadyForAnotherDeploy()"
-          >배포
+          >배포 {{ curWind.title }}
           <v-progress-circular
             v-if="!curWind.isReadyForAnotherDeploy()"
             color="primary"
@@ -48,7 +54,7 @@ const onClickRevert = (jenkinsDeploymentId: string, tag: string) => {
           ></v-progress-circular>
         </v-chip>
 
-        <v-list v-if="curWind?.deployLogs.filter(item => item.tag === props.tag).length > 0">
+        <v-list v-if="curWind?.deployLogs.filter(item => item.tag.includes(props.tag)).length > 0">
           <v-list-item>
             <div class="deploy-log-item title">
               <p>Build Number</p>
@@ -59,20 +65,22 @@ const onClickRevert = (jenkinsDeploymentId: string, tag: string) => {
             </div>
           </v-list-item>
 
-          <v-list-item v-for="deploylog in curWind?.deployLogs.filter(item => item.tag.includes(props.tag))">
-            <!-- <v-list-item v-for="deploylog in curWind?.deployLogs.filter(item => props.tag.includes(item.tag))"> -->
-            <div class="deploy-log-item">
-              <p>{{ deploylog.buildNumber }}</p>
-              <p>{{ deploylog.tag }}</p>
-              <p v-html="deploylog.reason"></p>
+          <v-list-item v-for="deploylogItem in curWind?.deployLogs.filter(item => item.tag.includes(props.tag))">
+            <div class="deploy-log-item" :key="deploylogItem.jenkinsDeploymentId">
+              <p>{{ deploylogItem.buildNumber }}</p>
+              <p>{{ deploylogItem.tag }}</p>
+              <p v-html="deploylogItem.reason"></p>
               <p>
-                <v-icon :color="deploylog.renderStatusIcon().color" :icon="deploylog.renderStatusIcon().icon"></v-icon>
+                <v-icon
+                  :color="deploylogItem.renderStatusIcon().color"
+                  :icon="deploylogItem.renderStatusIcon().icon"
+                ></v-icon>
               </p>
               <p>
                 <v-btn
                   variant="tonal"
                   color="primary"
-                  @click="onClickRevert(curWind.jenkinsDeploymentId as string, `${deploylog.tag}`)"
+                  @click="onClickRevert(curWind.jenkinsDeploymentId as string, `${deploylogItem.tag}`)"
                 >
                   Revert
                 </v-btn>
