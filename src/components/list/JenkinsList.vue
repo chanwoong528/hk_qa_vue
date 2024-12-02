@@ -18,6 +18,10 @@ const emit = defineEmits(["onClickdeploy"]);
 const onClickDeploy = (jenkinsDeploymentId: string) => {
   emit("onClickdeploy", jenkinsDeploymentId);
 };
+
+const onClickRevert = (jenkinsDeploymentId: string, tag: string) => {
+  emit("onClickdeploy", jenkinsDeploymentId, tag);
+};
 </script>
 <template>
   <section @click.stop="">
@@ -48,17 +52,29 @@ const onClickDeploy = (jenkinsDeploymentId: string) => {
           <v-list-item>
             <div class="deploy-log-item title">
               <p>Build Number</p>
+              <p>태그</p>
               <p>배포 사유</p>
               <p>상태</p>
+              <p>Revert</p>
             </div>
           </v-list-item>
 
-          <v-list-item v-for="deploylog in curWind?.deployLogs.filter(item => item.tag === props.tag)">
+          <v-list-item v-for="deploylog in curWind?.deployLogs.filter(item => item.tag.includes(props.tag))">
             <div class="deploy-log-item">
               <p>{{ deploylog.buildNumber }}</p>
+              <p>{{ deploylog.tag }}</p>
               <p v-html="deploylog.reason"></p>
               <p>
                 <v-icon :color="deploylog.renderStatusIcon().color" :icon="deploylog.renderStatusIcon().icon"></v-icon>
+              </p>
+              <p>
+                <v-btn
+                  variant="tonal"
+                  color="primary"
+                  @click="onClickRevert(curWind.jenkinsDeploymentId as string, `${deploylog.tag}`)"
+                >
+                  Revert
+                </v-btn>
               </p>
             </div>
           </v-list-item>
