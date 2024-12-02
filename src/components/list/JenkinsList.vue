@@ -59,7 +59,8 @@ const onClickRevert = (jenkinsDeploymentId: string, tag: string) => {
             </div>
           </v-list-item>
 
-          <v-list-item v-for="deploylog in curWind?.deployLogs.filter(item => props.tag.includes(item.tag))">
+          <v-list-item v-for="deploylog in curWind?.deployLogs.filter(item => item.tag.includes(props.tag))">
+            <!-- <v-list-item v-for="deploylog in curWind?.deployLogs.filter(item => props.tag.includes(item.tag))"> -->
             <div class="deploy-log-item">
               <p>{{ deploylog.buildNumber }}</p>
               <p>{{ deploylog.tag }}</p>
