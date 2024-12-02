@@ -171,6 +171,7 @@ const onSubmitDueDate = () => {
 };
 
 const onClickJenkinsDeployment = (jenkinsDeploymentId: string, tag?: string) => {
+  if (!tag) return alert("태그를 입력해주세요");
   const target = props.jenkinsDeploymentList?.find(
     deployment => deployment.jenkinsDeploymentId === jenkinsDeploymentId
   ) as JenkinsDeploymentClass;
