@@ -105,7 +105,7 @@ const onSubmitNewJenkinsDeployment = (jenkinsDeploymentParams: Partial<JenkinsDe
       @onClickDeleteJenkinsDeployment="onClickDeleteJenkinsDeployment"
     />
   </ModalWrap>
-
+ 
   <section v-if="type === E_SwTypeListType.section">
     <div class="card-wrap">
       <v-row>
@@ -166,7 +166,7 @@ const onSubmitNewJenkinsDeployment = (jenkinsDeploymentParams: Partial<JenkinsDe
     <v-data-table :headers="headers" :items="props.swList" :sort-by="[{ key: 'createdAt', order: 'asc' }]">
       <template v-slot:item.actions="{ item }">
         <div class="deployment-wrap">
-          <v-btn variant="elevated" size="small" @click="onAddJenkinsDeployment(item.swTypeId)">Add</v-btn>
+          <v-btn variant="tonal" color="blue" size="small" @click="onAddJenkinsDeployment(item.swTypeId)">Add</v-btn>
           <v-list>
             <v-list-item v-for="jenkinsDeployment in item.jenkinsDeployments">
               <v-list-item-title>

@@ -67,14 +67,34 @@ const onClickReactionBtn = (btnType: E_ReactionType, testUnitId: string) => {
 </script>
 
 <template>
-  <section v-if="unitList.length > 0">
-    <h5>유닛 테스트 목록</h5>
+  <section class="test-unit-section" v-if="unitList.length > 0">
+    <h5 class="test-unit-title">유닛 테스트 목록</h5>
     <ul class="test-unit-list">
       <li v-for="testUnit in unitList" :key="testUnit.testUnitId">
+        <v-speed-dial location="top right" transition="false" open-on-hover>
+          <template v-slot:activator="{ props: activatorProps }">
+            <v-btn class="test-unit-text" variant="text" v-bind="activatorProps">
+              {{ testUnit.unitDesc }}
+            </v-btn>
+          </template>
+          <div class="btn-checks">
+            <v-btn
+              v-for="btn in REACT_BTN_LIST"
+              :key="btn.icon"
+              icon
+              size="x-small"
+              @click.stop="onClickReactionBtn(btn.type, testUnit.testUnitId as string)"
+            >
+              <v-icon :icon="btn.icon" :color="btn.color"></v-icon>
+            </v-btn>
+          </div>
+        </v-speed-dial>
+        
         <ul v-if="testUnit.reactions" class="reactions-con">
           <li v-for="reactionKey in Object.keys(testUnit.counts as object)">
             <v-chip
               link
+              label
               v-if="testUnit?.counts && !!testUnit?.counts"
               @click.stop="onClickReactionBtn(reactionKey as E_ReactionType, testUnit.testUnitId as string)"
             >
@@ -96,25 +116,52 @@ const onClickReactionBtn = (btnType: E_ReactionType, testUnitId: string) => {
             </v-chip>
           </li>
         </ul>
-        <v-speed-dial location="right center" transition="fade-transition" open-on-hover>
-          <template v-slot:activator="{ props: activatorProps }">
-            <v-btn variant="text" v-bind="activatorProps">
-              {{ testUnit.unitDesc }}
-            </v-btn>
-          </template>
-          <v-btn
-            v-for="btn in REACT_BTN_LIST"
-            :key="btn.icon"
-            icon
-            size="x-small"
-            @click.stop="onClickReactionBtn(btn.type, testUnit.testUnitId as string)"
-          >
-            <v-icon :icon="btn.icon" :color="btn.color"></v-icon>
-          </v-btn>
-        </v-speed-dial>
       </li>
     </ul>
   </section>
 </template>
 
-<style scoped></style>
+<style scoped>
+.btn-checks {
+  display: flex;
+  gap:6px
+}
+.test-unit-section {
+  padding: 20px 0 26px;
+}
+.test-unit-title { 
+  position: relative;
+  display: inline-block;
+  font-size: 16px;
+  font-weight: 500;
+  padding-bottom: 5px;
+  padding-right:3px;
+}
+.test-unit-title:before {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 3px;
+  width: 100%;
+  height: 1px;
+  background: rgba(30, 41, 59, 0.6);
+}
+.test-unit-list {
+  margin-left: 24px;
+}
+.test-unit-text {
+  padding: 5px 7px;
+  margin-right: 5px;
+  margin-left: -7px;
+}
+.test-unit-list li {
+  position: relative;
+  margin-top: 3px;
+}
+.test-unit-section .reactions-con {
+  display: inline-block;
+}
+.test-unit-section .reactions-con li {
+  list-style: none; display: inline-block;
+}
+</style>
