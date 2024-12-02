@@ -461,6 +461,7 @@ const onSubmitJenkinsDeployment = (jenkinsDeploymentId: string, tag: string, rea
   display: flex;
   flex-direction: column;
   gap: 20px;
+  padding-top: 20px;
 
   .tester-con {
     p {

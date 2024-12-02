@@ -361,7 +361,7 @@ const onClickJenkinsDeployment = (jenkinsDeploymentId: string, tag: string, reas
           v-for="maintainer in maintainerList"
           :class="maintainer.id === loggedInUser?.id ? ' on' : ''"
           class="mr-2 mb-2"
-          :variant="maintainer.id === loggedInUser?.id ? 'tonal' : 'outlined'"
+          :variant="maintainer.id === loggedInUser?.id ? 'outlined' : 'tonal'"
           label
         >
           {{ maintainer.id === loggedInUser?.id ? "me" : maintainer.username }}

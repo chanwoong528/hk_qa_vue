@@ -79,7 +79,6 @@ const sortedTestSessions = computed(() => {
   }
 }
 .tester-con {
-  padding-top: 20px;
   padding-bottom: 6px;
   border-bottom: 1px dashed #ddd;
   p {

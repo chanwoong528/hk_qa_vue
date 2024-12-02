@@ -6,7 +6,7 @@
     "dev:front": "cross-env NODE_ENV=prod vite",
     "build": "cross-env NODE_ENV=prod vue-tsc --noEmit && vite build",
     "preview": "cross-env NODE_ENV=prod vite preview",
-    "lint": "eslint . --fix --ignore-path .gitignore",
+    "lint": "npm buildeslint . --fix --ignore-path .gitignore",
     "pm2:start": "pm2 serve dist/ 3001 --name hkqa-client  --spa"
   },
   "dependencies": {
