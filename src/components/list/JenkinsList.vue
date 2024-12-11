@@ -54,7 +54,7 @@ const onClickRevert = (jenkinsDeploymentId: string, tag: string) => {
           ></v-progress-circular>
         </v-chip>
 
-        <v-list v-if="curWind?.deployLogs.filter(item => item.tag.includes(props.tag)).length > 0">
+        <v-list v-if="curWind?.deployLogs.some(item => props.tag.includes(item.tag.split('-')[0]))">
           <v-list-item>
             <div class="deploy-log-item title">
               <p>Build Number</p>
@@ -65,7 +65,12 @@ const onClickRevert = (jenkinsDeploymentId: string, tag: string) => {
             </div>
           </v-list-item>
 
-          <v-list-item v-for="deploylogItem in curWind?.deployLogs.filter(item => item.tag.includes(props.tag))">
+          <v-list-item
+            v-for="deploylogItem in curWind?.deployLogs.filter(item => {
+              console.log(item.tag, props.tag);
+              return props.tag.includes(item.tag.split('-')[0]);
+            })"
+          >
             <div class="deploy-log-item" :key="deploylogItem.jenkinsDeploymentId">
               <p>{{ deploylogItem.buildNumber }}</p>
               <p>{{ deploylogItem.tag }}</p>
