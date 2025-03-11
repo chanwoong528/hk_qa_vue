@@ -40,7 +40,6 @@ const swStore = useSwStore();
 const { swTypes } = storeToRefs(swStore);
 
 const swVersionsStore = useSwVersionsStore();
-const { swVersions } = storeToRefs(swVersionsStore);
 
 const maintainerList = ref<IUserInfo[]>([]);
 const userList = ref<IUserInfo[]>([]);
