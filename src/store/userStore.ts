@@ -9,7 +9,7 @@ interface UserStoreState {
 export const useUserStore = defineStore("user", {
   state: (): UserStoreState => {
     return {
-      loggedInUser: undefined || ({} as IUserInfo) || undefined,
+      loggedInUser: undefined,
       isLoggedIn: true,
     };
   },
