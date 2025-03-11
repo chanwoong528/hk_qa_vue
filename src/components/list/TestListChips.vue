@@ -23,9 +23,9 @@ const onClickLoggedInUserStatus = (tester: ITestSession) => {
 };
 
 const sortedTestSessions = computed(() => {
-  const temp = props.swVersion?.testSessions;
-
-  return temp?.sort((a, b) => (a.createdAt > b.createdAt ? 1 : -1));
+  return props.swVersion?.testSessions 
+    ? [...props.swVersion.testSessions].sort((a, b) => (a.createdAt > b.createdAt ? 1 : -1))
+    : [];
 });
 </script>
 

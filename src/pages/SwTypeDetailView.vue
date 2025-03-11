@@ -18,7 +18,9 @@ import NewVersionForm from "@/components/form/NewVersionForm.vue";
 import AddMaintainerForm from "@/components/form/AddMaintainerForm.vue";
 import NewBoardForm from "@/components/form/NewBoardForm.vue";
 
+import { useSwVersionsStore } from "@/store/swVersionsStore";
 import { useSwStore } from "@/store/swStore";
+
 import { userApi } from "@/services/domain/userService";
 
 import { maintainerApi } from "@/services/domain/maintainerService";
@@ -36,6 +38,9 @@ const { loggedInUser } = storeToRefs(userStore);
 
 const swStore = useSwStore();
 const { swTypes } = storeToRefs(swStore);
+
+const swVersionsStore = useSwVersionsStore();
+const { swVersions } = storeToRefs(swVersionsStore);
 
 const maintainerList = ref<IUserInfo[]>([]);
 const userList = ref<IUserInfo[]>([]);
@@ -124,6 +129,7 @@ watch(
 const onFetchSwVersionList = (swTypeId: string) => {
   return swVersionApi.GET_swVersionsBySwTypeId(swTypeId).then(res => {
     swVersionList.value = res as ISwVersion[];
+    swVersionsStore.setSwVersions(res as ISwVersion[]);
   });
 };
 
@@ -377,7 +383,6 @@ const onClickJenkinsDeployment = (jenkinsDeploymentId: string, tag: string, reas
     <div class="content-con">
       <div class="list-con">
         <SwVersionList
-          :swVersionList="swVersionList"
           :jenkinsDeploymentList="jenkinsDeploymentList"
           :onFetchSwVersionList="onFetchSwVersionList"
           @onClickJenkinsDeployment="onClickJenkinsDeployment"

@@ -30,6 +30,11 @@ import JenkinsList from "./JenkinsList.vue";
 
 import { E_ModalType } from "@/types/enum.d";
 
+import { useSwVersionsStore } from "@/store/swVersionsStore";
+
+const swVersionsStore = useSwVersionsStore();
+const { swVersions } = storeToRefs(swVersionsStore);
+
 const store = useUserStore();
 const { loggedInUser } = storeToRefs(store);
 
@@ -46,6 +51,7 @@ const props = defineProps({
     type: Array as () => JenkinsDeploymentClass[],
   },
 });
+
 const unitList = ref<ITestUnit[]>([]);
 const openCalender = ref<boolean>(false);
 const selectedDate = ref<string>();
@@ -159,14 +165,25 @@ const onClickDetailView = () => {
     emit("onClickDetailView", props.swVersion?.swVersionId);
   }
 };
+const onCancelDate = () => {
+  openCalender.value = false;
+  selectedDate.value = dateAdapter.parseISO(
+    swVersions.value.find(ver => ver.swVersionId === props.swVersion?.swVersionId)?.dueDate as string
+  ) as string;
+};
 
 const onSubmitDueDate = () => {
   if (!selectedDate.value) return alert("마감일을 선택해주세요");
 
   swVersionApi
-    .PATCH_swVersionDueDate(props.swVersion?.swVersionId as string, formatDateForServer(selectedDate.value))
+    .PATCH_swVersionDueDate(props.swVersion?.swVersionId as string, formatDateForServer(selectedDate.value as string))
     .then(res => {
       openCalender.value = false;
+      swVersionsStore.updateSwVersionById(
+        props.swVersion?.swVersionId as string,
+        "dueDate",
+        formatDateForServer(selectedDate.value as string)
+      );
     });
 };
 
@@ -244,7 +261,7 @@ const onSubmitJenkinsDeployment = (jenkinsDeploymentId: string, tag: string, rea
             </template>
           </v-btn>
           <div class="date-picker" v-if="!!openCalender" @click.stop>
-            <v-btn class="close-btn" icon="mdi-close" @click="openCalender = false" variant="plain"></v-btn>
+            <v-btn class="close-btn" icon="mdi-close" @click="onCancelDate" variant="plain"></v-btn>
             <v-date-picker v-model="selectedDate" show-adjacent-months> </v-date-picker>
             <v-btn variant="plain" @click="onSubmitDueDate">ok</v-btn>
           </div>

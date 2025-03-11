@@ -25,15 +25,16 @@ import { useRoute } from "vue-router";
 import TestListChart from "./TestListChart.vue";
 import UnitTestList from "./UnitTestList.vue";
 import { JenkinsDeploymentClass } from "@/entity/JenkinsDeployment";
+import { useSwVersionsStore } from "@/store/swVersionsStore";
 // import UnitTestList from "./UnitTestList.vue";
 // import TestListChips from "./TestListChips.vue";
 
 const route = useRoute();
 
 const props = defineProps({
-  swVersionList: {
-    type: Array as () => ISwVersion[],
-  },
+  // swVersionList: {
+  //   type: Array as () => ISwVersion[],
+  // },
   onFetchSwVersionList: {
     type: Function,
   },
@@ -44,6 +45,9 @@ const props = defineProps({
 
 const detailViewTabs = ["버전 개요", "테스터"];
 const curModalTab = ref<string>("버전 개요");
+
+const swVersionsStore = useSwVersionsStore();
+const { swVersions } = storeToRefs(swVersionsStore);
 
 const userStore = useUserStore();
 const { loggedInUser } = storeToRefs(userStore);
@@ -90,11 +94,11 @@ onMounted(() => {
 });
 
 watch(
-  () => [props.swVersionList, route.params.id as string],
+  () => [swVersions.value, route.params.id as string],
   ([newList, newId]) => {
     console.log("@@@@ ", newList, newId);
     if (newList && Array.isArray(newList) && !!newId && !route.query.open) {
-      const firstSwVersion = newList
+      const firstSwVersion = swVersions.value
         .filter(ver => {
           if (!ver.testSessions.every(tester => tester.status === E_TestStatus.passed) || ver.testSessions.length === 0)
             return ver;
@@ -102,6 +106,8 @@ watch(
         .sort((a: ISwVersion, b: ISwVersion) => {
           return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
         });
+
+      console.log("first version>>> ", firstSwVersion?.[0]?.swVersionId);
 
       panelOpened.value = firstSwVersion?.[0]?.swVersionId;
       // console.log("@@@@ ", firstSwVersion?.[0]);
@@ -145,7 +151,7 @@ const computedIsLastPage = computed(() => {
 });
 
 const curSwVersionInfo = computed(() => {
-  return props.swVersionList?.find(sw => sw.swVersionId === curSwVersionId.value);
+  return swVersions.value?.find(sw => sw.swVersionId === curSwVersionId.value);
 });
 
 const toggleModal = (type?: E_SwVersionModalType, testerId?: string) => {
@@ -238,7 +244,7 @@ const onClickDeleteComment = (commentId: string) => {
 
 const onClickAddTester = (swVerId: string) => {
   curSwVersionId.value = swVerId;
-  const targetSwVersion = props.swVersionList?.find(sw => sw.swVersionId === swVerId);
+  const targetSwVersion = swVersions.value?.find(sw => sw.swVersionId === swVerId);
 
   return userApi.GET_users().then(usersData => {
     const curTesters = targetSwVersion?.testSessions.map(tester => {
@@ -273,7 +279,7 @@ const onSubmitAddTesters = (testers: IUserInfo[]) => {
   return testSessionApi
     .PUT_deleteOrAddTestSession(curSwVersionId.value, tobeDeleted, tobeAdded)
     .then(res => {
-      props.onFetchSwVersionList && props.onFetchSwVersionList(props.swVersionList?.[0]?.swType?.swTypeId);
+      props.onFetchSwVersionList && props.onFetchSwVersionList(swVersions.value?.[0]?.swType?.swTypeId);
       toggleModal(E_SwVersionModalType.addTester);
     })
     .catch(error => alert(error));
@@ -312,6 +318,7 @@ const onClickJenkinsDeployment = (jenkinsDeploymentId: string, tag: string, reas
         <SwVersionItem
           :swVersion="curSwVersionInfo"
           :toggleModal="toggleModal"
+          :isCurOpen="curSwVersionInfo?.swVersionId === panelOpened"
           @onClickTester="onClickTester"
           @onClickAddTester="onClickAddTester"
           @onClickDetailView="onClickDetailView"
@@ -344,7 +351,7 @@ const onClickJenkinsDeployment = (jenkinsDeploymentId: string, tag: string, reas
     </header>
     <v-expansion-panels v-model="panelOpened" flat variant="accordion">
       <SwVersionItem
-        v-for="swVersion in props.swVersionList?.filter(ver => {
+        v-for="swVersion in swVersions?.filter(ver => {
           if (!ver.testSessions.every(tester => tester.status === E_TestStatus.passed) || ver.testSessions.length === 0)
             return ver;
         })"
@@ -365,7 +372,7 @@ const onClickJenkinsDeployment = (jenkinsDeploymentId: string, tag: string, reas
   <section
     class="version-list-con finished box-wrap"
     v-if="
-      (props.swVersionList ?? []).filter(ver => {
+      (swVersions ?? []).filter(ver => {
         if (ver.testSessions.every(tester => tester.status === E_TestStatus.passed) && ver.testSessions.length > 0)
           return ver;
       }).length > 0
@@ -376,7 +383,7 @@ const onClickJenkinsDeployment = (jenkinsDeploymentId: string, tag: string, reas
     </header>
     <v-expansion-panels v-model="panelOpened" flat variant="accordion">
       <SwVersionItem
-        v-for="swVersion in props.swVersionList?.filter(ver => {
+        v-for="swVersion in swVersions?.filter(ver => {
           if (ver.testSessions.every(tester => tester.status === E_TestStatus.passed) && ver.testSessions.length > 0)
             return ver;
         })"
