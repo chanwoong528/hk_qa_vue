@@ -30,23 +30,15 @@ const btnList = ref<{ code: E_TestStatus; label: string }[]>([
 const isEditorFocused = ref<boolean>(false);
 
 const onClickHistoryTab = () => {
-  if (
-    testSessionModel?.value?.user?.id &&
-    testSessionModel.value.swVersion?.swVersionId
-  ) {
-    return fetchLogForUser(
-      testSessionModel.value?.user?.id,
-      testSessionModel.value.swVersion?.swVersionId
-    );
+  if (testSessionModel?.value?.user?.id && testSessionModel.value.swVersion?.swVersionId) {
+    return fetchLogForUser(testSessionModel.value?.user?.id, testSessionModel.value.swVersion?.swVersionId);
   }
 };
 
 const fetchLogForUser = (userId: string, swVersionId: string) => {
-  return logApi
-    .GET_testerStatusUpdateLogByUserId(userId, swVersionId)
-    .then((res) => {
-      logListByUser.value = res;
-    });
+  return logApi.GET_testerStatusUpdateLogByUserId(userId, swVersionId).then(res => {
+    logListByUser.value = res;
+  });
 };
 
 const onFocusEditorCon = (clickedCon: boolean) => {
@@ -82,17 +74,8 @@ const renderRadioBtnTestStatus = (status: E_TestStatus) => {
 
 <template>
   <v-tabs v-model="curTab" color="primary" direction="horizontal">
-    <v-tab
-      prepend-icon="mdi-account"
-      text="현재 상태"
-      :value="E_Tab.formTestStatus"
-    ></v-tab>
-    <v-tab
-      prepend-icon="mdi mdi-math-log"
-      text="변경 로그"
-      @click="onClickHistoryTab"
-      :value="E_Tab.history"
-    ></v-tab>
+    <v-tab prepend-icon="mdi-account" text="현재 상태" :value="E_Tab.formTestStatus"></v-tab>
+    <v-tab prepend-icon="mdi mdi-math-log" text="변경 로그" @click="onClickHistoryTab" :value="E_Tab.history"></v-tab>
   </v-tabs>
 
   <v-tabs-window v-model="curTab">

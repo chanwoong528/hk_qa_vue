@@ -161,15 +161,14 @@ const renderPercentage = (statusCount: number, total: number) => {
 
               <v-icon :icon="renderTestStatus(statusInfo as E_TestStatus)"></v-icon>
               <p v-if="statusInfo !== 'total'">
+
                 <span>
-                  {{ renderLabelKOR(statusInfo as E_TestStatus) }}: {{
-                    (computedData.infoData as Record<E_TestStatus, number>)[statusInfo as E_TestStatus] }}
+                  {{ renderLabelKOR(statusInfo as E_TestStatus) }}: 
+                  {{ (computedData.infoData as Record<E_TestStatus, number>)[statusInfo as E_TestStatus] }}
                 </span>
                 <br />
                 <span>
-                  {{
-
-                    renderPercentage(
+                  {{ renderPercentage(
                       (computedData.infoData as Record<E_TestStatus, number>)[statusInfo as E_TestStatus],
                       !!computedData.infoData?.total ? computedData.infoData?.total : 0
                     )
@@ -192,12 +191,12 @@ const renderPercentage = (statusCount: number, total: number) => {
     </div>
 
     <v-data-table :headers="dataHeaders" :items="computedData.tableHeader" :items-per-page="5" class="elevation-1">
-      <template v-slot:item.status="{ item }">
+      <template v-slot:[`item.status`]="{ item }">
         <v-icon :color="renderTestStatus(item.status as E_TestStatus)"
           :icon="renderIconForVersionStatus(item.status)"></v-icon>
       </template>
 
-      <template v-slot:item.comment="{ item }">
+      <template v-slot:[`item.comment`]="{ item }">
         <div v-if="item.status === E_TestStatus.pending">
           <p>아직 QA를 진행하지 않았습니다.</p>
         </div>

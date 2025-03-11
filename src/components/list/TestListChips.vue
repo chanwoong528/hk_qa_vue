@@ -23,7 +23,9 @@ const onClickLoggedInUserStatus = (tester: ITestSession) => {
 };
 
 const sortedTestSessions = computed(() => {
-  return props.swVersion?.testSessions?.sort((a, b) => (a.createdAt > b.createdAt ? 1 : -1));
+  const temp = props.swVersion?.testSessions;
+
+  return temp?.sort((a, b) => (a.createdAt > b.createdAt ? 1 : -1));
 });
 </script>
 
@@ -33,6 +35,7 @@ const sortedTestSessions = computed(() => {
       <p>현재 테스터</p>
       <v-chip
         v-for="tester in sortedTestSessions"
+        :key="tester.user.id"
         :class="tester.user.id === loggedInUser?.id ? ' on' : ''"
         class="mr-2 mb-2"
         :variant="tester.user.id === loggedInUser?.id ? 'tonal' : 'tonal'"

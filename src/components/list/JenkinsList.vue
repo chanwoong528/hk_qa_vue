@@ -10,7 +10,6 @@ const props = defineProps<{
 
 const curModalTab = ref<string>(props.jenkinsDeploymentList[0].title);
 
-console.log(props.jenkinsDeploymentList);
 // watch(curModalTab, newVal => {
 //   curWindowInfo.value = props.jenkinsDeploymentList.find(jenkins => jenkins.title === newVal) || null;
 // });
@@ -67,11 +66,11 @@ const onClickRevert = (jenkinsDeploymentId: string, tag: string) => {
 
           <v-list-item
             v-for="deploylogItem in curWind?.deployLogs.filter(item => {
-              console.log(item.tag, props.tag);
               return props.tag.includes(item.tag.split('-')[0]);
             })"
+            :key="deploylogItem.jenkinsDeploymentId"
           >
-            <div class="deploy-log-item" :key="deploylogItem.jenkinsDeploymentId">
+            <div class="deploy-log-item">
               <p>{{ deploylogItem.buildNumber }}</p>
               <p>{{ deploylogItem.tag }}</p>
               <p v-html="deploylogItem.reason"></p>
