@@ -167,9 +167,12 @@ const onClickDetailView = () => {
 };
 const onCancelDate = () => {
   openCalender.value = false;
-  selectedDate.value = dateAdapter.parseISO(
-    swVersions.value.find(ver => ver.swVersionId === props.swVersion?.swVersionId)?.dueDate as string
-  ) as string;
+  const prevDueDate = swVersions.value.find(ver => ver.swVersionId === props.swVersion?.swVersionId)?.dueDate;
+  if (!!prevDueDate) {
+    selectedDate.value = dateAdapter.parseISO(prevDueDate as string) as string;
+  } else {
+    selectedDate.value = undefined;
+  }
 };
 
 const onSubmitDueDate = () => {
