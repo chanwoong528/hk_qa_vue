@@ -21,5 +21,8 @@ module.exports = {
   rules: {
     "vue/multi-word-component-names": "off",
     "prettier/prettier": "error",
+    "no-extra-boolean-cast": "off",
+    "vue/no-v-text-v-html-on-component": "off",
+    "vue/no-parsing-error": ["error", { "x-invalid-end-tag": false }],
   },
 };

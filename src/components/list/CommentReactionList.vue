@@ -6,29 +6,28 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["onClickReactionBtn"]);
-const REACT_BTN_LIST: { type: E_ReactionType; icon: string; color: string }[] =
-  [
-    {
-      type: E_ReactionType.check,
-      icon: renderIconForReaction(E_ReactionType.check).icon,
-      color: renderIconForReaction(E_ReactionType.check).color,
-    },
-    {
-      type: E_ReactionType.stop,
-      icon: renderIconForReaction(E_ReactionType.stop).icon,
-      color: renderIconForReaction(E_ReactionType.stop).color,
-    },
-    {
-      type: E_ReactionType.like,
-      icon: renderIconForReaction(E_ReactionType.like).icon,
-      color: renderIconForReaction(E_ReactionType.like).color,
-    },
-    {
-      type: E_ReactionType.wow,
-      icon: renderIconForReaction(E_ReactionType.wow).icon,
-      color: renderIconForReaction(E_ReactionType.wow).color,
-    },
-  ];
+const REACT_BTN_LIST: { type: E_ReactionType; icon: string; color: string }[] = [
+  {
+    type: E_ReactionType.check,
+    icon: renderIconForReaction(E_ReactionType.check).icon,
+    color: renderIconForReaction(E_ReactionType.check).color,
+  },
+  {
+    type: E_ReactionType.stop,
+    icon: renderIconForReaction(E_ReactionType.stop).icon,
+    color: renderIconForReaction(E_ReactionType.stop).color,
+  },
+  {
+    type: E_ReactionType.like,
+    icon: renderIconForReaction(E_ReactionType.like).icon,
+    color: renderIconForReaction(E_ReactionType.like).color,
+  },
+  {
+    type: E_ReactionType.wow,
+    icon: renderIconForReaction(E_ReactionType.wow).icon,
+    color: renderIconForReaction(E_ReactionType.wow).color,
+  },
+];
 const onClickReactionBtn = (btnType: E_ReactionType) => {
   emit("onClickReactionBtn", btnType);
 };
@@ -50,7 +49,9 @@ const onClickReactionBtn = (btnType: E_ReactionType) => {
   top: 10px;
   left: 0;
   padding-inline: 16px;
-  transition: transform 0.3s, opacity 0.3s;
+  transition:
+    transform 0.3s,
+    opacity 0.3s;
   pointer-events: none;
   opacity: 0;
 

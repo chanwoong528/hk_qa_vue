@@ -105,11 +105,11 @@ const onSubmitNewJenkinsDeployment = (jenkinsDeploymentParams: Partial<JenkinsDe
       @onClickDeleteJenkinsDeployment="onClickDeleteJenkinsDeployment"
     />
   </ModalWrap>
- 
+
   <section v-if="type === E_SwTypeListType.section">
     <div class="card-wrap">
       <v-row>
-        <v-col cols="6" v-for="(swItem, i) in props.swList">
+        <v-col cols="6" v-for="(swItem, i) in props.swList" :key="swItem.swTypeId">
           <v-card
             :color="colors[i]"
             link
@@ -164,11 +164,14 @@ const onSubmitNewJenkinsDeployment = (jenkinsDeploymentParams: Partial<JenkinsDe
   </section>
   <section v-else>
     <v-data-table :headers="headers" :items="props.swList" :sort-by="[{ key: 'createdAt', order: 'asc' }]">
-      <template v-slot:item.actions="{ item }">
+      <template v-slot:[`item.actions`]="{ item }">
         <div class="deployment-wrap">
           <v-btn variant="tonal" color="blue" size="small" @click="onAddJenkinsDeployment(item.swTypeId)">Add</v-btn>
           <v-list>
-            <v-list-item v-for="jenkinsDeployment in item.jenkinsDeployments">
+            <v-list-item
+              v-for="jenkinsDeployment in item.jenkinsDeployments"
+              :key="jenkinsDeployment.jenkinsDeploymentId"
+            >
               <v-list-item-title>
                 <v-chip @click="onEditJenkinsDeployment(jenkinsDeployment, item.swTypeId)">
                   {{ jenkinsDeployment.title }}

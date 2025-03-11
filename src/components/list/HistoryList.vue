@@ -37,10 +37,7 @@ const renderIconForVersionStatus = (status: E_TestStatus) => {
         :dot-color="renderTestStatus(log.content.status)"
         :icon="renderIconForVersionStatus(log.content.status)"
       >
-        <v-expansion-panels
-          v-if="!!log.content.reasonContent"
-          variant="accordion"
-        >
+        <v-expansion-panels v-if="!!log.content.reasonContent" variant="accordion">
           <v-expansion-panel>
             <v-expansion-panel-title>
               {{ formatDateTime(log.createdAt) }}

@@ -80,7 +80,6 @@ onUnmounted(() => {
 watch(
   () => sseTrigger.date,
   newDate => {
-    console.log("newDate", newDate);
     onFetchJenkinsDeployment(route.params.id as string);
   }
 );
@@ -123,7 +122,9 @@ watch(
 );
 
 const onFetchSwVersionList = (swTypeId: string) => {
-  return swVersionApi.GET_swVersionsBySwTypeId(swTypeId).then(res => (swVersionList.value = res as ISwVersion[]));
+  return swVersionApi.GET_swVersionsBySwTypeId(swTypeId).then(res => {
+    swVersionList.value = res as ISwVersion[];
+  });
 };
 
 const onFetchJenkinsDeployment = (swTypeId: string) => {
@@ -222,15 +223,12 @@ const onSubmitEditVersion = async (
       tag,
       ...(file && { file }),
     });
-    // console.log("@@@@ ", unitTestList, !!unitTestList, unitTestList?.length > 0);
 
-    // if (!!unitTestList && unitTestList?.length > 0) {
     if (unitTestList?.some(item => !item.unitDesc)) {
       return alert("유닛테스트를 작성 해주세요");
     }
 
     await testUnitApi.PATCH_testUnit(unitTestList ?? [], swVersionId);
-    // }
 
     submitErrorFlag.value = false;
 
@@ -295,9 +293,15 @@ const onSubmitNewBoard = (boardParam: BoardClass) => {
 };
 
 const onClickJenkinsDeployment = (jenkinsDeploymentId: string, tag: string, reason: string) => {
-  buildLogApi.POST_buildLog({ jenkinsDeploymentId, tag, reason }).then(res => {
-    onFetchJenkinsDeployment(route.params.id as string);
-  });
+  buildLogApi
+    .POST_buildLog({ jenkinsDeploymentId, tag, reason })
+    .then(res => {
+      onFetchJenkinsDeployment(route.params.id as string);
+    })
+    .catch(error => {
+      console.error(error);
+      alert("배포 로그 저장에 실패하였습니다. 다시 시도해주세요.");
+    });
 };
 </script>
 
@@ -359,6 +363,7 @@ const onClickJenkinsDeployment = (jenkinsDeploymentId: string, tag: string, reas
         <v-chip
           color="blue-grey-darken-3"
           v-for="maintainer in maintainerList"
+          :key="maintainer.id"
           :class="maintainer.id === loggedInUser?.id ? ' on' : ''"
           class="mr-2 mb-2"
           :variant="maintainer.id === loggedInUser?.id ? 'outlined' : 'tonal'"

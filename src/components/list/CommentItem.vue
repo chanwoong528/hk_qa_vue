@@ -30,8 +30,6 @@ const isEditorFocused = ref<boolean>(false);
 const openEditorForReply = ref<boolean>(false);
 const openEditorForEdit = ref<boolean>(false);
 
-console.log(props.comment);
-
 // const commentStatus = ref<string>("") // 수정 | 답글작성 | 답글보기 ;
 
 const curCommentId = ref<string>("");
@@ -132,7 +130,7 @@ const renderCommentUserName = () => {
       <RichEditor v-else v-model="reCommentVal" :isEditorFocused="isEditorFocused" @onBlurEditorCon="onBlurEditorCon" />
 
       <ul v-if="props.comment?.reactions && !openEditorForEdit" class="reactions-con">
-        <li v-for="reactionKey in Object.keys(props.comment.counts as object)">
+        <li v-for="reactionKey in Object.keys(props.comment.counts as object)" :key="reactionKey">
           <v-chip
             link
             v-if="props.comment?.counts && !!props.comment?.counts"
@@ -146,7 +144,10 @@ const renderCommentUserName = () => {
             {{ props.comment.counts[reactionKey as E_ReactionType] }}
 
             <v-tooltip activator="parent" location="end" max-width="300">
-              <p v-for="person in props.comment.reactions.filter(reaction => reaction.reactionType === reactionKey)">
+              <p
+                v-for="person in props.comment.reactions.filter(reaction => reaction.reactionType === reactionKey)"
+                :key="person.user.id"
+              >
                 {{ person.user.username }}
               </p>
             </v-tooltip>

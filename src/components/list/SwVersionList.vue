@@ -48,7 +48,7 @@ const curModalTab = ref<string>("버전 개요");
 const userStore = useUserStore();
 const { loggedInUser } = storeToRefs(userStore);
 
-const panelOpened = ref(props.swVersionList?.[0]?.swVersionId ?? 0);
+const panelOpened = ref();
 
 const emit = defineEmits(["onSubmitStatus", "onClickEditVersion", "onClickJenkinsDeployment"]);
 
@@ -88,11 +88,23 @@ onMounted(() => {
     return (panelOpened.value = route.query.open as string);
   }
 });
+
 watch(
-  () => route.params.id as string,
-  newId => {
-    if (!!newId) {
-      return (panelOpened.value = 0);
+  () => [props.swVersionList, route.params.id as string],
+  ([newList, newId]) => {
+    console.log("@@@@ ", newList, newId);
+    if (newList && Array.isArray(newList) && !!newId && !route.query.open) {
+      const firstSwVersion = newList
+        .filter(ver => {
+          if (!ver.testSessions.every(tester => tester.status === E_TestStatus.passed) || ver.testSessions.length === 0)
+            return ver;
+        })
+        .sort((a: ISwVersion, b: ISwVersion) => {
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        });
+
+      panelOpened.value = firstSwVersion?.[0]?.swVersionId;
+      // console.log("@@@@ ", firstSwVersion?.[0]);
     }
   }
 );
@@ -332,14 +344,14 @@ const onClickJenkinsDeployment = (jenkinsDeploymentId: string, tag: string, reas
     </header>
     <v-expansion-panels v-model="panelOpened" flat variant="accordion">
       <SwVersionItem
-        v-for="(swVersion, idx) in props.swVersionList?.filter(ver => {
+        v-for="swVersion in props.swVersionList?.filter(ver => {
           if (!ver.testSessions.every(tester => tester.status === E_TestStatus.passed) || ver.testSessions.length === 0)
             return ver;
         })"
         :key="swVersion.swVersionId"
         :swVersion="swVersion"
         :toggleModal="toggleModal"
-        :isCurOpen="swVersion.swVersionId === panelOpened || idx === 0"
+        :isCurOpen="swVersion.swVersionId === panelOpened"
         itemType="panel"
         @onClickTester="onClickTester"
         @onClickAddTester="onClickAddTester"
@@ -364,14 +376,14 @@ const onClickJenkinsDeployment = (jenkinsDeploymentId: string, tag: string, reas
     </header>
     <v-expansion-panels v-model="panelOpened" flat variant="accordion">
       <SwVersionItem
-        v-for="(swVersion, idx) in props.swVersionList?.filter(ver => {
+        v-for="swVersion in props.swVersionList?.filter(ver => {
           if (ver.testSessions.every(tester => tester.status === E_TestStatus.passed) && ver.testSessions.length > 0)
             return ver;
         })"
         :key="swVersion.swVersionId"
         :swVersion="swVersion"
         :toggleModal="toggleModal"
-        :isCurOpen="swVersion.swVersionId === panelOpened || idx === 0"
+        :isCurOpen="swVersion.swVersionId === panelOpened"
         itemType="panel"
         @onClickTester="onClickTester"
         @onClickAddTester="onClickAddTester"

@@ -55,12 +55,12 @@ const selectedJenkinsDeployment = ref();
 watch(
   () => [props.isCurOpen, props.swVersion?.swVersionId],
   ([newOpen, newVerId]) => {
+    if (!!props.swVersion?.dueDate) {
+      selectedDate.value = dateAdapter.parseISO(props.swVersion.dueDate) as string;
+    }
+
     if (!!newOpen && !!newVerId) {
       fetchUnitList(newVerId as string);
-
-      if (!!props.swVersion?.dueDate) {
-        selectedDate.value = dateAdapter.parseISO(props.swVersion.dueDate) as string;
-      }
     }
   }
 );
@@ -181,6 +181,7 @@ const onClickJenkinsDeployment = (jenkinsDeploymentId: string, tag?: string) => 
 
 const onSubmitJenkinsDeployment = (jenkinsDeploymentId: string, tag: string, reason: string) => {
   emit("onClickJenkinsDeployment", jenkinsDeploymentId, tag, reason);
+  openDeployModal.value = false;
 };
 </script>
 
@@ -205,6 +206,15 @@ const onSubmitJenkinsDeployment = (jenkinsDeploymentId: string, tag: string, rea
         }}</v-chip>
         <v-icon size="x-large" :icon="!!expanded ? 'mdi-chevron-up' : 'mdi-chevron-down'"></v-icon>
       </template>
+      <v-tooltip v-if="!props.isCurOpen" activator="parent" location="bottom" max-width="800px">
+        <div class="tooltip-con--header">
+          <h3>{{ props.swVersion?.versionTitle }}</h3>
+          <p v-if="!!props.swVersion?.createdAt" class="date">
+            <strong>생성 :</strong> {{ formatDateTime(props.swVersion?.createdAt) }}
+          </p>
+        </div>
+        <div class="desc-inner-html" v-html="props.swVersion?.versionDesc" />
+      </v-tooltip>
     </v-expansion-panel-title>
 
     <v-expansion-panel-text @Click.stop="onClickDetailView">
@@ -225,11 +235,13 @@ const onSubmitJenkinsDeployment = (jenkinsDeploymentId: string, tag: string, rea
             복사되었습니다.
           </v-snackbar>
           <v-btn class="edit-btn" variant="tonal" color="primary" size="small" @click.stop="openCalender = true">
-            <template v-if="!selectedDate">
+            <template v-if="!selectedDate && !props.swVersion?.dueDate">
               <v-icon class="mdi mdi-calendar-check" start></v-icon>
               마감일
             </template>
-            <template v-else> Due: {{ formatDate(selectedDate) }} </template>
+            <template v-else>
+              Due: {{ formatDate(selectedDate ? selectedDate : (props.swVersion?.dueDate as string)) }}
+            </template>
           </v-btn>
           <div class="date-picker" v-if="!!openCalender" @click.stop>
             <v-btn class="close-btn" icon="mdi-close" @click="openCalender = false" variant="plain"></v-btn>
@@ -301,6 +313,17 @@ const onSubmitJenkinsDeployment = (jenkinsDeploymentId: string, tag: string, rea
 </template>
 
 <style scoped lang="scss">
+.tooltip-con--header {
+  display: flex;
+  justify-content: space-between;
+  & + .desc-inner-html {
+    :deep(img) {
+      border: 1px solid #ececec;
+      width: 100%;
+    }
+  }
+}
+
 .test-unit-list {
   display: flex;
   flex-direction: column;
@@ -452,6 +475,7 @@ const onSubmitJenkinsDeployment = (jenkinsDeploymentId: string, tag: string, rea
 
       :deep(img) {
         border: 1px solid #ececec;
+        width: 100%;
       }
     }
   }

@@ -42,8 +42,6 @@ export const jenkinsDeploymentApi = {
 
 export const buildLogApi = {
   POST_buildLog: (buildLogParams: Partial<any>): Promise<any> => {
-    console.log(buildLogParams);
-
     return ExceptionWrapper(async () => {
       const apiResult = await http.post("/deploy-log", buildLogParams);
       const data = await apiResult.data;
