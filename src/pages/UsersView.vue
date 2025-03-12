@@ -1,19 +1,20 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { storeToRefs } from 'pinia';
+import { ref, onMounted } from "vue";
+import { storeToRefs } from "pinia";
 
-import { useUserStore } from '@/store/userStore';
-import { userApi } from '@/services/domain/userService';
+import { useUserStore } from "@/store/userStore";
+import { userApi } from "@/services/domain/userService";
 
-import type { IUserInfo } from '@/types/types';
-import { E_Role, E_UserStatus } from '@/types/enum.d';
+import { E_Role, E_UserStatus } from "@/types/enum.d";
 
-import DefaultLayout from '@/layout/DefaultLayout.vue';
-import UserList from '@/components/list/UserList.vue';
-import ModalWrap from '@/components/ModalWrap.vue';
-import AddUserForm from '@/components/form/AddUserForm.vue';
+import { UserClass, UserType } from "@/entity/User";
 
-const userList = ref<IUserInfo[]>([]);
+import DefaultLayout from "@/layout/DefaultLayout.vue";
+import UserList from "@/components/list/UserList.vue";
+import ModalWrap from "@/components/ModalWrap.vue";
+import AddUserForm from "@/components/form/AddUserForm.vue";
+
+const userList = ref<UserClass[]>([]);
 const userStore = useUserStore();
 const { loggedInUser } = storeToRefs(userStore);
 
@@ -22,8 +23,8 @@ const openModalNewUser = ref<boolean>(false);
 onMounted(() => fetchUsers());
 
 const fetchUsers = () => {
-  return userApi.GET_users('all').then(usersData => {
-    userList.value = usersData as IUserInfo[];
+  return userApi.GET_users("all").then(usersData => {
+    userList.value = usersData.map(user => new UserClass(user as UserType));
   });
 };
 
@@ -46,14 +47,14 @@ const onToggleNewUser = () => {
 };
 
 const onSubmitAddUser = (
-  newUser: Partial<IUserInfo> & {
+  newUser: Partial<UserClass> & {
     username: string;
     email: string;
   }
 ) => {
   return userApi.POST_user(newUser).then(res => {
     fetchUsers();
-    alert('New user added successfully!');
+    alert("New user added successfully!");
     openModalNewUser.value = false;
   });
 };

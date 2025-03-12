@@ -25,7 +25,8 @@ export interface IUserInfo {
   refresh_token?: string;
 }
 
-export interface IUserUpdateInfo extends Partial<Omit<IUserInfo, "access_token" | "refresh_token">> {
+export interface IUserUpdateInfo
+  extends Partial<Omit<IUserInfo, "access_token" | "refresh_token">> {
   id: string;
   pw?: string;
 }

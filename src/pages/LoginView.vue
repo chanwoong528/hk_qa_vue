@@ -9,8 +9,8 @@ import ForgotPwForm from "@/components/form/ForgotPwForm.vue";
 import LoginForm from "@/components/form/LoginForm.vue";
 import ModalWrap from "@/components/ModalWrap.vue";
 
-import type { IUserInfo } from "@/types/types";
 import { userApi } from "@/services/domain/userService";
+import { UserClass } from "@/entity/User";
 
 import HIQ_LOGO from "@/assets/hiq_logo_text.svg";
 
@@ -32,7 +32,7 @@ const handleForgotPw = (errors: Object, email: string, closeFlag?: boolean) => {
   if (!errors) {
     // console.log("Forgot pw no error", email);
     //TODO: api call forget pw -> send verfication email
-    userApi.POST_forgetPw(email).then((res) => {
+    userApi.POST_forgetPw(email).then(res => {
       alert("이메일 전송 완료");
     });
   }
@@ -42,14 +42,14 @@ const handleLogin = (error: Object, email: string, pw: string) => {
   if (!error) {
     authApi
       .POST_login({ email, pw })
-      .then((res) => {
+      .then(res => {
         if (!!res.isPwDefault) {
           alert("Please reset your password");
         }
-        setUser(res as IUserInfo);
+        setUser(res as UserClass);
         return router.push("/");
       })
-      .catch((err) => {
+      .catch(err => {
         const errorCode = err.statusCode;
         const errorMsg = err.message;
         switch (errorCode) {
@@ -66,7 +66,10 @@ const handleLogin = (error: Object, email: string, pw: string) => {
 </script>
 
 <template>
-  <ModalWrap v-model="isDialogOpen" title="비밀번호 초기화할 이메일을 입력해 주세요">
+  <ModalWrap
+    v-model="isDialogOpen"
+    title="비밀번호 초기화할 이메일을 입력해 주세요"
+  >
     <ForgotPwForm @handleForgotPw="handleForgotPw" />
   </ModalWrap>
   <div class="login-wrap">
@@ -75,10 +78,15 @@ const handleLogin = (error: Object, email: string, pw: string) => {
         <img :src="HIQ_LOGO" alt="HK QA Tester" />
       </h1>
 
-      <h3><strong>품질 향상</strong>과 <strong>방향성</strong>을 <strong>제시</strong>하는 가이드</h3>
+      <h3>
+        <strong>품질 향상</strong>과 <strong>방향성</strong>을
+        <strong>제시</strong>하는 가이드
+      </h3>
       <p class="acronym-expand">
-        <span class="acronym">Q</span>uality <span class="acronym"> I</span>mprovement &
-        <span class="acronym">N</span>avigation <span class="acronym">G</span>uide
+        <span class="acronym">Q</span>uality
+        <span class="acronym"> I</span>mprovement &
+        <span class="acronym">N</span>avigation
+        <span class="acronym">G</span>uide
       </p>
     </div>
     <div class="login-right-con">

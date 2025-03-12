@@ -23,10 +23,10 @@ const v$ = useVuelidate(rules, state);
 const emit = defineEmits(["handleForgotPw"]);
 
 const handleSubmitEmail = (closeFlag?: boolean) => {
-  if (!!v$.value.$errors.map((e) => e.$message).join(", ")) return;
+  if (!!v$.value.$errors.map(e => e.$message).join(", ")) return;
   emit(
     "handleForgotPw",
-    v$.value.$errors.map((e) => e.$message).join(", "),
+    v$.value.$errors.map(e => e.$message).join(", "),
     state.email,
     closeFlag
   );
@@ -37,7 +37,7 @@ const handleSubmitEmail = (closeFlag?: boolean) => {
   <form @submit.prevent="">
     <v-text-field
       v-model="state.email"
-      :error-messages="v$.email.$errors.map((e) => e.$message).join(', ')"
+      :error-messages="v$.email.$errors.map(e => e.$message).join(', ')"
       label="E-mail"
       required
       @blur="v$.email.$touch"

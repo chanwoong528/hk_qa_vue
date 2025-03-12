@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { reactive, ref } from "vue";
+import { reactive, ref, computed } from "vue";
 import { useVuelidate } from "@vuelidate/core";
 import { email, required, helpers } from "@vuelidate/validators";
-import UserClass from "@/entity/User";
 
 const props = defineProps({
   toggleDialog: Function,
@@ -10,12 +9,15 @@ const props = defineProps({
 
 const pwVisible = ref<boolean>(false);
 
-const state = reactive(new UserClass());
+const state = reactive({
+  email: "",
+  pw: "",
+});
 
 const rules = {
   email: {
     required: helpers.withMessage("이메일을 입력해주세요", required),
-    email: helpers.withMessage("이메일 형식이 아닙니다", email),
+    // email: helpers.withMessage("", email),
   },
   pw: { required: helpers.withMessage("패스워드를 입력해주세요", required) },
 };
@@ -23,7 +25,15 @@ const v$ = useVuelidate(rules, state);
 const emit = defineEmits(["handleLogin", "toggleDialog"]);
 
 const handleSubmitEmail = () => {
-  emit("handleLogin", v$.value.$errors.map((e) => e.$message).join(", "), state.email, state.pw);
+  if (!state.email.includes("@")) {
+    state.email = `${state.email}@hankookilbo.com`;
+  }
+  emit(
+    "handleLogin",
+    v$.value.$errors.map(e => e.$message).join(", "),
+    state.email,
+    state.pw
+  );
 };
 </script>
 
@@ -32,7 +42,7 @@ const handleSubmitEmail = () => {
     <div class="text-subtitle-1 text-medium-emphasis">Email</div>
 
     <v-text-field
-      :error-messages="v$.email.$errors.map((e) => e.$message).join(', ')"
+      :error-messages="v$.email.$errors.map(e => e.$message).join(', ')"
       placeholder="이메일"
       prepend-inner-icon="mdi-email-outline"
       variant="outlined"
@@ -40,9 +50,14 @@ const handleSubmitEmail = () => {
       @input="v$.email.$touch"
       v-model="state.email"
     />
-    <div class="text-subtitle-1 text-medium-emphasis d-flex align-center justify-space-between">Password</div>
+
+    <div
+      class="text-subtitle-1 text-medium-emphasis d-flex align-center justify-space-between"
+    >
+      Password
+    </div>
     <v-text-field
-      :error-messages="v$.pw.$errors.map((e) => e.$message).join(', ')"
+      :error-messages="v$.pw.$errors.map(e => e.$message).join(', ')"
       :append-inner-icon="pwVisible ? 'mdi-eye-off' : 'mdi-eye'"
       :type="pwVisible ? 'text' : 'password'"
       placeholder="비밀번호"
@@ -69,7 +84,9 @@ const handleSubmitEmail = () => {
       >
         Login
       </v-btn>
-      <v-btn variant="plain" class="text-caption" @click="props.toggleDialog"> 비밀번호 찾기 </v-btn>
+      <v-btn variant="plain" class="text-caption" @click="props.toggleDialog">
+        비밀번호 찾기
+      </v-btn>
     </div>
   </form>
 </template>
@@ -80,6 +97,23 @@ form {
   width: 100%;
   input {
     padding: 20px;
+  }
+  .email-suggestion {
+    margin-top: -12px;
+    margin-bottom: 12px;
+    font-size: 0.875rem;
+    color: #666;
+
+    .suggestion-link {
+      color: #1976d2;
+      text-decoration: none;
+      font-weight: 500;
+      cursor: pointer;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
   }
   .btn-con {
     display: flex;

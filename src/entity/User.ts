@@ -1,35 +1,36 @@
-export default class UserClass {
-  // id: string;
-  // username: string;
-  // role: E_Role;
-  // email: string;
-  // userStatus: E_UserStatus;
-  // isPwDefault?: boolean;
-  // createdAt?: string;
-  // access_token?: string;
-  // refresh_token?: string;
+import { E_Role, E_UserStatus } from "../types/enum";
 
-  public email = "";
-  public pw = "";
+export type UserType = {
+  id: string;
+  username: string;
+  role: E_Role;
+  email: string;
+  isPwDefault: boolean;
 
-  //   public id = "";
-  //   public username = "";
-  //   public role = "";
-  //   public userStatus = "";
-  //   public isPwDefault = "";
-  //   public createdAt = "";
-  //   public access_token = "";
-  //   public refresh_token = "";
+  userStatus: E_UserStatus;
+  createdAt: string;
+  updatedAt: string;
+};
 
-  //   constructor({ id, username, role, email, userStatus, isPwDefault, createdAt, access_token, refresh_token }) {
-  // this.email = email;
-  // this.id = id;
-  // this.username = username;
-  // this.role = role;
-  // this.userStatus = userStatus;
-  // this.isPwDefault = isPwDefault;
-  // this.createdAt = createdAt;
-  // this.access_token = access_token;
-  // this.refresh_token = refresh_token;
-  //   }
+export class UserClass {
+  id: string;
+  username: string;
+  role: E_Role;
+  email: string;
+  isPwDefault: boolean;
+
+  userStatus: E_UserStatus;
+  createdAt: string;
+  updatedAt: string;
+
+  constructor(user: UserType) {
+    this.id = user.id;
+    this.username = user.username;
+    this.role = user.role;
+    this.email = user.email;
+    this.isPwDefault = user.isPwDefault;
+    this.userStatus = user.userStatus;
+    this.createdAt = user.createdAt;
+    this.updatedAt = user.updatedAt;
+  }
 }

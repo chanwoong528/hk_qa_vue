@@ -21,10 +21,8 @@ const id = ref(route.params.id);
 const userStore = useUserStore();
 const { loggedInUser } = storeToRefs(userStore);
 
-
 const editMode = ref<boolean>(false);
 const boardInfo = reactive(new BoardClass());
-
 
 const commetListForBoard = ref<IComment[]>([]);
 const commentPage = ref<number>(1);
@@ -43,7 +41,10 @@ const computedIsLastPage = computed(() => {
 });
 
 onMounted(() => {
-  Promise.all([onFetchBoardDetail(id.value as string), onFetchCommentListByBoardId(id.value as string)]);
+  Promise.all([
+    onFetchBoardDetail(id.value as string),
+    onFetchCommentListByBoardId(id.value as string),
+  ]);
   eventSse.onMsg(id.value as string, sseTrigger);
 });
 
@@ -52,25 +53,25 @@ onUnmounted(() => {
 });
 watch(
   () => commentPage.value,
-  (newPage) => {
+  newPage => {
     onFetchCommentListByBoardId(id.value as string, newPage as number);
-  },
+  }
 );
 
 watch(
   () => sseTrigger.date,
-  (newDate) => {
+  newDate => {
     onFetchCommentListByBoardId(id.value as string);
-  },
+  }
 );
 
 const onFetchBoardDetail = (id: string) => {
-  boardApi.GET_boardDetail(id).then((res) => {
+  boardApi.GET_boardDetail(id).then(res => {
     Object.assign(boardInfo, res);
   });
 };
 const onFetchCommentListByBoardId = (id: string, page?: number) => {
-  commentApi.GET_commentsByBoardId(id, page).then((res) => {
+  commentApi.GET_commentsByBoardId(id, page).then(res => {
     const { commentList, page, lastPage } = res as unknown as {
       commentList: IComment[];
       page: number;
@@ -79,11 +80,11 @@ const onFetchCommentListByBoardId = (id: string, page?: number) => {
     };
     commnetLastPage.value = lastPage;
 
-    const commentListWithReactionCount = commentList.map((comment) => {
+    const commentListWithReactionCount = commentList.map(comment => {
       return {
         ...comment,
         counts: countReactions(comment.reactions),
-        childComments: comment.childComments.map((child) => {
+        childComments: comment.childComments.map(child => {
           return {
             ...child,
             counts: countReactions(child.reactions),
@@ -108,34 +109,39 @@ const onClickLoadNextPage = () => {
 };
 
 const onSubmitEditComment = (commentId: string, content: string) => {
-  return commentApi.PATCH_comment({ commentId, content }).then((res) => {
+  return commentApi.PATCH_comment({ commentId, content }).then(res => {
     return onFetchCommentListByBoardId(id.value as string);
   });
 };
 const onClickDeleteComment = (commentId: string) => {
-  return commentApi.DELETE_comment(commentId).then((res) => {
+  return commentApi.DELETE_comment(commentId).then(res => {
     return onFetchCommentListByBoardId(id.value as string);
   });
-
 };
 
 const onClickEditBoard = () => {
   editMode.value = !editMode.value;
-}
-
-const onSubmitEditBoard = () => {
-  return boardApi.PATCH_board({ boardId: id.value, title: boardInfo.title, content: boardInfo.content, userId: loggedInUser.value?.id }).then((res) => {
-    editMode.value = false;
-    return onFetchBoardDetail(id.value as string);
-  });
 };
 
+const onSubmitEditBoard = () => {
+  return boardApi
+    .PATCH_board({
+      boardId: id.value,
+      title: boardInfo.title,
+      content: boardInfo.content,
+      userId: loggedInUser.value?.id,
+    })
+    .then(res => {
+      editMode.value = false;
+      return onFetchBoardDetail(id.value as string);
+    });
+};
 
 const onSubmitComment = (params: any) => {
   if (!id.value) return alert("게시글이 없습니다.");
 
   params.boardId = id.value;
-  return commentApi.POST_comment(params).then((res) => {
+  return commentApi.POST_comment(params).then(res => {
     onFetchCommentListByBoardId(id.value as string);
   });
 };
@@ -143,22 +149,40 @@ const onSubmitComment = (params: any) => {
 
 <template>
   <DefaultLayout>
-
     <div class="board-detail-btn-con">
-      <v-btn variant="tonal" icon="mdi mdi-keyboard-backspace" @click="onClickBack"> </v-btn>
+      <v-btn
+        variant="tonal"
+        icon="mdi mdi-keyboard-backspace"
+        @click="onClickBack"
+      >
+      </v-btn>
 
       <div v-if="loggedInUser?.id === boardInfo.user.id" class="board-ctl-con">
-
-        <v-btn v-if="!editMode" variant="outlined" color="primary" @click="onClickEditBoard">
+        <v-btn
+          v-if="!editMode"
+          variant="outlined"
+          color="primary"
+          @click="onClickEditBoard"
+        >
           <v-icon icon="mdi-pencil" prepend></v-icon>
           수정
         </v-btn>
 
-        <v-btn v-if="!!editMode" variant="outlined" color="success" @click="onSubmitEditBoard">
+        <v-btn
+          v-if="!!editMode"
+          variant="outlined"
+          color="success"
+          @click="onSubmitEditBoard"
+        >
           <v-icon icon="mdi-content-save-outline" prepend></v-icon>
           저장
         </v-btn>
-        <v-btn v-if="!!editMode" variant="outlined" color="error" @click="onClickEditBoard">
+        <v-btn
+          v-if="!!editMode"
+          variant="outlined"
+          color="error"
+          @click="onClickEditBoard"
+        >
           <v-icon icon="mdi-cancel" prepend></v-icon>
           취소
         </v-btn>
@@ -171,7 +195,12 @@ const onSubmitComment = (params: any) => {
           <h3 v-if="!editMode">
             {{ boardInfo.title }}
           </h3>
-          <v-text-field v-else v-model="boardInfo.title" label="제목" outlined></v-text-field>
+          <v-text-field
+            v-else
+            v-model="boardInfo.title"
+            label="제목"
+            outlined
+          ></v-text-field>
           <div class="left-con">
             <p>
               {{ boardInfo.convertBoardTypeKor() }}
@@ -185,13 +214,23 @@ const onSubmitComment = (params: any) => {
           </div>
         </header>
 
-        <div v-if="!editMode" v-html="boardInfo.content" class="board-content"></div>
+        <div
+          v-if="!editMode"
+          v-html="boardInfo.content"
+          class="board-content"
+        ></div>
         <RichEditor v-else class="board-content" v-model="boardInfo.content" />
       </section>
     </v-card>
-    <CommentList hideAdmin v-model="commetListForBoard" :computedLastPage="computedIsLastPage"
-      @onClickLoadNextPage="onClickLoadNextPage" @onSubmitComment="onSubmitComment"
-      @onSubmitEditComment="onSubmitEditComment" @onClickDeleteComment="onClickDeleteComment" />
+    <CommentList
+      hideAdmin
+      v-model="commetListForBoard"
+      :computedLastPage="computedIsLastPage"
+      @onClickLoadNextPage="onClickLoadNextPage"
+      @onSubmitComment="onSubmitComment"
+      @onSubmitEditComment="onSubmitEditComment"
+      @onClickDeleteComment="onClickDeleteComment"
+    />
   </DefaultLayout>
 </template>
 
@@ -201,7 +240,6 @@ const onSubmitComment = (params: any) => {
   justify-content: space-between;
   align-items: center;
   padding: 10px;
-
 }
 
 header {
@@ -216,8 +254,6 @@ header {
     font-size: 24px;
     font-weight: 700;
   }
-
-
 
   .left-con {
     display: flex;

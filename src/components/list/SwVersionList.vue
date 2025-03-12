@@ -3,9 +3,18 @@ import { reactive, ref, computed, watch, onMounted } from "vue";
 import { storeToRefs } from "pinia";
 
 import { useUserStore } from "@/store/userStore";
-import type { ISwVersion, ITestSession, IUserInfo, IComment } from "@/types/types";
+import type {
+  ISwVersion,
+  ITestSession,
+  IUserInfo,
+  IComment,
+} from "@/types/types";
 
-import { E_TestStatus, E_SwVersionModalType, E_ModalType } from "@/types/enum.d";
+import {
+  E_TestStatus,
+  E_SwVersionModalType,
+  E_ModalType,
+} from "@/types/enum.d";
 
 import { userApi } from "@/services/domain/userService";
 import { testSessionApi } from "@/services/domain/testSessionService";
@@ -26,6 +35,7 @@ import TestListChart from "./TestListChart.vue";
 import UnitTestList from "./UnitTestList.vue";
 import { JenkinsDeploymentClass } from "@/entity/JenkinsDeployment";
 import { useSwVersionsStore } from "@/store/swVersionsStore";
+import { UserClass } from "@/entity/User";
 // import UnitTestList from "./UnitTestList.vue";
 // import TestListChips from "./TestListChips.vue";
 
@@ -54,11 +64,15 @@ const { loggedInUser } = storeToRefs(userStore);
 
 const panelOpened = ref();
 
-const emit = defineEmits(["onSubmitStatus", "onClickEditVersion", "onClickJenkinsDeployment"]);
+const emit = defineEmits([
+  "onSubmitStatus",
+  "onClickEditVersion",
+  "onClickJenkinsDeployment",
+]);
 
-const userList = ref<IUserInfo[]>([]);
+const userList = ref<UserClass[]>([]);
 
-const testSessionUserList = ref<IUserInfo[]>([]);
+const testSessionUserList = ref<UserClass[]>([]);
 const curSwVersionId = ref<string>("");
 
 const commentListForVersion = ref<IComment[]>([]);
@@ -100,11 +114,18 @@ watch(
     if (newList && Array.isArray(newList) && !!newId && !route.query.open) {
       const firstSwVersion = swVersions.value
         .filter(ver => {
-          if (!ver.testSessions.every(tester => tester.status === E_TestStatus.passed) || ver.testSessions.length === 0)
+          if (
+            !ver.testSessions.every(
+              tester => tester.status === E_TestStatus.passed
+            ) ||
+            ver.testSessions.length === 0
+          )
             return ver;
         })
         .sort((a: ISwVersion, b: ISwVersion) => {
-          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+          return (
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          );
         });
 
       console.log("first version>>> ", firstSwVersion?.[0]?.swVersionId);
@@ -169,7 +190,12 @@ const toggleModal = (type?: E_SwVersionModalType, testerId?: string) => {
 };
 
 const onSubmitStatus = () => {
-  emit("onSubmitStatus", selectedTestSession, dbSavedTestSession, openModalUpdateStatus);
+  emit(
+    "onSubmitStatus",
+    selectedTestSession,
+    dbSavedTestSession,
+    openModalUpdateStatus
+  );
 };
 
 const onClickTester = (testerInfo: ITestSession, loggedInUserId: string) => {
@@ -190,36 +216,38 @@ const onClickLoadNextPage = () => {
 };
 
 const onFetchCommentsBySwVersionId = (page?: number) => {
-  return commentApi.GET_commentsBySwVersionId(curSwVersionId.value, page).then(res => {
-    const { commentList, page, lastPage } = res as unknown as {
-      commentList: IComment[];
-      page: number;
-      total: number;
-      lastPage: number;
-    };
-
-    commnetLastPage.value = lastPage;
-
-    const commentListWithReactionCount = commentList.map(comment => {
-      return {
-        ...comment,
-        counts: countReactions(comment.reactions),
-        childComments: comment.childComments.map(child => {
-          return {
-            ...child,
-            counts: countReactions(child.reactions),
-          };
-        }),
+  return commentApi
+    .GET_commentsBySwVersionId(curSwVersionId.value, page)
+    .then(res => {
+      const { commentList, page, lastPage } = res as unknown as {
+        commentList: IComment[];
+        page: number;
+        total: number;
+        lastPage: number;
       };
+
+      commnetLastPage.value = lastPage;
+
+      const commentListWithReactionCount = commentList.map(comment => {
+        return {
+          ...comment,
+          counts: countReactions(comment.reactions),
+          childComments: comment.childComments.map(child => {
+            return {
+              ...child,
+              counts: countReactions(child.reactions),
+            };
+          }),
+        };
+      });
+      if (!!page && page > 1) {
+        return (commentListForVersion.value = [
+          ...commentListForVersion.value,
+          ...(commentListWithReactionCount as IComment[]),
+        ]);
+      }
+      commentListForVersion.value = commentListWithReactionCount as IComment[];
     });
-    if (!!page && page > 1) {
-      return (commentListForVersion.value = [
-        ...commentListForVersion.value,
-        ...(commentListWithReactionCount as IComment[]),
-      ]);
-    }
-    commentListForVersion.value = commentListWithReactionCount as IComment[];
-  });
 };
 
 const onSubmitComment = (params: any) => {
@@ -244,22 +272,26 @@ const onClickDeleteComment = (commentId: string) => {
 
 const onClickAddTester = (swVerId: string) => {
   curSwVersionId.value = swVerId;
-  const targetSwVersion = swVersions.value?.find(sw => sw.swVersionId === swVerId);
+  const targetSwVersion = swVersions.value?.find(
+    sw => sw.swVersionId === swVerId
+  );
 
   return userApi.GET_users().then(usersData => {
     const curTesters = targetSwVersion?.testSessions.map(tester => {
       const targetUsers = usersData.find(user => user.id === tester.user.id);
       if (targetUsers) return targetUsers;
     });
-    testSessionUserList.value = curTesters as IUserInfo[];
-    userList.value = usersData as IUserInfo[];
+    testSessionUserList.value = curTesters as UserClass[];
+    userList.value = usersData as UserClass[];
   });
 };
 
 const onClickDetailView = (swVerId: string) => {
   curSwVersionId.value = swVerId;
 
-  return commentApi.GET_commentsBySwVersionId(swVerId).then(res => onFetchCommentsBySwVersionId());
+  return commentApi
+    .GET_commentsBySwVersionId(swVerId)
+    .then(res => onFetchCommentsBySwVersionId());
 };
 
 const onClickEditVersion = (swVerId: string) => {
@@ -273,19 +305,27 @@ const onSubmitAddTesters = (testers: IUserInfo[]) => {
     .map(tester => tester.id);
 
   const tobeAdded = testers
-    .filter(tester => !testSessionUserList.value.some(oldTester => oldTester.id === tester.id))
+    .filter(
+      tester =>
+        !testSessionUserList.value.some(oldTester => oldTester.id === tester.id)
+    )
     .map(tester => tester.id);
 
   return testSessionApi
     .PUT_deleteOrAddTestSession(curSwVersionId.value, tobeDeleted, tobeAdded)
     .then(res => {
-      props.onFetchSwVersionList && props.onFetchSwVersionList(swVersions.value?.[0]?.swType?.swTypeId);
+      props.onFetchSwVersionList &&
+        props.onFetchSwVersionList(swVersions.value?.[0]?.swType?.swTypeId);
       toggleModal(E_SwVersionModalType.addTester);
     })
     .catch(error => alert(error));
 };
 
-const onClickJenkinsDeployment = (jenkinsDeploymentId: string, tag: string, reason: string) => {
+const onClickJenkinsDeployment = (
+  jenkinsDeploymentId: string,
+  tag: string,
+  reason: string
+) => {
   emit("onClickJenkinsDeployment", jenkinsDeploymentId, tag, reason);
 };
 </script>
@@ -294,7 +334,11 @@ const onClickJenkinsDeployment = (jenkinsDeploymentId: string, tag: string, reas
   <!-- //'QA 항목 상태 변경' -->
   <ModalWrap
     v-model="openModalUpdateStatus"
-    :title="selectedTestSession.user?.id === loggedInUser?.id ? '내 상태 변경' : 'QA 항목 상태'"
+    :title="
+      selectedTestSession.user?.id === loggedInUser?.id
+        ? '내 상태 변경'
+        : 'QA 항목 상태'
+    "
     haveBtnCtl
     @onSubmit="onSubmitStatus"
   >
@@ -302,10 +346,18 @@ const onClickJenkinsDeployment = (jenkinsDeploymentId: string, tag: string, reas
   </ModalWrap>
 
   <ModalWrap v-model="openModalAddTester" title="테스터 관리">
-    <AddTesterForm :userList="userList" :curTesterList="testSessionUserList" @onSubmitAddTesters="onSubmitAddTesters" />
+    <AddTesterForm
+      :userList="userList"
+      :curTesterList="testSessionUserList"
+      @onSubmitAddTesters="onSubmitAddTesters"
+    />
   </ModalWrap>
   <!-- Detail Modal for Specific Version -->
-  <ModalWrap v-model="openModalDetailView" :type="E_ModalType.full" :title="curSwVersionInfo?.versionTitle + ' 버전'">
+  <ModalWrap
+    v-model="openModalDetailView"
+    :type="E_ModalType.full"
+    :title="curSwVersionInfo?.versionTitle + ' 버전'"
+  >
     <div>
       <v-tabs v-model="curModalTab" color="primary">
         <v-tab v-for="tab in detailViewTabs" :key="tab" :value="tab">
@@ -352,7 +404,12 @@ const onClickJenkinsDeployment = (jenkinsDeploymentId: string, tag: string, reas
     <v-expansion-panels v-model="panelOpened" flat variant="accordion">
       <SwVersionItem
         v-for="swVersion in swVersions?.filter(ver => {
-          if (!ver.testSessions.every(tester => tester.status === E_TestStatus.passed) || ver.testSessions.length === 0)
+          if (
+            !ver.testSessions.every(
+              tester => tester.status === E_TestStatus.passed
+            ) ||
+            ver.testSessions.length === 0
+          )
             return ver;
         })"
         :key="swVersion.swVersionId"
@@ -373,7 +430,12 @@ const onClickJenkinsDeployment = (jenkinsDeploymentId: string, tag: string, reas
     class="version-list-con finished box-wrap"
     v-if="
       (swVersions ?? []).filter(ver => {
-        if (ver.testSessions.every(tester => tester.status === E_TestStatus.passed) && ver.testSessions.length > 0)
+        if (
+          ver.testSessions.every(
+            tester => tester.status === E_TestStatus.passed
+          ) &&
+          ver.testSessions.length > 0
+        )
           return ver;
       }).length > 0
     "
@@ -384,7 +446,12 @@ const onClickJenkinsDeployment = (jenkinsDeploymentId: string, tag: string, reas
     <v-expansion-panels v-model="panelOpened" flat variant="accordion">
       <SwVersionItem
         v-for="swVersion in swVersions?.filter(ver => {
-          if (ver.testSessions.every(tester => tester.status === E_TestStatus.passed) && ver.testSessions.length > 0)
+          if (
+            ver.testSessions.every(
+              tester => tester.status === E_TestStatus.passed
+            ) &&
+            ver.testSessions.length > 0
+          )
             return ver;
         })"
         :key="swVersion.swVersionId"

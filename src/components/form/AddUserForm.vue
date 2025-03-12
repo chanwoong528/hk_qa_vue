@@ -23,14 +23,14 @@ const rules = {
 const v$ = useVuelidate(rules, state);
 
 const onClickSubmit = () => {
-  if (!!v$.value.$errors.map((e) => e.$message).join(", ")) return;
+  if (!!v$.value.$errors.map(e => e.$message).join(", ")) return;
   emit("submitUser", state);
 };
 </script>
 <template>
   <form @submit.prevent="">
     <v-text-field
-      :error-messages="v$.email.$errors.map((e) => e.$message).join(', ')"
+      :error-messages="v$.email.$errors.map(e => e.$message).join(', ')"
       density="compact"
       placeholder="Email address"
       prepend-inner-icon="mdi-email-outline"
@@ -40,7 +40,7 @@ const onClickSubmit = () => {
       v-model="state.email"
     />
     <v-text-field
-      :error-messages="v$.username.$errors.map((e) => e.$message).join(', ')"
+      :error-messages="v$.username.$errors.map(e => e.$message).join(', ')"
       density="compact"
       placeholder="Username"
       prepend-inner-icon="mdi-account-outline"

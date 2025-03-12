@@ -2,26 +2,26 @@
 import { ref, watch } from "vue";
 import UserList from "../list/UserList.vue";
 
-import type { IUserInfo } from "@/types/types";
 import { E_UserListType } from "@/types/enum.d";
+import { UserClass } from "@/entity/User";
 
 const props = defineProps({
   userList: {
-    type: Array as () => IUserInfo[],
+    type: Array as () => UserClass[],
     required: true,
   },
   curTesterList: {
-    type: Array as () => IUserInfo[],
+    type: Array as () => UserClass[],
     required: false,
   },
 });
 
-const selectedUsers = ref<IUserInfo[]>([]);
+const selectedUsers = ref<UserClass[]>([]);
 const emit = defineEmits(["onSubmitAddTesters"]);
 
 watch(
   () => props.curTesterList,
-  (newVal) => {
+  newVal => {
     selectedUsers.value = newVal ?? [];
   }
 );

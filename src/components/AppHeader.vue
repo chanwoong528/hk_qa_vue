@@ -9,12 +9,10 @@ import { storeToRefs } from "pinia";
 
 import { useUserStore } from "@/store/userStore";
 import { authApi } from "@/services/domain/authService";
-// import { NAV_LIST } from "@/router/index.ts";
-
-import type { IUserInfo } from "@/types/types";
 
 import SideHeader from "@/components/SideHeader.vue";
 import ResetPwForm from "@/components/form/ResetPwForm.vue";
+import { UserClass } from "@/entity/User";
 
 const route = useRoute();
 const router = useRouter();
@@ -29,10 +27,10 @@ const openResetPwModal = computed(() => {
 const fetchAuthByAccToken = () => {
   return authApi
     .GET_loginCheck()
-    .then((loginResult) => {
-      return store.setUser(loginResult as IUserInfo);
+    .then(loginResult => {
+      return store.setUser(loginResult as UserClass);
     })
-    .catch((err) => {
+    .catch(err => {
       store.setResetUser();
       alert("Session expired. Please login again.");
       return router.push("/login");

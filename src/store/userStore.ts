@@ -1,8 +1,9 @@
 import { defineStore } from "pinia";
-import { IUserInfo } from "@/types/types";
+
+import { UserClass } from "@/entity/User";
 
 interface UserStoreState {
-  loggedInUser: IUserInfo | undefined;
+  loggedInUser: UserClass | undefined;
   isLoggedIn: boolean;
 }
 
@@ -14,7 +15,7 @@ export const useUserStore = defineStore("user", {
     };
   },
   actions: {
-    setUser(user: IUserInfo) {
+    setUser(user: UserClass) {
       this.loggedInUser = user;
       this.isLoggedIn = true;
     },

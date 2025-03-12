@@ -13,12 +13,21 @@ const { swTypes } = storeToRefs(swStore);
   <DefaultLayout>
     <header class="home-header">
       <p>
-        <span class="acronym">Q</span>uality <span class="acronym"> I</span>mprovement &
-        <span class="acronym">N</span>avigation <span class="acronym">G</span>uide
+        <span class="acronym">Q</span>uality
+        <span class="acronym"> I</span>mprovement &
+        <span class="acronym">N</span>avigation
+        <span class="acronym">G</span>uide
       </p>
-      <h3><strong> 품질 향상</strong>과 <strong>방향성</strong>을 <strong>제시</strong>하는 가이드</h3>
+      <h3>
+        <strong> 품질 향상</strong>과 <strong>방향성</strong>을
+        <strong>제시</strong>하는 가이드
+      </h3>
     </header>
-    <SwList v-if="swTypes.length > 0" :type="E_SwTypeListType.section" :swList="swTypes" />
+    <SwList
+      v-if="swTypes.length > 0"
+      :type="E_SwTypeListType.section"
+      :swList="swTypes"
+    />
   </DefaultLayout>
 </template>
 

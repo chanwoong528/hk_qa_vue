@@ -30,6 +30,7 @@ import { checkEditorValueEmpty } from "@/utils/common/validator";
 import { buildLogApi, jenkinsDeploymentApi } from "@/services/domain/jenkinsDeploymentService";
 import { DeployLogClass, JenkinsDeploymentClass } from "@/entity/JenkinsDeployment";
 import { sseApiForJenkinsDeployment } from "@/services/domain/sseService";
+import { UserClass } from "@/entity/User";
 
 const route = useRoute();
 
@@ -41,8 +42,8 @@ const { swTypes } = storeToRefs(swStore);
 
 const swVersionsStore = useSwVersionsStore();
 
-const maintainerList = ref<IUserInfo[]>([]);
-const userList = ref<IUserInfo[]>([]);
+const maintainerList = ref<UserClass[]>([]);
+const userList = ref<UserClass[]>([]);
 const swVersionList = ref<ISwVersion[]>([]);
 const boardList = ref<BoardClass[]>([]);
 const boardPageInfo = reactive({ page: 1, totalPage: 1 });
@@ -135,12 +136,20 @@ const onFetchSwVersionList = (swTypeId: string) => {
 const onFetchJenkinsDeployment = (swTypeId: string) => {
   return jenkinsDeploymentApi.GET_jenkinsDeploymentBySwType(swTypeId).then(res => {
     jenkinsDeploymentList.value = res.map(
-      dep => new JenkinsDeploymentClass({ ...dep, deployLogs: dep.deployLogs.map(log => new DeployLogClass(log)) })
+      dep =>
+        new JenkinsDeploymentClass({
+          ...dep,
+          deployLogs: dep.deployLogs.map(log => new DeployLogClass(log)),
+        })
     );
   });
 };
 
-const onFetchBoardList = (swTypeId: string, boardType: "req" | "update" = "req", page: number = 1) => {
+const onFetchBoardList = (
+  swTypeId: string,
+  boardType: "req" | "update" = "req",
+  page: number = 1
+) => {
   return boardApi.GET_boardList(swTypeId, boardType, page).then(res => {
     boardList.value = res.boardList as BoardClass[];
     boardPageInfo.totalPage = res.lastPage as number;
@@ -153,7 +162,11 @@ const onSubmitStatus = (
   dbSavedTestSession: Partial<ITestSession>,
   openModalUpdateStatus: any
 ) => {
-  if (!!selectedTestSession.sessionId && !!selectedTestSession.status && !!selectedTestSession.reasonContent) {
+  if (
+    !!selectedTestSession.sessionId &&
+    !!selectedTestSession.status &&
+    !!selectedTestSession.reasonContent
+  ) {
     if (
       selectedTestSession.status === dbSavedTestSession.status &&
       selectedTestSession.reasonContent === dbSavedTestSession.reasonContent
@@ -162,7 +175,11 @@ const onSubmitStatus = (
     }
 
     return testSessionApi
-      .PATCH_testSession(selectedTestSession.sessionId, selectedTestSession.status, selectedTestSession.reasonContent)
+      .PATCH_testSession(
+        selectedTestSession.sessionId,
+        selectedTestSession.status,
+        selectedTestSession.reasonContent
+      )
       .then(_ => {
         submitErrorFlag.value = true;
         openModalUpdateStatus.value = false;
@@ -256,8 +273,9 @@ const onClickEditVersion = (curSwVer: ISwVersion) => {
 };
 
 const onFetchMaintainerList = (swTypeId: string) => {
-  return maintainerApi.GET_maintainerListBySwTypeId(swTypeId).then(res => {
-    const dataMaintainerList = (res as { user: IUserInfo }[]).map(maintainer => maintainer.user) as IUserInfo[];
+  return maintainerApi.GET_maintainerListBySwTypeId(swTypeId).then(maintainerData => {
+    const dataMaintainerList = maintainerData.map(maintainer => new UserClass(maintainer));
+
     maintainerList.value = dataMaintainerList;
   });
 };
@@ -266,7 +284,8 @@ const onClickManageMaintainer = () => {
   modalStatus.openModalAddMaintainer = true;
 
   return userApi.GET_users().then(usersData => {
-    userList.value = usersData as IUserInfo[];
+    userList.value = usersData.map(user => new UserClass(user));
+
     onFetchMaintainerList(route.params.id as string);
   });
 };

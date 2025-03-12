@@ -62,7 +62,9 @@ watch(
   () => [props.isCurOpen, props.swVersion?.swVersionId],
   ([newOpen, newVerId]) => {
     if (!!props.swVersion?.dueDate) {
-      selectedDate.value = dateAdapter.parseISO(props.swVersion.dueDate) as string;
+      selectedDate.value = dateAdapter.parseISO(
+        props.swVersion.dueDate
+      ) as string;
     }
 
     if (!!newOpen && !!newVerId) {
@@ -92,9 +94,21 @@ const emit = defineEmits([
 ]);
 
 const testSessionsPassStatus = computed(() => {
-  if (props.swVersion?.testSessions && props.swVersion?.testSessions.length > 0) {
-    if (props.swVersion?.testSessions.some(tester => tester.status === E_TestStatus.failed)) return E_TestStatus.failed;
-    if (props.swVersion?.testSessions.every(tester => tester.status === E_TestStatus.passed))
+  if (
+    props.swVersion?.testSessions &&
+    props.swVersion?.testSessions.length > 0
+  ) {
+    if (
+      props.swVersion?.testSessions.some(
+        tester => tester.status === E_TestStatus.failed
+      )
+    )
+      return E_TestStatus.failed;
+    if (
+      props.swVersion?.testSessions.every(
+        tester => tester.status === E_TestStatus.passed
+      )
+    )
       return E_TestStatus.passed;
 
     return E_TestStatus.pending;
@@ -104,7 +118,10 @@ const testSessionsPassStatus = computed(() => {
 
 const onClickLoggedInUserStatus = (tester: ITestSession) => {
   if (!!props.toggleModal) {
-    if (tester.status === E_TestStatus.pending && loggedInUser.value?.id !== tester.user.id)
+    if (
+      tester.status === E_TestStatus.pending &&
+      loggedInUser.value?.id !== tester.user.id
+    )
       return alert("테스트가 진행중입니다.");
 
     props.toggleModal();
@@ -167,7 +184,9 @@ const onClickDetailView = () => {
 };
 const onCancelDate = () => {
   openCalender.value = false;
-  const prevDueDate = swVersions.value.find(ver => ver.swVersionId === props.swVersion?.swVersionId)?.dueDate;
+  const prevDueDate = swVersions.value.find(
+    ver => ver.swVersionId === props.swVersion?.swVersionId
+  )?.dueDate;
   if (!!prevDueDate) {
     selectedDate.value = dateAdapter.parseISO(prevDueDate as string) as string;
   } else {
@@ -179,7 +198,10 @@ const onSubmitDueDate = () => {
   if (!selectedDate.value) return alert("마감일을 선택해주세요");
 
   swVersionApi
-    .PATCH_swVersionDueDate(props.swVersion?.swVersionId as string, formatDateForServer(selectedDate.value as string))
+    .PATCH_swVersionDueDate(
+      props.swVersion?.swVersionId as string,
+      formatDateForServer(selectedDate.value as string)
+    )
     .then(res => {
       openCalender.value = false;
       swVersionsStore.updateSwVersionById(
@@ -190,30 +212,49 @@ const onSubmitDueDate = () => {
     });
 };
 
-const onClickJenkinsDeployment = (jenkinsDeploymentId: string, tag?: string) => {
+const onClickJenkinsDeployment = (
+  jenkinsDeploymentId: string,
+  tag?: string
+) => {
   const target = props.jenkinsDeploymentList?.find(
     deployment => deployment.jenkinsDeploymentId === jenkinsDeploymentId
   ) as JenkinsDeploymentClass;
 
-  selectedJenkinsDeployment.value = { ...target, tag: !!tag ? tag : props.swVersion?.versionTitle };
+  selectedJenkinsDeployment.value = {
+    ...target,
+    tag: !!tag ? tag : props.swVersion?.versionTitle,
+  };
   openDeployModal.value = true;
 };
 
-const onSubmitJenkinsDeployment = (jenkinsDeploymentId: string, tag: string, reason: string) => {
+const onSubmitJenkinsDeployment = (
+  jenkinsDeploymentId: string,
+  tag: string,
+  reason: string
+) => {
   emit("onClickJenkinsDeployment", jenkinsDeploymentId, tag, reason);
   openDeployModal.value = false;
 };
 </script>
 
 <template>
-  <ModalWrap v-model="openDeployModal" :title="`배포  ${selectedJenkinsDeployment?.title}`" :type="E_ModalType.full">
+  <ModalWrap
+    v-model="openDeployModal"
+    :title="`배포  ${selectedJenkinsDeployment?.title}`"
+    :type="E_ModalType.full"
+  >
     <AddDeployForm
-      :selectedJenkinsDeployment="selectedJenkinsDeployment || new JenkinsDeploymentClass()"
+      :selectedJenkinsDeployment="
+        selectedJenkinsDeployment || new JenkinsDeploymentClass()
+      "
       @onSubmitJenkinsDeployment="onSubmitJenkinsDeployment"
     />
   </ModalWrap>
 
-  <v-expansion-panel v-if="itemType === 'panel'" :value="props.swVersion?.swVersionId">
+  <v-expansion-panel
+    v-if="itemType === 'panel'"
+    :value="props.swVersion?.swVersionId"
+  >
     <v-expansion-panel-title variant="tonal">
       <div class="title-header">
         <h3>
@@ -221,16 +262,27 @@ const onSubmitJenkinsDeployment = (jenkinsDeploymentId: string, tag: string, rea
         </h3>
       </div>
       <template v-slot:actions="{ expanded }">
-        <v-chip size="small" :color="renderTestStatus(testSessionsPassStatus)">{{
-          renderIconForVersionStatus(testSessionsPassStatus)
-        }}</v-chip>
-        <v-icon size="x-large" :icon="!!expanded ? 'mdi-chevron-up' : 'mdi-chevron-down'"></v-icon>
+        <v-chip
+          size="small"
+          :color="renderTestStatus(testSessionsPassStatus)"
+          >{{ renderIconForVersionStatus(testSessionsPassStatus) }}</v-chip
+        >
+        <v-icon
+          size="x-large"
+          :icon="!!expanded ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+        ></v-icon>
       </template>
-      <v-tooltip v-if="!props.isCurOpen" activator="parent" location="bottom" max-width="800px">
+      <v-tooltip
+        v-if="!props.isCurOpen"
+        activator="parent"
+        location="bottom"
+        max-width="800px"
+      >
         <div class="tooltip-con--header">
           <h3>{{ props.swVersion?.versionTitle }}</h3>
           <p v-if="!!props.swVersion?.createdAt" class="date">
-            <strong>생성 :</strong> {{ formatDateTime(props.swVersion?.createdAt) }}
+            <strong>생성 :</strong>
+            {{ formatDateTime(props.swVersion?.createdAt) }}
           </p>
         </div>
         <div class="desc-inner-html" v-html="props.swVersion?.versionDesc" />
@@ -242,45 +294,84 @@ const onSubmitJenkinsDeployment = (jenkinsDeploymentId: string, tag: string, rea
         <div class="edit-btn-con">
           <div class="title-header--left">
             <p v-if="!!props.swVersion?.createdAt" class="date">
-              <strong>생성 :</strong> {{ formatDateTime(props.swVersion?.createdAt) }}
+              <strong>생성 :</strong>
+              {{ formatDateTime(props.swVersion?.createdAt) }}
             </p>
-            <p class="author"><strong>만든이 :</strong> {{ props.swVersion?.user.username }}</p>
+            <p class="author">
+              <strong>만든이 :</strong> {{ props.swVersion?.user.username }}
+            </p>
           </div>
           <v-snackbar :timeout="2000" rounded="pill">
             <template v-slot:activator="{ props }">
-              <v-btn v-bind="props" variant="tonal" @click.stop="copyToClipboard" size="small" color="blue-grey">
+              <v-btn
+                v-bind="props"
+                variant="tonal"
+                @click.stop="copyToClipboard"
+                size="small"
+                color="blue-grey"
+              >
                 <v-icon class="mdi mdi-link-variant" size="large"></v-icon>
               </v-btn>
             </template>
             복사되었습니다.
           </v-snackbar>
-          <v-btn class="edit-btn" variant="tonal" color="primary" size="small" @click.stop="openCalender = true">
+          <v-btn
+            class="edit-btn"
+            variant="tonal"
+            color="primary"
+            size="small"
+            @click.stop="openCalender = true"
+          >
             <template v-if="!selectedDate && !props.swVersion?.dueDate">
               <v-icon class="mdi mdi-calendar-check" start></v-icon>
               마감일
             </template>
             <template v-else>
-              Due: {{ formatDate(selectedDate ? selectedDate : (props.swVersion?.dueDate as string)) }}
+              Due:
+              {{
+                formatDate(
+                  selectedDate
+                    ? selectedDate
+                    : (props.swVersion?.dueDate as string)
+                )
+              }}
             </template>
           </v-btn>
           <div class="date-picker" v-if="!!openCalender" @click.stop>
-            <v-btn class="close-btn" icon="mdi-close" @click="onCancelDate" variant="plain"></v-btn>
-            <v-date-picker v-model="selectedDate" show-adjacent-months> </v-date-picker>
+            <v-btn
+              class="close-btn"
+              icon="mdi-close"
+              @click="onCancelDate"
+              variant="plain"
+            ></v-btn>
+            <v-date-picker v-model="selectedDate" show-adjacent-months>
+            </v-date-picker>
             <v-btn variant="plain" @click="onSubmitDueDate">ok</v-btn>
           </div>
-          <v-btn class="edit-btn" variant="tonal" color="primary" size="small" @click.stop="onClickEditVersion">
+          <v-btn
+            class="edit-btn"
+            variant="tonal"
+            color="primary"
+            size="small"
+            @click.stop="onClickEditVersion"
+          >
             <v-icon class="mdi mdi-application-edit" start></v-icon>
             수정
           </v-btn>
         </div>
         <div class="desc-inner-html" v-html="props.swVersion?.versionDesc" />
       </div>
-      <a v-if="props.swVersion?.fileSrc" :href="props.swVersion?.fileSrc">첨부 파일</a>
+      <a v-if="props.swVersion?.fileSrc" :href="props.swVersion?.fileSrc"
+        >첨부 파일</a
+      >
 
       <UnitTestList :swVersion="props.swVersion" />
 
       <div class="version-ctrl-con">
-        <TestListChips :swVersion="props.swVersion" @onClickLoggedInUserStatus="onClickLoggedInUserStatus" />
+        <TestListChips
+          :swVersion="props.swVersion"
+          @onClickLoggedInUserStatus="onClickLoggedInUserStatus"
+        />
 
         <div class="modify-tester-btn-con">
           <v-btn
@@ -322,8 +413,13 @@ const onSubmitJenkinsDeployment = (jenkinsDeploymentId: string, tag: string, rea
   </v-expansion-panel>
 
   <div class="default-type-item" v-else>
-    <a v-if="props.swVersion?.fileSrc" :href="props.swVersion?.fileSrc">Download File</a>
-    <div class="desc-inner-html expand" v-html="props.swVersion?.versionDesc"></div>
+    <a v-if="props.swVersion?.fileSrc" :href="props.swVersion?.fileSrc"
+      >Download File</a
+    >
+    <div
+      class="desc-inner-html expand"
+      v-html="props.swVersion?.versionDesc"
+    ></div>
 
     <div class="version-ctrl-con">
       <v-divider :thickness="2"></v-divider>
@@ -392,7 +488,8 @@ const onSubmitJenkinsDeployment = (jenkinsDeploymentId: string, tag: string, rea
   min-height: 140px;
   margin-bottom: 14px;
 }
-.v-expansion-panel--active > .v-expansion-panel-title:not(.v-expansion-panel-title--static) {
+.v-expansion-panel--active
+  > .v-expansion-panel-title:not(.v-expansion-panel-title--static) {
   min-height: 54px;
   background: #f4f8ff;
   border-bottom-style: solid;

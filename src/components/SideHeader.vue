@@ -38,27 +38,27 @@ watch(
   () => [route.path, loggedInUser.value?.id],
   ([newPath, newUserId]) => {
     if (!!newUserId) return fetchSw();
-  },
+  }
 );
 
 const fetchSw = () => {
-  return swApi.GET_sw().then((swListRes) => {
+  return swApi.GET_sw().then(swListRes => {
     return swStore.setSwTypes(swListRes as ISwType[]);
   });
 };
 const computedNavList = computed(() => {
-  const filterHiddenNavList = NAV_LIST.filter((navItem) => !navItem.meta.hidden);
+  const filterHiddenNavList = NAV_LIST.filter(navItem => !navItem.meta.hidden);
 
   if (!loggedInUser.value) return filterHiddenNavList;
 
   if (loggedInUser.value?.role === E_Role.master) return filterHiddenNavList;
 
   if (loggedInUser.value?.role === E_Role.admin) {
-    return filterHiddenNavList.filter((navItem) => !navItem.meta.requiresMaster);
+    return filterHiddenNavList.filter(navItem => !navItem.meta.requiresMaster);
   }
 
   if (loggedInUser.value?.role === E_Role.tester) {
-    return filterHiddenNavList.filter((navItem) => !navItem.meta.requiresAdmin && !navItem.meta.requiresMaster);
+    return filterHiddenNavList.filter(navItem => !navItem.meta.requiresAdmin && !navItem.meta.requiresMaster);
   }
 });
 
@@ -68,7 +68,7 @@ const onClickLogout = () => {
   return router.push("/login");
 };
 const onSubmitNewService = (title: string, desc: string) => {
-  return swApi.POST_sw({ typeTitle: title, typeDesc: desc }).then((res) => {
+  return swApi.POST_sw({ typeTitle: title, typeDesc: desc }).then(res => {
     fetchSw();
     openNewServiceModal.value = false;
   });
@@ -105,42 +105,43 @@ const onSubmitNewService = (title: string, desc: string) => {
       </v-list-item>
 
       <div class="user-wrap">
-        <div class="user-state">{{ loggedInUser?.role.substr(0,1) }}</div> {{ loggedInUser?.username }} 
+        <div class="user-state">{{ loggedInUser?.role.substr(0, 1) }}</div>
+        {{ loggedInUser?.username }}
         <v-btn variant="plain" icon="mdi-logout-variant" color="error" @click="onClickLogout" />
       </div>
       <div class="navItem-wrap">
-      <template v-for="navItem in computedNavList">
-        <v-list-item
-          :key="navItem.label"
-          link
-          :to="navItem.path"
-          v-if="!!navItem.meta.requiresAuth && !(navItem.code === 'SW Type Detail')"
-        >
-          {{ navItem.label }}
-        </v-list-item>
-        <v-list-group v-else-if="!!(navItem.code === 'SW Type Detail')" v-model="openGroups" :value="navItem.label">
-          <template v-slot:activator="{ props }">
-            <v-list-item v-bind="props" :title="navItem.label"></v-list-item>
-          </template>
+        <template v-for="navItem in computedNavList">
           <v-list-item
-            v-for="swType in swTypes"
-            :key="navItem.directTo + swType.swTypeId"
+            :key="navItem.label"
             link
-            :to="navItem.directTo + swType.swTypeId"
-            :title="swType.typeTitle"
-            :value="swType.typeTitle"
+            :to="navItem.path"
+            v-if="!!navItem.meta.requiresAuth && !(navItem.code === 'SW Type Detail')"
           >
-            <!-- :active="route.path === navItem.directTo + swType.swTypeId" -->
+            {{ navItem.label }}
           </v-list-item>
-        </v-list-group>
-      </template>
+          <v-list-group v-else-if="!!(navItem.code === 'SW Type Detail')" v-model="openGroups" :value="navItem.label">
+            <template v-slot:activator="{ props }">
+              <v-list-item v-bind="props" :title="navItem.label"></v-list-item>
+            </template>
+            <v-list-item
+              v-for="swType in swTypes"
+              :key="navItem.directTo + swType.swTypeId"
+              link
+              :to="navItem.directTo + swType.swTypeId"
+              :title="swType.typeTitle"
+              :value="swType.typeTitle"
+            >
+              <!-- :active="route.path === navItem.directTo + swType.swTypeId" -->
+            </v-list-item>
+          </v-list-group>
+        </template>
       </div>
     </v-list>
   </v-navigation-drawer>
 </template>
 
 <style lang="scss" scoped>
-.logo-wrap { 
+.logo-wrap {
   background: #296ae5;
 }
 .navItem-wrap {
@@ -153,13 +154,13 @@ const onSubmitNewService = (title: string, desc: string) => {
   padding: 0px;
 }
 .v-list-item--active {
-  color: rgba(41, 106 ,229);
+  color: rgba(41, 106, 229);
   border-radius: 8px !important;
 }
-.v-list-item--active .v-list-item__overlay, 
-.v-list-item[aria-haspopup=menu][aria-expanded=true] .v-list-item__overlay {
+.v-list-item--active .v-list-item__overlay,
+.v-list-item[aria-haspopup="menu"][aria-expanded="true"] .v-list-item__overlay {
   color: #fff;
-  text-shadow: 1px 1px 1px rgba(0, 0 ,0, 0.2);
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2);
 }
 .title-wrap {
   display: flex;
@@ -203,7 +204,7 @@ const onSubmitNewService = (title: string, desc: string) => {
     font-weight: 600;
     font-size: 14px;
     margin-right: 8px;
-    color: #475569
+    color: #475569;
   }
 }
 .v-navigation-drawer {

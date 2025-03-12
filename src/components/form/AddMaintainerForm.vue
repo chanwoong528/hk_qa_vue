@@ -2,28 +2,28 @@
 import { ref, watch } from "vue";
 import UserList from "../list/UserList.vue";
 
-import type { IUserInfo } from "@/types/types";
 import { E_UserListType } from "@/types/enum.d";
+import { UserClass } from "@/entity/User";
 
 const props = defineProps({
   userList: {
-    type: Array as () => IUserInfo[],
+    type: Array as () => UserClass[],
     required: true,
   },
   curMaintainerList: {
-    type: Array as () => IUserInfo[],
+    type: Array as () => UserClass[],
     required: false,
   },
 });
 
-const selectedUsers = ref<IUserInfo[]>([]);
+const selectedUsers = ref<UserClass[]>([]);
 const emit = defineEmits(["onSubmitAddMaintainers"]);
 
 watch(
   () => props.curMaintainerList,
-  (newVal) => {
+  newVal => {
     selectedUsers.value = newVal ?? [];
-  },
+  }
 );
 
 const onSubmit = () => {
@@ -33,8 +33,21 @@ const onSubmit = () => {
 
 <template>
   <form @submit.prevent="">
-    <UserList v-model="selectedUsers" :table-type="E_UserListType.checkbox" :user-list="props.userList" />
-    <v-btn color="blue" size="large" variant="tonal" block type="submit" @click="onSubmit"> 관리자 확정 </v-btn>
+    <UserList
+      v-model="selectedUsers"
+      :table-type="E_UserListType.checkbox"
+      :user-list="props.userList"
+    />
+    <v-btn
+      color="blue"
+      size="large"
+      variant="tonal"
+      block
+      type="submit"
+      @click="onSubmit"
+    >
+      관리자 확정
+    </v-btn>
   </form>
 
   <!-- <pre>{{ selectedUsers }}</pre> -->

@@ -1,8 +1,9 @@
 import type { IUserInfo, IUserUpdateInfo } from "@/types/types";
 import { http, ExceptionWrapper } from "../http";
+import { UserClass } from "@/entity/User";
 
 export const userApi = {
-  GET_users: (getType?: string): Promise<IUserInfo[]> => {
+  GET_users: (getType?: string): Promise<UserClass[]> => {
     return ExceptionWrapper(async () => {
       const apiResult = await http.get("/user", {
         params: { getType: getType },
@@ -12,8 +13,8 @@ export const userApi = {
     });
   },
   POST_user: (
-    userInfo: Partial<IUserInfo> & { username: string; email: string }
-  ): Promise<IUserInfo> => {
+    userInfo: Partial<UserClass> & { username: string; email: string }
+  ): Promise<UserClass> => {
     return ExceptionWrapper(async () => {
       const apiResult = await http.post("/user", userInfo);
       const data = await apiResult.data;
@@ -39,7 +40,7 @@ export const userApi = {
     });
   },
 
-  PATCH_user: (userInfo: IUserUpdateInfo): Promise<IUserInfo> => {
+  PATCH_user: (userInfo: IUserUpdateInfo): Promise<UserClass> => {
     return ExceptionWrapper(async () => {
       const apiResult = await http.patch(`/user/${userInfo.id}`, userInfo);
       const data = await apiResult.data;

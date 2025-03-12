@@ -34,7 +34,7 @@ export const swVersionApi = {
       versionDesc: string;
       tag: string;
       file?: File;
-    },
+    }
   ): Promise<ISwVersion> => {
     return ExceptionWrapper(async () => {
       const formData = new FormData();
@@ -61,7 +61,7 @@ export const swVersionApi = {
       tag: string;
       dueDate?: string;
       file?: File;
-    },
+    }
   ): Promise<void> => {
     return ExceptionWrapper(async () => {
       const formData = new FormData();

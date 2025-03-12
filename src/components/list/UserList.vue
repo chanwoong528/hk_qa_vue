@@ -1,16 +1,19 @@
 <script setup lang="ts">
+import { storeToRefs } from "pinia";
+
 import { E_Role, E_UserListType, E_UserStatus } from "@/types/enum.d";
-import type { IUserInfo } from "@/types/types";
 import { computed, PropType } from "vue";
 
 import { formatDateTime } from "@/utils/common/formatter";
 import { ref } from "vue";
 
 import { userApi } from "@/services/domain/userService";
+import { UserClass } from "@/entity/User";
+import { useUserStore } from "@/store/userStore";
 
 const props = defineProps({
   userList: {
-    type: Array as () => IUserInfo[],
+    type: Array as () => UserClass[],
     required: true,
   },
   tableType: {
@@ -18,12 +21,19 @@ const props = defineProps({
     required: false,
   },
 });
+const userStore = useUserStore();
+const { loggedInUser } = storeToRefs(userStore);
 
 const computedUserList = computed(() => {
-  return props.userList.filter((user) => {
+  return props.userList.filter(user => {
+    if (user.id === loggedInUser.value?.id) return false;
+
     if (!serachUserTerm.value) return user;
 
-    return user.email.includes(serachUserTerm.value) || user.username.includes(serachUserTerm.value);
+    return (
+      user.email.includes(serachUserTerm.value) ||
+      user.username.includes(serachUserTerm.value)
+    );
   });
 });
 
@@ -57,10 +67,10 @@ const onClickSendVerificationEmail = (email: string) => {
   return userApi
     .POST_sendVerificationEmail(email)
     .then(() => alert("Email Sent!"))
-    .catch((err) => alert(err.message));
+    .catch(err => alert(err.message));
 };
 
-const model = defineModel<IUserInfo[]>();
+const model = defineModel<UserClass[]>();
 const emit = defineEmits(["onChangeSelectRole", "onChangeUserStatus"]);
 </script>
 
@@ -109,34 +119,38 @@ const emit = defineEmits(["onChangeSelectRole", "onChangeUserStatus"]);
       :items-per-page="0"
       :headers="headers"
       :items="
-        computedUserList.map((user) => ({
+        computedUserList.map(user => ({
           ...user,
           createdAt: user.createdAt && formatDateTime(user.createdAt),
         }))
       "
       :sort-by="[{ key: 'createdAt', order: 'asc' }]"
     >
-      <template v-slot:item.actions="{ item }">
+      <template v-slot:[`item.actions`]="{ item }">
         <div class="action-wrap">
-        <v-select
-          v-model="item.role"
-          :items="Object.values(E_Role)"
-          @update:modelValue="emit('onChangeSelectRole', item.id, item.role)"
-          hide-details
-          variant="outlined"
-        >
-        </v-select>
-        <v-select
-          v-model="item.userStatus"
-          :items="Object.values(E_UserStatus)"
-          @update:modelValue="emit('onChangeUserStatus', item.id, item.userStatus)"
-          hide-details
-          variant="outlined"
-        ></v-select>
+          <v-select
+            v-model="item.role"
+            :items="Object.values(E_Role)"
+            @update:modelValue="emit('onChangeSelectRole', item.id, item.role)"
+            hide-details
+            variant="outlined"
+          >
+          </v-select>
+          <v-select
+            v-model="item.userStatus"
+            :items="Object.values(E_UserStatus)"
+            @update:modelValue="
+              emit('onChangeUserStatus', item.id, item.userStatus)
+            "
+            hide-details
+            variant="outlined"
+          ></v-select>
         </div>
       </template>
-      <template v-slot:item.verification="{ item }">
-        <v-btn v-if="item.userStatus !== E_UserStatus.ok" @click="onClickSendVerificationEmail(item.email)"
+      <template v-slot:[`item.verification`]="{ item }">
+        <v-btn
+          v-if="item.userStatus !== E_UserStatus.ok"
+          @click="onClickSendVerificationEmail(item.email)"
           >인증 메일 보내기
         </v-btn>
         <p v-else>
@@ -151,9 +165,6 @@ const emit = defineEmits(["onChangeSelectRole", "onChangeUserStatus"]);
 </template>
 
 <style scoped>
-
-
-
 .serach-user {
   max-width: 400px;
   float: right;
@@ -166,5 +177,4 @@ const emit = defineEmits(["onChangeSelectRole", "onChangeUserStatus"]);
     width: 100%;
   }
 }
-
 </style>
