@@ -2,7 +2,7 @@ import { UserClass } from "@/entity/User";
 import { ExceptionWrapper, http } from "../http";
 
 export const maintainerApi = {
-  GET_maintainerListBySwTypeId: async (swTypeId: string): Promise<UserClass[]> => {
+  GET_maintainerListBySwTypeId: async (swTypeId: string): Promise<{ user: UserClass[] }> => {
     return ExceptionWrapper(async () => {
       const apiResult = await http.get(`/sw-maintainer/${swTypeId}`);
       const data = await apiResult.data;

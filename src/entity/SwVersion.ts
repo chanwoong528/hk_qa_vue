@@ -43,6 +43,8 @@ export class SwVersionClass {
   swType: SwTypeClass;
 
   testUnits: TestUnitClass[] | [];
+  // this is needed for the status of version (test passed or progressing)
+  // if every tester updated status to pass, then it autmatically goes to done category.
 
   constructor(
     swVersion: SwVersionType,

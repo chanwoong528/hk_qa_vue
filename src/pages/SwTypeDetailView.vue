@@ -274,7 +274,9 @@ const onClickEditVersion = (curSwVer: ISwVersion) => {
 
 const onFetchMaintainerList = (swTypeId: string) => {
   return maintainerApi.GET_maintainerListBySwTypeId(swTypeId).then(maintainerData => {
-    const dataMaintainerList = maintainerData.map(maintainer => new UserClass(maintainer));
+    const dataMaintainerList = maintainerData.map(maintainer => new UserClass(maintainer.user));
+
+    console.log(dataMaintainerList);
 
     maintainerList.value = dataMaintainerList;
   });
