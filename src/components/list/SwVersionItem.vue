@@ -233,7 +233,7 @@ const onSubmitJenkinsDeployment = (jenkinsDeploymentId: string, tag: string, rea
         
       </template>
       
-      <v-tooltip v-if="!props.isCurOpen" activator="parent" location="bottom" max-width="800px" class="tooltip__custom" >
+      <v-tooltip v-if="!props.isCurOpen" activator="parent" location="bottom" width="800px" class="tooltip__custom" >
         <div class="desc-inner-html" v-html="props.swVersion?.versionDesc" />
       </v-tooltip>
     </v-expansion-panel-title>
@@ -543,18 +543,10 @@ const onSubmitJenkinsDeployment = (jenkinsDeploymentId: string, tag: string, rea
   --v-theme-on-surface-variant : #111;
 
   :deep(.v-overlay__content) {
-      
-      border: 1px solid #bbb;
       width: 100%;
-      padding: 20px 20px;
-      box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, 0.1);
       transform: translate3d(0%,-11px, 0);
       left: 288px !important;
-
-      img {
-        max-width: 100%;
-      }
-
+      padding: 0px 0px 0px;
       &::before {
         content: "";
         position: absolute;
@@ -577,6 +569,19 @@ const onSubmitJenkinsDeployment = (jenkinsDeploymentId: string, tag: string, rea
         border-right: 9px solid transparent;
         border-bottom: 9px solid #fff; 
       }
+      img {
+        max-width: 100%;
+      }
+      .desc-inner-html {
+        border: 1px solid #bbb;
+        padding: 20px 20px;
+        box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, 0.1);
+        border-radius: 6px;
+        overflow-y: auto;
+        max-height: calc(100vh - 300px);
+
+      }
    }
+  
 }
 </style>
