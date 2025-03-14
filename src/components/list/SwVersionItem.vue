@@ -220,19 +220,20 @@ const onSubmitJenkinsDeployment = (jenkinsDeploymentId: string, tag: string, rea
           {{ props.swVersion?.versionTitle }}
         </h3>
       </div>
-      <template v-slot:actions="{ expanded }">
-        <v-chip size="small" :color="renderTestStatus(testSessionsPassStatus)">{{
-          renderIconForVersionStatus(testSessionsPassStatus)
-        }}</v-chip>
-        <v-icon size="x-large" :icon="!!expanded ? 'mdi-chevron-up' : 'mdi-chevron-down'"></v-icon>
-      </template>
-      <v-tooltip v-if="!props.isCurOpen" activator="parent" location="bottom" max-width="800px">
-        <div class="tooltip-con--header">
-          <h3>{{ props.swVersion?.versionTitle }}</h3>
-          <p v-if="!!props.swVersion?.createdAt" class="date">
-            <strong>생성 :</strong> {{ formatDateTime(props.swVersion?.createdAt) }}
-          </p>
+      
+      
+        <div class="title-setting">
+          <span class="title-date">{{ formatDateForServer(props.swVersion?.createdAt) }}</span>
+          <v-chip size="small" :color="renderTestStatus(testSessionsPassStatus)">{{
+            renderIconForVersionStatus(testSessionsPassStatus)
+          }}</v-chip>
         </div>
+      <template v-slot:actions="{ expanded }">
+        <v-icon size="x-large" :icon="!!expanded ? 'mdi-chevron-up' : 'mdi-chevron-down'"></v-icon>
+        
+      </template>
+      
+      <v-tooltip v-if="!props.isCurOpen" activator="parent" location="bottom" max-width="800px" class="tooltip__custom" >
         <div class="desc-inner-html" v-html="props.swVersion?.versionDesc" />
       </v-tooltip>
     </v-expansion-panel-title>
@@ -415,6 +416,7 @@ const onSubmitJenkinsDeployment = (jenkinsDeploymentId: string, tag: string, rea
 
   .v-chip {
     margin-right: 8px;
+    flex-shrink: 0;
   }
   .title-header {
     width: 100%;
@@ -447,8 +449,28 @@ const onSubmitJenkinsDeployment = (jenkinsDeploymentId: string, tag: string, rea
     // .author {
     // }
   }
+  .title-date {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    font-size: 14px;
+    color: #999;
+    font-weight: 400;
+    margin-right: 10px;
+    line-height: 1;
+
+  }
+  .title-setting {
+    flex-shrink: 0;
+  }
+  
+}
+.v-expansion-panel-title__icon {
+  width: 100%;
+  flex-shrink: 0;
 }
 .v-expansion-panel-text {
+  flex-shrink: 0;
   padding: 10px 2px;
   border-bottom: 1px solid #ddd;
 }
@@ -514,5 +536,47 @@ const onSubmitJenkinsDeployment = (jenkinsDeploymentId: string, tag: string, rea
       margin: 10px 0;
     }
   }
+}
+
+.tooltip__custom {
+  --v-theme-surface-variant : 255,255,255;
+  --v-theme-on-surface-variant : #111;
+
+  :deep(.v-overlay__content) {
+      
+      border: 1px solid #bbb;
+      width: 100%;
+      padding: 20px 20px;
+      box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, 0.1);
+      transform: translate3d(0%,-11px, 0);
+      left: 288px !important;
+
+      img {
+        max-width: 100%;
+      }
+
+      &::before {
+        content: "";
+        position: absolute;
+        left: 28px;
+        top: -10px;
+        width: 0;
+        height: 0;
+        border-left: 10px solid transparent;
+        border-right: 10px solid transparent;
+        border-bottom: 10px solid #bbb; 
+      }
+      &::after {
+        content: "";
+        position: absolute;
+        top: -8px;
+        left: 29px;
+        width: 0;
+        height: 0;
+        border-left: 9px solid transparent;
+        border-right: 9px solid transparent;
+        border-bottom: 9px solid #fff; 
+      }
+   }
 }
 </style>
