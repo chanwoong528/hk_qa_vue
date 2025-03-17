@@ -541,30 +541,31 @@ const onSubmitJenkinsDeployment = (jenkinsDeploymentId: string, tag: string, rea
 .tooltip__custom {
   --v-theme-surface-variant : 255,255,255;
   --v-theme-on-surface-variant : #111;
+  
 
   :deep(.v-overlay__content) {
       width: 100%;
       transform: translate3d(0%,-11px, 0);
       left: 288px !important;
       padding: 0px 0px 0px;
-      &::before {
+      z-index: 1;
+      &::before,  &::after {
         content: "";
         position: absolute;
-        left: 28px;
-        top: -10px;
         width: 0;
         height: 0;
+        z-index: 2;
+      }
+      &::before {
+        left: 28px;
+        top: -10px;
         border-left: 10px solid transparent;
         border-right: 10px solid transparent;
         border-bottom: 10px solid #bbb; 
       }
       &::after {
-        content: "";
-        position: absolute;
         top: -8px;
         left: 29px;
-        width: 0;
-        height: 0;
         border-left: 9px solid transparent;
         border-right: 9px solid transparent;
         border-bottom: 9px solid #fff; 
@@ -578,8 +579,19 @@ const onSubmitJenkinsDeployment = (jenkinsDeploymentId: string, tag: string, rea
         box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, 0.1);
         border-radius: 6px;
         overflow-y: auto;
-        max-height: calc(100vh - 300px);
+        max-height: 400px;
 
+      }
+      &:not([style*='transform-origin: center top']){ 
+        &::before,  &::after {
+          transform: rotate(180deg);
+        }
+        &::before {
+          top:calc(100% - 1px);
+        }
+        &::after {
+          top:calc(100% - 2px);
+        }
       }
    }
   
